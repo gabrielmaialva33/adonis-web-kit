@@ -73,6 +73,18 @@ export default interface LucidRepositoryInterface<T extends typeof BaseModel> {
   ): Promise<InstanceType<T>>
 
   /**
+   * Update a record by a specific field and value.
+   * @param field - The field to search by.
+   * @param value - The value to match.
+   * @param payload - The attributes to update.
+   */
+  update<K extends ModelKeys<T>>(
+    field: K,
+    value: ModelAttributes<InstanceType<T>>[K],
+    payload: Partial<ModelAttributes<InstanceType<T>>>
+  ): Promise<InstanceType<T> | null>
+
+  /**
    * Delete records matching a specific field and value.
    * @param field - The field to search by.
    * @param value - The value to match.
