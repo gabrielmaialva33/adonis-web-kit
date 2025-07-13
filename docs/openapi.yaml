@@ -359,7 +359,7 @@ paths:
                 properties:
                   name:
                     type: string
-                    example: 'base-acl-api'
+                    example: 'base-web-kit'
                   description:
                     type: string
                     example: 'Base ACL API built with AdonisJS'
