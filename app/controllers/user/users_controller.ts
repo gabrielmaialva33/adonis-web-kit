@@ -8,7 +8,7 @@ import CreateUserService from '#services/users/create_user_service'
 import EditUserService from '#services/users/edit_user_service'
 import DeleteUserService from '#services/users/delete_user_service'
 
-import { createUserValidator, editUserValidator } from '#validators/users_validator'
+import { createUserValidator, editUserValidator } from '#validations/users_validator'
 
 @inject()
 export default class UsersController {

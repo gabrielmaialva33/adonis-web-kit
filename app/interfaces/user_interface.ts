@@ -1,6 +1,6 @@
-import User from '#models/user'
-import { AccessToken } from '@adonisjs/auth/access_tokens'
 import LucidRepositoryInterface from '#shared/lucid/lucid_repository_interface'
+import { AccessToken } from '@adonisjs/auth/access_tokens'
+import User from '#models/user'
 
 namespace IUser {
   export interface Repository extends LucidRepositoryInterface<typeof User> {
