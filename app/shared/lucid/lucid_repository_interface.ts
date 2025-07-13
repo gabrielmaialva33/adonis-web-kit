@@ -17,22 +17,14 @@ export default interface LucidRepositoryInterface<T extends typeof BaseModel> {
   /**
    * Create a new model instance.
    * @param payload - The attributes to initialize the model with.
-   * @param opts
    */
-  create(
-    payload: Partial<ModelAttributes<InstanceType<T>>>,
-    opts?: DefaultOptions<T>
-  ): Promise<InstanceType<T>>
+  create(payload: Partial<ModelAttributes<InstanceType<T>>>): Promise<InstanceType<T>>
 
   /**
    * Create multiple model instances in a single operation.
    * @param payload - Array of attributes for each model instance.
-   * @param opts
    */
-  createMany(
-    payload: Partial<ModelAttributes<InstanceType<T>>>[],
-    opts?: DefaultOptions<T>
-  ): Promise<InstanceType<T>[]>
+  createMany(payload: Partial<ModelAttributes<InstanceType<T>>>[]): Promise<InstanceType<T>[]>
 
   /**
    * Find a model by a specific field and value.
@@ -81,32 +73,14 @@ export default interface LucidRepositoryInterface<T extends typeof BaseModel> {
   ): Promise<InstanceType<T>>
 
   /**
-   * Update a model instance by a specific field and value.
-   * @param field - The field to search by.
-   * @param value - The value to match.
-   * @param payload - The attributes to update.
-   * @param opts
-   * @returns The updated model instance or null if not found.
-   */
-  update<K extends ModelKeys<T>>(
-    field: K,
-    value: ModelAttributes<InstanceType<T>>[K],
-    payload: Partial<ModelAttributes<InstanceType<T>>>,
-    opts?: DefaultOptions<T>
-  ): Promise<InstanceType<T> | null>
-
-  /**
    * Delete records matching a specific field and value.
    * @param field - The field to search by.
    * @param value - The value to match.
-   * @param opts
-   * @returns The number of deleted rows.
    */
   destroy<K extends ModelKeys<T>>(
     field: K,
-    value: ModelAttributes<InstanceType<T>>[K],
-    opts?: DefaultOptions<T>
-  ): Promise<number>
+    value: ModelAttributes<InstanceType<T>>[K]
+  ): ModelQueryBuilderContract<T, InstanceType<T>>
 }
 
 /**
@@ -134,7 +108,7 @@ export interface DefaultOptions<T extends typeof BaseModel> {
   sortBy?: string
 
   /**
-   * Sorting a direction, either ascending or descending.
+   * Sorting direction, either ascending or descending.
    */
   direction?: OrderDirection
 }

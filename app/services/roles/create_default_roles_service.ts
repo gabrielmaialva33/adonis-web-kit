@@ -18,6 +18,7 @@ export default class CreateDefaultRolesService {
 
   async run() {
     for (const role of AvailableRoles) {
+      console.log(`Checking if role ${role.name} exists...`)
       const r = await this.rolesRepository.findBy('slug', role.slug)
       if (!r) await this.rolesRepository.create(role)
     }
