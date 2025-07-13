@@ -8,6 +8,8 @@ export default class EditUserService {
   constructor(private userRepository: UsersRepository) {}
 
   async run(userId: number, payload: IUser.EditPayload): Promise<User | null> {
-    return this.userRepository.update('id', userId, payload)
+    // Filter out email and username to prevent updates
+    const { email, username, ...allowedPayload } = payload
+    return this.userRepository.update('id', userId, allowedPayload)
   }
 }

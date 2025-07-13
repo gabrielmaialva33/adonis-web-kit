@@ -33,26 +33,48 @@ export default class HttpExceptionHandler extends ExceptionHandler {
     /**
      * Handle validation errors from VineJS
      */
-    if (error && typeof error === 'object' && 'code' in error && error.code === 'E_VALIDATION_ERROR') {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      error.code === 'E_VALIDATION_ERROR'
+    ) {
       const validationError = error as any
       return ctx.response.status(422).json({
-        errors: validationError.messages || []
+        errors: validationError.messages || [],
       })
     }
 
     /**
      * Handle rate limiting errors
      */
-    if (error && typeof error === 'object' && 'code' in error && error.code === 'E_TOO_MANY_REQUESTS') {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      error.code === 'E_TOO_MANY_REQUESTS'
+    ) {
       const rateLimitError = error as any
+
+      // Set rate limit headers
+      if (rateLimitError.limit) {
+        ctx.response.header('x-ratelimit-limit', rateLimitError.limit)
+      }
+      if (rateLimitError.remaining !== undefined) {
+        ctx.response.header('x-ratelimit-remaining', rateLimitError.remaining)
+      }
+      if (rateLimitError.retryAfter) {
+        ctx.response.header('retry-after', rateLimitError.retryAfter)
+      }
+
       return ctx.response.status(429).json({
         errors: [
           {
             code: 'E_TOO_MANY_REQUESTS',
             message: rateLimitError.message || 'Too many requests',
             status: 429,
-          }
-        ]
+          },
+        ],
       })
     }
 

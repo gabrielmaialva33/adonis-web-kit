@@ -37,6 +37,11 @@ export default class UsersController {
     const service = await app.container.make(GetUserService)
 
     const user = await service.run(userId)
+    if (!user) {
+      return response.status(404).json({
+        message: 'User not found',
+      })
+    }
     return response.json(user)
   }
 
