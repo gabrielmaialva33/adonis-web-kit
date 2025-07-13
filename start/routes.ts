@@ -21,12 +21,6 @@ import '#routes/permissions/index'
 import '#routes/health/index'
 
 router
-  .get('/', async () => {
-    return { status: 'ok' }
-  })
-  .use(throttle)
-
-router
   .get('/version', async () => {
     const packageJsonPath = join(process.cwd(), 'package.json')
     const packageJson = JSON.parse(await readFile(packageJsonPath, 'utf-8'))
@@ -39,3 +33,5 @@ router
     }
   })
   .use(throttle)
+
+router.on('/').renderInertia('home')
