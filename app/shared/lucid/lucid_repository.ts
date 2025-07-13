@@ -9,7 +9,7 @@ import LucidRepositoryInterface, {
   OrderDirection,
   PaginateOptions,
   PaginateResult,
-} from '#shared/lucid_repository_interface'
+} from '#shared/lucid/lucid_repository_interface'
 import { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 import ValidationException from '#exceptions/validation_exception'
