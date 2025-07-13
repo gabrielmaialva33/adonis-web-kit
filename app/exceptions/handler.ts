@@ -56,15 +56,11 @@ export default class HttpExceptionHandler extends ExceptionHandler {
     ) {
       const rateLimitError = error as any
 
-      // Set rate limit headers
-      if (rateLimitError.limit) {
-        ctx.response.header('x-ratelimit-limit', rateLimitError.limit)
-      }
-      if (rateLimitError.remaining !== undefined) {
-        ctx.response.header('x-ratelimit-remaining', rateLimitError.remaining)
-      }
-      if (rateLimitError.retryAfter) {
-        ctx.response.header('retry-after', rateLimitError.retryAfter)
+      // Set rate limit headers from the response object
+      if (rateLimitError.response) {
+        ctx.response.header('x-ratelimit-limit', rateLimitError.response.limit)
+        ctx.response.header('x-ratelimit-remaining', rateLimitError.response.remaining)
+        ctx.response.header('retry-after', rateLimitError.response.availableIn)
       }
 
       return ctx.response.status(429).json({
