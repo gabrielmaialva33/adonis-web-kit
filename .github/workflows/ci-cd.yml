@@ -56,6 +56,9 @@ jobs:
     - name: Setup test environment
       run: cp .env.test .env
 
+    - name: Create tmp directory
+      run: mkdir -p tmp
+
     - name: Run database migrations
       run: NODE_ENV=test node ace migration:run --force
 
