@@ -34,4 +34,4 @@ router
   })
   .use(throttle)
 
-router.on('/').renderInertia('home')
+router.on('/').renderInertia('home').use(throttle)
