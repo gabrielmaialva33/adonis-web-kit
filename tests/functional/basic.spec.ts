@@ -2,11 +2,11 @@ import { test } from '@japa/runner'
 
 test.group('Basic API', () => {
   test('should respond to root route', async ({ client }) => {
-    const response = await client.get('/')
+    const response = await client.get('/version')
 
     response.assertStatus(200)
     response.assertBodyContains({
-      name: 'base-acl-api',
+      name: 'base-web-kit',
       version: '0.0.1',
     })
   })
