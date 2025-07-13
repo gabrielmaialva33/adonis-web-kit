@@ -13,6 +13,12 @@ import { throttle } from '#start/limiter'
 
 import router from '@adonisjs/core/services/router'
 
+import '#routes/files/index'
+import '#routes/roles/index'
+import '#routes/users/index'
+import '#routes/files/index'
+import '#routes/permissions/index'
+
 router.on('/').renderInertia('home')
 
 router
