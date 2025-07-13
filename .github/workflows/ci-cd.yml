@@ -60,7 +60,7 @@ jobs:
       run: NODE_ENV=test node ace migration:run --force
 
     - name: Run database seeders
-      run: NODE_ENV=test node ace db:seed --force
+      run: NODE_ENV=test node ace db:seed
 
     - name: Run unit tests
       run: pnpm test
