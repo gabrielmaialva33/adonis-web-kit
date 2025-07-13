@@ -83,6 +83,19 @@ export default class LucidRepository<T extends typeof BaseModel>
     return this.model.firstOrCreate(search, payload)
   }
 
+  async update<K extends ModelKeys<T>>(
+    field: K,
+    value: ModelAttributes<InstanceType<T>>[K],
+    payload: Partial<ModelAttributes<InstanceType<T>>>
+  ): Promise<InstanceType<T> | null> {
+    const record = await this.findBy(field, value)
+    if (!record) {
+      return null
+    }
+    
+    return record.merge(payload).save()
+  }
+
   destroy<K extends ModelKeys<T>>(
     field: K,
     value: ModelAttributes<InstanceType<T>>[K]
