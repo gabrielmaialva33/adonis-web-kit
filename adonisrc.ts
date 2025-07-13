@@ -54,6 +54,7 @@ export default defineConfig({
     () => import('@adonisjs/auth/auth_provider'),
     () => import('@adonisjs/inertia/inertia_provider'),
     () => import('@adonisjs/i18n/i18n_provider'),
+    () => import('@adonisjs/limiter/limiter_provider'),
   ],
 
   /*
