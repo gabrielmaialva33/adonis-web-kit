@@ -1,187 +1,199 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Base Web Kit</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+          sans-serif;
+        line-height: 1.6;
+        color: #333;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
 
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
 
-        .logo {
-            font-size: 3rem;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 1rem;
-        }
+      .logo {
+        font-size: 3rem;
+        font-weight: bold;
+        color: #667eea;
+        margin-bottom: 1rem;
+      }
 
-        .subtitle {
-            font-size: 1.2rem;
-            color: #666;
-            margin-bottom: 2rem;
-        }
+      .subtitle {
+        font-size: 1.2rem;
+        color: #666;
+        margin-bottom: 2rem;
+      }
 
-        .description {
-            font-size: 1rem;
-            margin-bottom: 2rem;
-            text-align: left;
-        }
+      .description {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+        text-align: left;
+      }
 
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-            margin: 2rem 0;
-        }
+      .features {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        margin: 2rem 0;
+      }
 
-        .feature {
-            padding: 1rem;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
-        }
+      .feature {
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 4px solid #667eea;
+      }
 
-        .feature h3 {
-            color: #333;
-            margin-bottom: 0.5rem;
-        }
+      .feature h3 {
+        color: #333;
+        margin-bottom: 0.5rem;
+      }
 
-        .feature p {
-            color: #666;
-            font-size: 0.9rem;
-        }
+      .feature p {
+        color: #666;
+        font-size: 0.9rem;
+      }
 
-        .tech-stack {
-            margin: 2rem 0;
-        }
+      .tech-stack {
+        margin: 2rem 0;
+      }
 
-        .tech-stack h3 {
-            margin-bottom: 1rem;
-            color: #333;
-        }
+      .tech-stack h3 {
+        margin-bottom: 1rem;
+        color: #333;
+      }
 
-        .tech-list {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 0.5rem;
-        }
+      .tech-list {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+      }
 
-        .tech-item {
-            background: #667eea;
-            color: white;
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-        }
+      .tech-item {
+        background: #667eea;
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+      }
 
-        .note {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            border-radius: 5px;
-            padding: 1rem;
-            margin: 2rem 0;
-            color: #856404;
-        }
+      .note {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 5px;
+        padding: 1rem;
+        margin: 2rem 0;
+        color: #856404;
+      }
 
-        .github-link {
-            display: inline-block;
-            background: #333;
-            color: white;
-            padding: 0.8rem 1.5rem;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 1rem;
-            transition: background 0.3s;
-        }
+      .github-link {
+        display: inline-block;
+        background: #333;
+        color: white;
+        padding: 0.8rem 1.5rem;
+        text-decoration: none;
+        border-radius: 5px;
+        margin-top: 1rem;
+        transition: background 0.3s;
+      }
 
-        .github-link:hover {
-            background: #555;
-        }
+      .github-link:hover {
+        background: #555;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="logo">🚀 Base Web Kit</div>
-        <div class="subtitle">A Modern AdonisJS Web Application Starter Kit</div>
+      <div class="logo">🚀 Base Web Kit</div>
+      <div class="subtitle">A Modern AdonisJS Web Application Starter Kit</div>
 
-        <div class="description">
-            <p>Base Web Kit is a comprehensive starter template for building modern web applications using AdonisJS with React and Inertia.js. It provides a solid foundation with authentication, user management, file uploads, and more.</p>
+      <div class="description">
+        <p>
+          Base Web Kit is a comprehensive starter template for building modern web applications
+          using AdonisJS with React and Inertia.js. It provides a solid foundation with
+          authentication, user management, file uploads, and more.
+        </p>
+      </div>
+
+      <div class="features">
+        <div class="feature">
+          <h3>🔐 Authentication</h3>
+          <p>JWT-based authentication with user registration, login, and email verification</p>
         </div>
-
-        <div class="features">
-            <div class="feature">
-                <h3>🔐 Authentication</h3>
-                <p>JWT-based authentication with user registration, login, and email verification</p>
-            </div>
-            <div class="feature">
-                <h3>👥 User Management</h3>
-                <p>Complete user management system with roles and permissions</p>
-            </div>
-            <div class="feature">
-                <h3>📁 File Upload</h3>
-                <p>Secure file upload system with validation and categorization</p>
-            </div>
-            <div class="feature">
-                <h3>🛡️ Security</h3>
-                <p>Built-in security features including rate limiting and CORS protection</p>
-            </div>
-            <div class="feature">
-                <h3>🧪 Testing</h3>
-                <p>Comprehensive test suite with unit and functional tests</p>
-            </div>
-            <div class="feature">
-                <h3>🚀 CI/CD</h3>
-                <p>Automated testing and deployment pipeline with GitHub Actions</p>
-            </div>
+        <div class="feature">
+          <h3>👥 User Management</h3>
+          <p>Complete user management system with roles and permissions</p>
         </div>
-
-        <div class="tech-stack">
-            <h3>Technology Stack</h3>
-            <div class="tech-list">
-                <span class="tech-item">AdonisJS 6</span>
-                <span class="tech-item">React 19</span>
-                <span class="tech-item">Inertia.js</span>
-                <span class="tech-item">TypeScript</span>
-                <span class="tech-item">TailwindCSS</span>
-                <span class="tech-item">PostgreSQL</span>
-                <span class="tech-item">Redis</span>
-                <span class="tech-item">Vite</span>
-                <span class="tech-item">Japa Testing</span>
-            </div>
+        <div class="feature">
+          <h3>📁 File Upload</h3>
+          <p>Secure file upload system with validation and categorization</p>
         </div>
-
-        <div class="note">
-            <strong>Note:</strong> This is a static landing page for the Base Web Kit project. The actual application is a server-side rendered application built with AdonisJS and requires a Node.js environment to run. This page is served via GitHub Pages for documentation purposes.
+        <div class="feature">
+          <h3>🛡️ Security</h3>
+          <p>Built-in security features including rate limiting and CORS protection</p>
         </div>
+        <div class="feature">
+          <h3>🧪 Testing</h3>
+          <p>Comprehensive test suite with unit and functional tests</p>
+        </div>
+        <div class="feature">
+          <h3>🚀 CI/CD</h3>
+          <p>Automated testing and deployment pipeline with GitHub Actions</p>
+        </div>
+      </div>
 
-        <a href="https://github.com/gabrielmaialva33/base-web-kit" class="github-link" target="_blank">
-            View on GitHub
-        </a>
+      <div class="tech-stack">
+        <h3>Technology Stack</h3>
+        <div class="tech-list">
+          <span class="tech-item">AdonisJS 6</span>
+          <span class="tech-item">React 19</span>
+          <span class="tech-item">Inertia.js</span>
+          <span class="tech-item">TypeScript</span>
+          <span class="tech-item">TailwindCSS</span>
+          <span class="tech-item">PostgreSQL</span>
+          <span class="tech-item">Redis</span>
+          <span class="tech-item">Vite</span>
+          <span class="tech-item">Japa Testing</span>
+        </div>
+      </div>
+
+      <div class="note">
+        <strong>Note:</strong> This is a static landing page for the Base Web Kit project. The
+        actual application is a server-side rendered application built with AdonisJS and requires a
+        Node.js environment to run. This page is served via GitHub Pages for documentation purposes.
+      </div>
+
+      <a
+        href="https://github.com/gabrielmaialva33/base-web-kit"
+        class="github-link"
+        target="_blank"
+      >
+        View on GitHub
+      </a>
     </div>
-</body>
+  </body>
 </html>

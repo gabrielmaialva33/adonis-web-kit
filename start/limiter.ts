@@ -11,7 +11,7 @@ export const throttle = limiter.define('global', async (ctx) => {
    */
   try {
     await ctx.auth.check()
-    if (ctx.auth.user && ctx.auth.isAuthenticated) {
+    if (ctx.auth.user) {
       return limiter.allowRequests(60).every('1 minute').usingKey(`user_${ctx.auth.user.id}`)
     }
   } catch {
