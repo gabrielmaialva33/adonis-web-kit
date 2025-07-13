@@ -1,1 +1,1 @@
-export * from '#routes/health/public_routes'
+import '#routes/health/public_routes'

@@ -6,6 +6,6 @@ export default class DeleteUserService {
   constructor(private userRepository: UsersRepository) {}
 
   async run(userId: number): Promise<void> {
-    await this.userRepository.destroy('id', userId)
+    await this.userRepository.softDelete('id', userId)
   }
 }

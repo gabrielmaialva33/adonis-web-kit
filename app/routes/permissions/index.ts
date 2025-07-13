@@ -1,1 +1,1 @@
-export * from '#routes/permissions/admin_routes'
+import '#routes/permissions/admin_routes'

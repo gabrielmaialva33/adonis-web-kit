@@ -1,1 +1,1 @@
-export * from '#routes/roles/admin_routes'
+import '#routes/roles/admin_routes'

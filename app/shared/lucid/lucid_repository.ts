@@ -92,8 +92,27 @@ export default class LucidRepository<T extends typeof BaseModel>
     if (!record) {
       return null
     }
-    
+
     return record.merge(payload).save()
+  }
+
+  async softDelete<K extends ModelKeys<T>>(
+    field: K,
+    value: ModelAttributes<InstanceType<T>>[K]
+  ): Promise<InstanceType<T> | null> {
+    const record = await this.findBy(field, value)
+    if (!record) {
+      return null
+    }
+
+    // Check if the model has an is_deleted column
+    if ('is_deleted' in record.$attributes) {
+      return record.merge({ is_deleted: true } as any).save()
+    }
+
+    // Fall back to hard delete if no soft delete support
+    await record.delete()
+    return record
   }
 
   destroy<K extends ModelKeys<T>>(

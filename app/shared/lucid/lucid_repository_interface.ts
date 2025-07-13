@@ -85,6 +85,16 @@ export default interface LucidRepositoryInterface<T extends typeof BaseModel> {
   ): Promise<InstanceType<T> | null>
 
   /**
+   * Soft delete a record by a specific field and value.
+   * @param field - The field to search by.
+   * @param value - The value to match.
+   */
+  softDelete<K extends ModelKeys<T>>(
+    field: K,
+    value: ModelAttributes<InstanceType<T>>[K]
+  ): Promise<InstanceType<T> | null>
+
+  /**
    * Delete records matching a specific field and value.
    * @param field - The field to search by.
    * @param value - The value to match.

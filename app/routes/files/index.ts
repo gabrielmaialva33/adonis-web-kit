@@ -1,1 +1,1 @@
-export * from '#routes/files/user.routes'
+import '#routes/files/user.routes'

@@ -30,6 +30,32 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * response to the client
    */
   async handle(error: unknown, ctx: HttpContext) {
+    /**
+     * Handle validation errors from VineJS
+     */
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'E_VALIDATION_ERROR') {
+      const validationError = error as any
+      return ctx.response.status(422).json({
+        errors: validationError.messages || []
+      })
+    }
+
+    /**
+     * Handle rate limiting errors
+     */
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'E_TOO_MANY_REQUESTS') {
+      const rateLimitError = error as any
+      return ctx.response.status(429).json({
+        errors: [
+          {
+            code: 'E_TOO_MANY_REQUESTS',
+            message: rateLimitError.message || 'Too many requests',
+            status: 429,
+          }
+        ]
+      })
+    }
+
     return super.handle(error, ctx)
   }
 
