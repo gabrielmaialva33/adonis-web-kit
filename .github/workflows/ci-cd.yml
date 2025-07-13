@@ -57,10 +57,10 @@ jobs:
       run: cp .env.test .env
 
     - name: Run database migrations
-      run: NODE_ENV=test pnpm exec ace migration:run --force
+      run: NODE_ENV=test node ace migration:run --force
 
     - name: Run database seeders
-      run: NODE_ENV=test pnpm exec ace db:seed --force
+      run: NODE_ENV=test node ace db:seed --force
 
     - name: Run unit tests
       run: pnpm test
