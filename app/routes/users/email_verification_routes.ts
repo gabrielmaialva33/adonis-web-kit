@@ -1,8 +1,7 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 
-const EmailVerificationController = () =>
-  import('#controllers/user/email_verification_controller')
+const EmailVerificationController = () => import('#controllers/user/email_verification_controller')
 
 router
   .group(() => {
