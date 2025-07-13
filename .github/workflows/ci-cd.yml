@@ -107,7 +107,7 @@ jobs:
       run: pnpm install
 
     - name: Build application
-      run: pnpm exec ace build --ignore-ts-errors
+      run: node ace build --ignore-ts-errors
 
     - name: Setup Pages
       uses: actions/configure-pages@v4
