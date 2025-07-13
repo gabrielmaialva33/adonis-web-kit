@@ -4,9 +4,9 @@ import app from '@adonisjs/core/services/app'
 import UploadFileService from '#services/upload/upload_file_service'
 
 export default class FilesController {
-  async upload({ request, response }: HttpContext) {
+  async upload({ request, response, auth }: HttpContext) {
     const file = request.file('file', {
-      size: '5mb',
+      size: '10mb',
       extnames: [
         'jpeg',
         'jpg',
@@ -74,7 +74,7 @@ export default class FilesController {
     }
 
     const service = await app.container.make(UploadFileService)
-    const data = await service.run(file)
+    const data = await service.run(file, auth.user!)
 
     return response.created(data)
   }
