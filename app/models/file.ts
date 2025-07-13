@@ -1,10 +1,11 @@
 import { DateTime } from 'luxon'
-import { BaseModel, belongsTo, column } from '@adonisjs/lucid/orm'
+import { BaseModel, belongsTo, column, SnakeCaseNamingStrategy } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import User from '#models/user'
 
 export default class File extends BaseModel {
   static table = 'files'
+  static namingStrategy = new SnakeCaseNamingStrategy()
 
   @column({ isPrimary: true })
   declare id: number

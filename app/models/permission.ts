@@ -1,5 +1,11 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeCreate, column, manyToMany } from '@adonisjs/lucid/orm'
+import {
+  BaseModel,
+  beforeCreate,
+  column,
+  manyToMany,
+  SnakeCaseNamingStrategy,
+} from '@adonisjs/lucid/orm'
 import type { ManyToMany } from '@adonisjs/lucid/types/relations'
 
 import User from '#models/user'
@@ -7,6 +13,7 @@ import Role from '#models/role'
 
 export default class Permission extends BaseModel {
   static table = 'permissions'
+  static namingStrategy = new SnakeCaseNamingStrategy()
 
   /**
    * ------------------------------------------------------

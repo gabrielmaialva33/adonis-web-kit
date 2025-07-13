@@ -11,6 +11,7 @@ import {
   beforeSave,
   column,
   manyToMany,
+  SnakeCaseNamingStrategy,
 } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
@@ -33,6 +34,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
   })
 
   static table = 'users'
+  static namingStrategy = new SnakeCaseNamingStrategy()
 
   /**
    * ------------------------------------------------------
