@@ -77,7 +77,7 @@ jobs:
   build-and-deploy:
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'
 
     permissions:
       contents: read
