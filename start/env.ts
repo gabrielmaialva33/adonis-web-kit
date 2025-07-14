@@ -120,10 +120,18 @@ export default await Env.create(new URL('../', import.meta.url), {
   | Variables for configuring the mail package
   |----------------------------------------------------------
   */
-  SMTP_HOST: Env.schema.string(),
-  SMTP_PORT: Env.schema.string(),
-  SMTP_USER: Env.schema.string(),
-  SMTP_PASS: Env.schema.string(),
-  SMTP_FROM_ADDRESS: Env.schema.string.optional(),
-  SMTP_FROM_NAME: Env.schema.string.optional(),
+  MAIL_MAILER: Env.schema.enum(['smtp', 'mailgun', 'ses', 'sparkpost', 'resend', 'brevo'] as const),
+  MAIL_FROM_ADDRESS: Env.schema.string.optional(),
+  MAIL_FROM_NAME: Env.schema.string.optional(),
+
+  // SMTP Configuration
+  SMTP_HOST: Env.schema.string.optional(),
+  SMTP_PORT: Env.schema.string.optional(),
+  SMTP_USER: Env.schema.string.optional(),
+  SMTP_PASS: Env.schema.string.optional(),
+
+  // Mailgun Configuration
+  MAILGUN_API_KEY: Env.schema.string.optional(),
+  MAILGUN_DOMAIN: Env.schema.string.optional(),
+  MAILGUN_BASE_URL: Env.schema.string.optional(),
 })
