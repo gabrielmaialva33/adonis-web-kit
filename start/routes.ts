@@ -19,6 +19,7 @@ import '#routes/users/index'
 import '#routes/users/session_routes'
 import '#routes/permissions/index'
 import '#routes/health/index'
+
 import '#routes/inertia/index'
 
 router
