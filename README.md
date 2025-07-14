@@ -128,23 +128,28 @@ This starter kit is uniquely designed to maximize the effectiveness of AI-assist
 ### 🚀 Getting Started
 
 1. **Clone the repository:**
+
    ```sh
    git clone https://github.com/gabrielmaialva33/base-web-kit.git
    cd base-web-kit
    ```
 
 2. **Install dependencies:**
+
    ```sh
    pnpm install
    ```
 
 3. **Setup environment variables:**
+
    ```sh
    cp .env.example .env
    ```
-   *Open the `.env` file and configure your database credentials and other settings.*
+
+   _Open the `.env` file and configure your database credentials and other settings._
 
 4. **Run database migrations:**
+
    ```sh
    node ace migration:run
    ```
@@ -153,7 +158,7 @@ This starter kit is uniquely designed to maximize the effectiveness of AI-assist
    ```sh
    pnpm dev
    ```
-   *Your application will be available at `http://localhost:3333`.*
+   _Your application will be available at `http://localhost:3333`._
 
 ### 📜 Available Scripts
 

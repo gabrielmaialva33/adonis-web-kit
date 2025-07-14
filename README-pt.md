@@ -27,7 +27,7 @@
 
 ## :bookmark: Sobre
 
-O **Base Web Kit** é um *starter kit* full-stack moderno, opinativo e focado em IA, projetado para acelerar o
+O **Base Web Kit** é um _starter kit_ full-stack moderno, opinativo e focado em IA, projetado para acelerar o
 desenvolvimento de aplicações web robustas. Ele combina um poderoso backend em **AdonisJS v6** com um frontend dinâmico
 em **React 19** e **Inertia.js**, tudo dentro de uma estrutura monorepo unificada.
 
@@ -83,7 +83,7 @@ graph TD
 
 ## :rocket: Desenvolvimento AI-First
 
-Este *starter kit* foi projetado de forma única para maximizar a eficácia da codificação assistida por IA.
+Este _starter kit_ foi projetado de forma única para maximizar a eficácia da codificação assistida por IA.
 
 - **Contexto Unificado (Monorepo)**: Ter o código do backend e do frontend em um único repositório fornece um contexto
   completo para ferramentas de IA, permitindo que elas gerem código mais preciso e coeso que abrange toda a stack.
@@ -129,23 +129,28 @@ Este *starter kit* foi projetado de forma única para maximizar a eficácia da c
 ### 🚀 Começando
 
 1. **Clone o repositório:**
+
    ```sh
    git clone https://github.com/gabrielmaialva33/base-web-kit.git
    cd base-web-kit
    ```
 
 2. **Instale as dependências:**
+
    ```sh
    pnpm install
    ```
 
 3. **Configure as variáveis de ambiente:**
+
    ```sh
    cp .env.example .env
    ```
-   *Abra o arquivo `.env` e configure suas credenciais de banco de dados e outras configurações.*
+
+   _Abra o arquivo `.env` e configure suas credenciais de banco de dados e outras configurações._
 
 4. **Execute as migrações do banco de dados:**
+
    ```sh
    node ace migration:run
    ```
@@ -154,7 +159,7 @@ Este *starter kit* foi projetado de forma única para maximizar a eficácia da c
    ```sh
    pnpm dev
    ```
-   *Sua aplicação estará disponível em `http://localhost:3333`.*
+   _Sua aplicação estará disponível em `http://localhost:3333`._
 
 ### 📜 Scripts Disponíveis
 
