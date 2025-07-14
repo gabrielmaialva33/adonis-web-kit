@@ -58,7 +58,7 @@ export const apiThrottle = limiter.define('api', async (ctx) => {
    */
   try {
     const isAuthenticated = await ctx.auth.check()
-    
+
     // Check if user is authenticated and has a valid user object
     if (isAuthenticated && ctx.auth.user) {
       return limiter.allowRequests(100).every('1 minute').usingKey(`api_user_${ctx.auth.user.id}`)
@@ -81,7 +81,7 @@ export const apiThrottle = limiter.define('api', async (ctx) => {
 export const uploadThrottle = limiter.define('upload', async (ctx) => {
   try {
     const isAuthenticated = await ctx.auth.check()
-    
+
     // Check if user is authenticated and has a valid user object
     if (!isAuthenticated || !ctx.auth.user) {
       return limiter
@@ -133,7 +133,7 @@ export const uploadThrottle = limiter.define('upload', async (ctx) => {
 export const adminThrottle = limiter.define('admin', async (ctx) => {
   try {
     const isAuthenticated = await ctx.auth.check()
-    
+
     // Check if user is authenticated and has a valid user object
     if (!isAuthenticated || !ctx.auth.user) {
       return limiter
