@@ -30,7 +30,7 @@ const mailConfig = defineConfig({
         pass: env.get('SMTP_PASS'),
       },
     }),
-    
+
     mailgun: transports.mailgun({
       key: env.get('MAILGUN_API_KEY'),
       domain: env.get('MAILGUN_DOMAIN'),
