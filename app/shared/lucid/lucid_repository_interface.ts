@@ -8,6 +8,7 @@ import {
   ModelQueryBuilderContract,
 } from '@adonisjs/lucid/types/model'
 import { SimplePaginatorContract } from '@adonisjs/lucid/types/querybuilder'
+import { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 /**
  * Repository interface for working with AdonisJS Lucid models.
@@ -18,7 +19,10 @@ export default interface LucidRepositoryInterface<T extends typeof BaseModel> {
    * Create a new model instance.
    * @param payload - The attributes to initialize the model with.
    */
-  create(payload: Partial<ModelAttributes<InstanceType<T>>>): Promise<InstanceType<T>>
+  create(
+    payload: Partial<ModelAttributes<InstanceType<T>>>,
+    options?: { client: TransactionClientContract }
+  ): Promise<InstanceType<T>>
 
   /**
    * Create multiple model instances in a single operation.
@@ -114,6 +118,7 @@ export type ModelKeys<T extends typeof BaseModel> = keyof ModelAttributes<Instan
  * Default options for modifying queries.
  */
 export interface DefaultOptions<T extends typeof BaseModel> {
+  client?: TransactionClientContract
   /**
    * Function to apply custom modifications to the query.
    */

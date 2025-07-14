@@ -3,6 +3,7 @@ import { HttpContext } from '@adonisjs/core/http'
 import { BaseModel } from '@adonisjs/lucid/orm'
 import { ModelAttributes, ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
 import ValidationException from '#exceptions/validation_exception'
+import { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 import LucidRepositoryInterface, {
   DefaultOptions,
@@ -29,8 +30,11 @@ export default class LucidRepository<T extends typeof BaseModel>
    * CRUD
    * ------------------------------------------------------
    */
-  async create(payload: Partial<ModelAttributes<InstanceType<T>>>): Promise<InstanceType<T>> {
-    return this.model.create(payload)
+  async create(
+    payload: Partial<ModelAttributes<InstanceType<T>>>,
+    options?: { client: TransactionClientContract }
+  ): Promise<InstanceType<T>> {
+    return this.model.create(payload, options)
   }
 
   async createMany(
@@ -179,6 +183,10 @@ export default class LucidRepository<T extends typeof BaseModel>
     opts?: DefaultOptions<T>
   }): ModelQueryBuilderContract<T, InstanceType<T>> {
     const query = this.model.query()
+
+    if (opts?.client) {
+      query.useTransaction(opts.client)
+    }
 
     if (field && value) {
       query.where({ [field]: value })
