@@ -48,7 +48,7 @@ graph TD
 
     subgraph "Backend (AdonisJS)"
         BE_ROUTES[Routes]
-        BE_MW[Middleware (Auth, ACL)]
+        BE_MW["Middleware (Auth, ACL)"]
         BE_CTRL[Controllers]
         BE_SERVICES[Services]
         BE_REPOS[Repositories]
