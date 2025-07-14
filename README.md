@@ -27,9 +27,14 @@
 
 ## :bookmark: About
 
-**Base Web Kit** is a modern, opinionated, and AI-first full-stack starter kit designed to accelerate the development of robust web applications. It combines a powerful **AdonisJS v6** backend with a dynamic **React 19** and **Inertia.js** frontend, all within a unified monorepo structure.
+**Base Web Kit** is a modern, opinionated, and AI-first full-stack starter kit designed to accelerate the development of
+robust web applications. It combines a powerful **AdonisJS v6** backend with a dynamic **React 19** and **Inertia.js**
+frontend, all within a unified monorepo structure.
 
-This project is not just a collection of technologies; it's a foundation engineered for efficiency, scalability, and seamless collaboration with AI development partners. By providing a well-defined architecture with features like authentication, role-based access control (RBAC), and file management out of the box, it allows developers (both human and AI) to focus on building unique business logic instead of boilerplate code.
+This project is not just a collection of technologies; it's a foundation engineered for efficiency, scalability, and
+seamless collaboration with AI development partners. By providing a well-defined architecture with features like
+authentication, role-based access control (RBAC), and file management out of the box, it allows developers (both human
+and AI) to focus on building unique business logic instead of boilerplate code.
 
 ### 🏗️ Architecture Overview
 
@@ -37,7 +42,7 @@ This project is not just a collection of technologies; it's a foundation enginee
 graph TD
     subgraph "Frontend (Inertia.js)"
         FE_UI[React Components & Pages]
-        FE_HOOKS[Hooks (useAuth, useApi)]
+        FE_HOOKS["Hooks (useAuth, useApi)"]
         FE_UTILS[Utilities & Types]
     end
 
@@ -79,18 +84,25 @@ graph TD
 
 This starter kit is uniquely designed to maximize the effectiveness of AI-assisted coding.
 
-- **Unified Context (Monorepo)**: Having backend and frontend code in a single repository provides a complete context for AI tools, enabling them to generate more accurate and cohesive code that spans the full stack.
-- **Strongly-Typed Foundation**: End-to-end TypeScript usage creates a clear contract between the frontend, backend, and API layers. This reduces ambiguity and allows AI to understand data structures and function signatures, leading to fewer errors.
-- **Modular and Opinionated Architecture**: The clear separation of concerns (controllers, services, repositories) makes it easy for an AI to locate, understand, and modify specific parts of the codebase with precision.
-- **Focus on Business Logic**: With boilerplate for authentication, permissions, and file storage already handled, AI can be directed to solve higher-level business problems from day one.
+- **Unified Context (Monorepo)**: Having backend and frontend code in a single repository provides a complete context
+  for AI tools, enabling them to generate more accurate and cohesive code that spans the full stack.
+- **Strongly-Typed Foundation**: End-to-end TypeScript usage creates a clear contract between the frontend, backend, and
+  API layers. This reduces ambiguity and allows AI to understand data structures and function signatures, leading to
+  fewer errors.
+- **Modular and Opinionated Architecture**: The clear separation of concerns (controllers, services, repositories) makes
+  it easy for an AI to locate, understand, and modify specific parts of the codebase with precision.
+- **Focus on Business Logic**: With boilerplate for authentication, permissions, and file storage already handled, AI
+  can be directed to solve higher-level business problems from day one.
 
 ## 🌟 Key Features
 
 - **🔐 Multi-Guard Authentication**: Ready-to-use JWT-based authentication.
 - **👥 Advanced Role-Based Access Control (RBAC)**: Manage user permissions with roles and fine-grained rules.
 - **📁 File Management**: Pre-configured file upload service with support for local and S3 drivers.
-- **⚡️ Full-Stack Reactivity**: The power of React combined with the simplicity of a traditional server-rendered app, thanks to Inertia.js.
-- **🎨 UI Components**: A set of beautiful, reusable UI components built with `shadcn/ui`, Tailwind CSS, and `lucide-react`.
+- **⚡️ Full-Stack Reactivity**: The power of React combined with the simplicity of a traditional server-rendered app,
+  thanks to Inertia.js.
+- **🎨 UI Components**: A set of beautiful, reusable UI components built with `shadcn/ui`, Tailwind CSS, and
+  `lucide-react`.
 - **✅ Type-Safe API**: Auto-completion and type checking for API calls and props.
 - **🏥 Health Checks**: Integrated health check endpoint for monitoring.
 
@@ -115,33 +127,33 @@ This starter kit is uniquely designed to maximize the effectiveness of AI-assist
 
 ### 🚀 Getting Started
 
-1.  **Clone the repository:**
-    ```sh
-    git clone https://github.com/gabrielmaialva33/base-web-kit.git
-    cd base-web-kit
-    ```
+1. **Clone the repository:**
+   ```sh
+   git clone https://github.com/gabrielmaialva33/base-web-kit.git
+   cd base-web-kit
+   ```
 
-2.  **Install dependencies:**
-    ```sh
-    pnpm install
-    ```
+2. **Install dependencies:**
+   ```sh
+   pnpm install
+   ```
 
-3.  **Setup environment variables:**
-    ```sh
-    cp .env.example .env
-    ```
-    *Open the `.env` file and configure your database credentials and other settings.*
+3. **Setup environment variables:**
+   ```sh
+   cp .env.example .env
+   ```
+   *Open the `.env` file and configure your database credentials and other settings.*
 
-4.  **Run database migrations:**
-    ```sh
-    node ace migration:run
-    ```
+4. **Run database migrations:**
+   ```sh
+   node ace migration:run
+   ```
 
-5.  **Start the development server:**
-    ```sh
-    pnpm dev
-    ```
-    *Your application will be available at `http://localhost:3333`.*
+5. **Start the development server:**
+   ```sh
+   pnpm dev
+   ```
+   *Your application will be available at `http://localhost:3333`.*
 
 ### 📜 Available Scripts
 
