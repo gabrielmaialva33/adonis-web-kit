@@ -1,6 +1,7 @@
 import LucidRepository from '#shared/lucid/lucid_repository'
 import IPermission from '#interfaces/permission_interface'
 import Permission from '#models/permission'
+import { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 export default class PermissionRepository
   extends LucidRepository<typeof Permission>
@@ -18,7 +19,10 @@ export default class PermissionRepository
     return await Permission.query().where('resource', resource).where('action', action).first()
   }
 
-  async syncPermissions(permissions: IPermission.SyncPermissionData[]): Promise<void> {
+  async syncPermissions(
+    permissions: IPermission.SyncPermissionData[],
+    trx?: TransactionClientContract
+  ): Promise<void> {
     for (const permissionData of permissions) {
       await Permission.firstOrCreate(
         {
@@ -28,7 +32,8 @@ export default class PermissionRepository
         {
           name: permissionData.name,
           description: permissionData.description,
-        }
+        },
+        { client: trx }
       )
     }
   }
