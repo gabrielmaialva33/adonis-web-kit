@@ -1,5 +1,5 @@
 <h1 align="center">
-  <img src=".github/assets/ui-design.png" height="250" alt="Base Web Kit">
+  <img src=".github/assets/ui-design.png" height="250" alt="Adonis Web Kit">
 </h1>
 
 <p align="center">
@@ -27,7 +27,7 @@
 
 ## :bookmark: Sobre
 
-O **Base Web Kit** é um _starter kit_ full-stack moderno, opinativo e focado em IA, projetado para acelerar o
+O **Adonis Web Kit** é um _starter kit_ full-stack moderno, opinativo e focado em IA, projetado para acelerar o
 desenvolvimento de aplicações web robustas. Ele combina um poderoso backend em **AdonisJS v6** com um frontend dinâmico
 em **React 19** e **Inertia.js**, tudo dentro de uma estrutura monorepo unificada.
 
