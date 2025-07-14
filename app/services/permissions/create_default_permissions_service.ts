@@ -1,14 +1,15 @@
 import { inject } from '@adonisjs/core'
 import PermissionRepository from '#repositories/permission_repository'
 import IPermission from '#interfaces/permission_interface'
+import { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 @inject()
 export default class CreateDefaultPermissionsService {
   constructor(private permissionRepository: PermissionRepository) {}
 
-  async run(): Promise<void> {
+  async run(trx?: TransactionClientContract): Promise<void> {
     const defaultPermissions = this.getDefaultPermissions()
-    await this.permissionRepository.syncPermissions(defaultPermissions)
+    await this.permissionRepository.syncPermissions(defaultPermissions, trx)
   }
 
   private getDefaultPermissions(): IPermission.SyncPermissionData[] {
