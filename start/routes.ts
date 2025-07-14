@@ -19,6 +19,7 @@ import '#routes/users/index'
 import '#routes/users/session_routes'
 import '#routes/permissions/index'
 import '#routes/health/index'
+import '#routes/inertia/index'
 
 router
   .get('/version', async () => {
@@ -33,5 +34,3 @@ router
     }
   })
   .use(throttle)
-
-router.on('/').renderInertia('home').use(throttle)
