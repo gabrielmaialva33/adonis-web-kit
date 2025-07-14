@@ -47,10 +47,12 @@ export default class VerifyEmailNotification extends BaseMail {
       this.message.htmlView('emails/verify_email_html', {
         user: this.user,
         verificationUrl,
+        appName: env.get('SMTP_FROM_NAME', 'ACL API'),
       })
       this.message.textView('emails/verify_email_text', {
         user: this.user,
         verificationUrl,
+        appName: env.get('SMTP_FROM_NAME', 'ACL API'),
       })
     }
   }
