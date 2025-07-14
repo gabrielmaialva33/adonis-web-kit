@@ -21,8 +21,8 @@ export default class VerifyEmailNotification extends BaseMail {
 
     // Set the sender of the email
     this.message.from(
-      env.get('SMTP_FROM_ADDRESS', 'noreply@example.com'),
-      env.get('SMTP_FROM_NAME', 'ACL API')
+      env.get('MAIL_FROM_ADDRESS', 'noreply@example.com'),
+      env.get('MAIL_FROM_NAME', 'Base Web Kit')
     )
 
     // Set the recipient of the email
@@ -47,12 +47,12 @@ export default class VerifyEmailNotification extends BaseMail {
       this.message.htmlView('emails/verify_email_html', {
         user: this.user,
         verificationUrl,
-        appName: env.get('SMTP_FROM_NAME', 'ACL API'),
+        appName: env.get('MAIL_FROM_NAME', 'Base Web Kit'),
       })
       this.message.textView('emails/verify_email_text', {
         user: this.user,
         verificationUrl,
-        appName: env.get('SMTP_FROM_NAME', 'ACL API'),
+        appName: env.get('MAIL_FROM_NAME', 'Base Web Kit'),
       })
     }
   }
