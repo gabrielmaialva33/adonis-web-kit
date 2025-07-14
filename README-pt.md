@@ -3,11 +3,11 @@
 </h1>
 
 <p align="center">
-  <img src="https://img.shields.io/github/license/gabrielmaialva33/base-web-kit?color=00b8d3&style=flat-square" alt="Licença" />
-  <img src="https://img.shields.io/github/languages/top/gabrielmaialva33/base-web-kit?style=flat-square" alt="Linguagem principal do GitHub" >
-  <img src="https://img.shields.io/github/repo-size/gabrielmaialva33/base-web-kit?style=flat-square" alt="Tamanho do repositório" >
-  <a href="https://github.com/gabrielmaialva33/base-web-kit/commits/main">
-    <img src="https://img.shields.io/github/last-commit/gabrielmaialva33/base-web-kit?style=flat-square" alt="Último commit do GitHub" >
+  <img src="https://img.shields.io/github/license/gabrielmaialva33/adonis-web-kit?color=00b8d3&style=flat-square" alt="Licença" />
+  <img src="https://img.shields.io/github/languages/top/gabrielmaialva33/adonis-web-kit?style=flat-square" alt="Linguagem principal do GitHub" >
+  <img src="https://img.shields.io/github/repo-size/gabrielmaialva33/adonis-web-kit?style=flat-square" alt="Tamanho do repositório" >
+  <a href="https://github.com/gabrielmaialva33/adonis-web-kit/commits/main">
+    <img src="https://img.shields.io/github/last-commit/gabrielmaialva33/adonis-web-kit?style=flat-square" alt="Último commit do GitHub" >
   </a>
 </p>
 
@@ -131,8 +131,8 @@ Este _starter kit_ foi projetado de forma única para maximizar a eficácia da c
 1. **Clone o repositório:**
 
    ```sh
-   git clone https://github.com/gabrielmaialva33/base-web-kit.git
-   cd base-web-kit
+   git clone https://github.com/gabrielmaialva33/adonis-web-kit.git
+   cd adonis-web-kit
    ```
 
 2. **Instale as dependências:**

@@ -3,11 +3,11 @@
 </h1>
 
 <p align="center">
-  <img src="https://img.shields.io/github/license/gabrielmaialva33/base-web-kit?color=00b8d3&style=flat-square" alt="License" />
-  <img src="https://img.shields.io/github/languages/top/gabrielmaialva33/base-web-kit?style=flat-square" alt="GitHub top language" >
-  <img src="https://img.shields.io/github/repo-size/gabrielmaialva33/base-web-kit?style=flat-square" alt="Repository size" >
-  <a href="https://github.com/gabrielmaialva33/base-web-kit/commits/main">
-    <img src="https://img.shields.io/github/last-commit/gabrielmaialva33/base-web-kit?style=flat-square" alt="GitHub last commit" >
+  <img src="https://img.shields.io/github/license/gabrielmaialva33/adonis-web-kit?color=00b8d3&style=flat-square" alt="License" />
+  <img src="https://img.shields.io/github/languages/top/gabrielmaialva33/adonis-web-kit?style=flat-square" alt="GitHub top language" >
+  <img src="https://img.shields.io/github/repo-size/gabrielmaialva33/adonis-web-kit?style=flat-square" alt="Repository size" >
+  <a href="https://github.com/gabrielmaialva33/adonis-web-kit/commits/main">
+    <img src="https://img.shields.io/github/last-commit/gabrielmaialva33/adonis-web-kit?style=flat-square" alt="GitHub last commit" >
   </a>
 </p>
 
@@ -130,8 +130,8 @@ This starter kit is uniquely designed to maximize the effectiveness of AI-assist
 1. **Clone the repository:**
 
    ```sh
-   git clone https://github.com/gabrielmaialva33/base-web-kit.git
-   cd base-web-kit
+   git clone https://github.com/gabrielmaialva33/adonis-web-kit.git
+   cd adonis-web-kit
    ```
 
 2. **Install dependencies:**

@@ -1,5 +1,5 @@
 {
-  "name": "base-web-kit",
+  "name": "adonis-web-kit",
   "version": "0.0.0",
   "private": true,
   "type": "module",
