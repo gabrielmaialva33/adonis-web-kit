@@ -57,12 +57,14 @@ export const apiThrottle = limiter.define('api', async (ctx) => {
    * Higher rate limit for authenticated API users
    */
   try {
-    await ctx.auth.check()
-    if (ctx.auth.user) {
+    const isAuthenticated = await ctx.auth.check()
+    
+    // Check if user is authenticated and has a valid user object
+    if (isAuthenticated && ctx.auth.user) {
       return limiter.allowRequests(100).every('1 minute').usingKey(`api_user_${ctx.auth.user.id}`)
     }
   } catch {
-    // User is not authenticated
+    // User is not authenticated - continue to guest rate limit
   }
 
   /**
@@ -78,8 +80,10 @@ export const apiThrottle = limiter.define('api', async (ctx) => {
  */
 export const uploadThrottle = limiter.define('upload', async (ctx) => {
   try {
-    await ctx.auth.check()
-    if (!ctx.auth.user) {
+    const isAuthenticated = await ctx.auth.check()
+    
+    // Check if user is authenticated and has a valid user object
+    if (!isAuthenticated || !ctx.auth.user) {
       return limiter
         .allowRequests(0)
         .every('1 minute')
@@ -128,8 +132,10 @@ export const uploadThrottle = limiter.define('upload', async (ctx) => {
  */
 export const adminThrottle = limiter.define('admin', async (ctx) => {
   try {
-    await ctx.auth.check()
-    if (!ctx.auth.user) {
+    const isAuthenticated = await ctx.auth.check()
+    
+    // Check if user is authenticated and has a valid user object
+    if (!isAuthenticated || !ctx.auth.user) {
       return limiter
         .allowRequests(0)
         .every('1 minute')
