@@ -6,7 +6,9 @@ import CreateDefaultRolesService from '#services/roles/create_default_roles_serv
 export default class extends BaseSchema {
   async up() {
     const service = await app.container.make(CreateDefaultRolesService)
-    await service.run()
+    const trx = await this.db.transaction()
+    await service.run(trx)
+    await trx.commit()
   }
 
   async down() {

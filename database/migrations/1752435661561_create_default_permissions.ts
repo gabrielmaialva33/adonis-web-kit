@@ -6,7 +6,14 @@ import AssignDefaultPermissionsService from '#services/permissions/assign_defaul
 export default class extends BaseSchema {
   async up() {
     const service = await app.container.make(AssignDefaultPermissionsService)
-    await service.run()
+    const trx = await this.db.transaction()
+    try {
+      await service.run(trx)
+      await trx.commit()
+    } catch (error) {
+      await trx.rollback()
+      throw error
+    }
   }
 
   async down() {
