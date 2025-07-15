@@ -59,7 +59,15 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column({ serializeAs: null })
   declare is_deleted: boolean
 
-  @column()
+  @column({
+    prepare: (value) => JSON.stringify(value),
+    consume: (value) => {
+      if (typeof value === 'string') {
+        return JSON.parse(value)
+      }
+      return value
+    },
+  })
   declare metadata: {
     email_verified: boolean
     email_verification_token: string | null
