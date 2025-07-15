@@ -96,7 +96,7 @@
     "@rlanz/bull-queue": "^3.1.0",
     "@tailwindcss/vite": "^4.1.11",
     "@vinejs/vine": "^3.0.1",
-    "argon2": "^0.43.0",
+    "argon2": "^0.43.1",
     "better-sqlite3": "^12.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
