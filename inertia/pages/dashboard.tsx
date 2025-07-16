@@ -10,10 +10,16 @@ import {
   Users,
 } from 'lucide-react'
 
-import { MetronicLayout } from '~/components/layout/MetronicLayout'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/Card'
-import { Button } from '~/components/ui/Button'
-import { Badge } from '~/components/ui/Badge'
+import { Demo1Layout } from '~/layouts/demo1/layout'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '~/components/ui/core/card'
+import { Button } from '~/components/ui/core/button'
+import { Badge } from '~/components/ui/core/badge'
 import { Alert, AlertDescription, AlertTitle } from '~/components/ui/Alert'
 import { useAuth } from '~/hooks/use_auth'
 
@@ -52,7 +58,7 @@ export default function DashboardPage() {
   ]
 
   return (
-    <MetronicLayout>
+    <Demo1Layout>
       <Head title="Dashboard" />
 
       <div className="space-y-6">
@@ -168,6 +174,6 @@ export default function DashboardPage() {
           </Card>
         </div>
       </div>
-    </MetronicLayout>
+    </Demo1Layout>
   )
 }
