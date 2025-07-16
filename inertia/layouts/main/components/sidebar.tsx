@@ -1,18 +1,17 @@
-import * as React from 'react'
 import { Link, usePage } from '@inertiajs/react'
+import { useState } from 'react'
 import {
-  Home,
-  Users,
-  FileText,
-  Settings,
   ChevronDown,
   ChevronRight,
+  Home,
+  type LucideIcon,
+  Settings,
   Shield,
   Upload,
-  type LucideIcon,
+  Users,
 } from 'lucide-react'
+
 import { cn } from '~/utils/cn'
-import { Button } from '~/components/ui/core/button'
 import type { User as UserType } from '~/types'
 
 interface MenuItem {
@@ -64,8 +63,8 @@ interface SidebarProps {
 }
 
 export function Sidebar({ isOpen, onClose, isCollapsed = false }: SidebarProps) {
-  const { url, auth } = usePage().props as { url: string; auth?: { user?: UserType } }
-  const [expandedItems, setExpandedItems] = React.useState<string[]>([])
+  const { url, auth } = usePage().props as unknown as { url: string; auth?: { user?: UserType } }
+  const [expandedItems, setExpandedItems] = useState<string[]>([])
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) =>
