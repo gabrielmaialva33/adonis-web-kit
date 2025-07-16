@@ -1,8 +1,10 @@
 import { Link } from '@inertiajs/react'
-import { Button } from '../ui/Button'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card'
-import type { PaginatedResponse, User } from '../../types'
-import { formatDate } from '../../utils/api'
+
+import { Button } from '../ui/core/button'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/core/card'
+
+import type { PaginatedResponse, User } from '~/types'
+import { formatDate } from '~/utils/api'
 
 interface UserListProps {
   users: PaginatedResponse<User>
