@@ -1,17 +1,17 @@
-import * as React from 'react'
+import { useState, ReactNode } from 'react'
 import { Header } from './main/components/header'
 import { Sidebar } from './main/components/sidebar'
 import { cn } from '~/utils/cn'
 import { useIsMobile } from '~/hooks/use-mobile'
 
 interface MainLayoutProps {
-  children: React.ReactNode
+  children: ReactNode
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
   const isMobile = useIsMobile()
-  const [sidebarOpen, setSidebarOpen] = React.useState(false)
-  const [sidebarCollapsed, setSidebarCollapsed] = React.useState(false)
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
   const toggleSidebar = () => {
     if (isMobile) {

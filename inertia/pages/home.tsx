@@ -2,7 +2,13 @@ import { Head, Link } from '@inertiajs/react'
 import { Code, Database, FileText, Lock, Settings, Shield, Users, Zap } from 'lucide-react'
 
 import { Button } from '~/components/ui/core/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/core/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '~/components/ui/core/card'
 
 export default function Home() {
   return (
