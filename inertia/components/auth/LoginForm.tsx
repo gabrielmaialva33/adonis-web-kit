@@ -5,7 +5,7 @@ import { Mail, Lock } from 'lucide-react'
 import { Button } from '../ui/core/button'
 import { Input } from '../ui/core/input'
 import { Label } from '../ui/core/label'
-import { Alert, AlertDescription } from '../ui/Alert'
+import { Alert, AlertDescription } from '../ui/core/alert'
 import type { LoginFormData } from '~/types'
 
 interface LoginFormProps {
