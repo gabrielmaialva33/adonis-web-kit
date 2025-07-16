@@ -1,9 +1,11 @@
 import { ChangeEvent, useState } from 'react'
-import { Button } from '../ui/Button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/Card'
-import { Alert, AlertDescription, AlertTitle } from '../ui/Alert'
-import { useApi } from '../../hooks/use_api'
-import type { FileUploadResponse } from '../../types'
+
+import { Button } from '../ui/core/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/core/card'
+import { Alert, AlertDescription, AlertTitle } from '../ui/core/alert'
+
+import { useApi } from '~/hooks/use_api'
+import type { FileUploadResponse } from '~/types'
 
 export function FileUpload() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
