@@ -1,7 +1,7 @@
 import { FormEvent, useState } from 'react'
 import { router } from '@inertiajs/react'
+
 import { Button } from '../ui/core/button'
-import { Input } from '../ui/core/input'
 import {
   Card,
   CardContent,
@@ -11,7 +11,9 @@ import {
   CardTitle,
 } from '../ui/core/card'
 import { Alert, AlertDescription } from '../ui/core/alert'
+
 import type { RegisterFormData } from '~/types'
+import { FormInput } from '~/components/ui/core'
 
 interface RegisterFormProps {
   errors?: Record<string, string>
@@ -51,60 +53,60 @@ export function RegisterForm({ errors }: RegisterFormProps) {
             </Alert>
           )}
 
-          <Input
+          <FormInput
             label="Full Name"
             type="text"
             name="full_name"
             value={data.full_name}
             onChange={(e) => setData({ ...data, full_name: e.target.value })}
-            error={!!errors?.full_name}
+            error={errors?.full_name}
             placeholder="John Doe"
             required
             autoComplete="name"
           />
 
-          <Input
+          <FormInput
             label="Email"
             type="email"
             name="email"
             value={data.email}
             onChange={(e) => setData({ ...data, email: e.target.value })}
-            error={!!errors?.email}
+            error={errors?.email}
             placeholder="john@example.com"
             required
             autoComplete="email"
           />
 
-          <Input
+          <FormInput
             label="Username (optional)"
             type="text"
             name="username"
             value={data.username}
             onChange={(e) => setData({ ...data, username: e.target.value })}
-            error={!!errors?.username}
+            error={errors?.username}
             placeholder="johndoe"
             autoComplete="username"
           />
 
-          <Input
+          <FormInput
             label="Password"
             type="password"
             name="password"
             value={data.password}
             onChange={(e) => setData({ ...data, password: e.target.value })}
-            error={!!errors?.password}
+            error={errors?.password}
             hint="Must be at least 8 characters"
             required
             autoComplete="new-password"
           />
 
-          <Input
+          <FormInput
             label="Confirm Password"
             type="password"
             name="password_confirmation"
             value={data.password_confirmation}
             onChange={(e) => setData({ ...data, password_confirmation: e.target.value })}
-            error={!!errors?.password_confirmation}
+            error={errors?.password_confirmation}
             required
             autoComplete="new-password"
           />
