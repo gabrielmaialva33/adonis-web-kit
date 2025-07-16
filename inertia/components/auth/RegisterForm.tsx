@@ -31,7 +31,7 @@ export function RegisterForm({ errors }: RegisterFormProps) {
     e.preventDefault()
     setProcessing(true)
 
-    router.post('/api/v1/sessions/sign-up', data, {
+    router.post('/api/v1/sessions/sign-up', data as any, {
       onFinish: () => setProcessing(false),
     })
   }
@@ -46,7 +46,7 @@ export function RegisterForm({ errors }: RegisterFormProps) {
 
         <CardContent className="space-y-4">
           {errors?.general && (
-            <Alert variant="error">
+            <Alert variant="destructive">
               <AlertDescription>{errors.general}</AlertDescription>
             </Alert>
           )}
@@ -57,7 +57,7 @@ export function RegisterForm({ errors }: RegisterFormProps) {
             name="full_name"
             value={data.full_name}
             onChange={(e) => setData({ ...data, full_name: e.target.value })}
-            error={errors?.full_name}
+            error={!!errors?.full_name}
             placeholder="John Doe"
             required
             autoComplete="name"
@@ -69,7 +69,7 @@ export function RegisterForm({ errors }: RegisterFormProps) {
             name="email"
             value={data.email}
             onChange={(e) => setData({ ...data, email: e.target.value })}
-            error={errors?.email}
+            error={!!errors?.email}
             placeholder="john@example.com"
             required
             autoComplete="email"
@@ -81,7 +81,7 @@ export function RegisterForm({ errors }: RegisterFormProps) {
             name="username"
             value={data.username}
             onChange={(e) => setData({ ...data, username: e.target.value })}
-            error={errors?.username}
+            error={!!errors?.username}
             placeholder="johndoe"
             autoComplete="username"
           />
@@ -92,7 +92,7 @@ export function RegisterForm({ errors }: RegisterFormProps) {
             name="password"
             value={data.password}
             onChange={(e) => setData({ ...data, password: e.target.value })}
-            error={errors?.password}
+            error={!!errors?.password}
             hint="Must be at least 8 characters"
             required
             autoComplete="new-password"
@@ -104,14 +104,14 @@ export function RegisterForm({ errors }: RegisterFormProps) {
             name="password_confirmation"
             value={data.password_confirmation}
             onChange={(e) => setData({ ...data, password_confirmation: e.target.value })}
-            error={errors?.password_confirmation}
+            error={!!errors?.password_confirmation}
             required
             autoComplete="new-password"
           />
         </CardContent>
 
         <CardFooter>
-          <Button type="submit" isLoading={processing} disabled={processing} className="w-full">
+          <Button type="submit" loading={processing} disabled={processing} className="w-full">
             Create account
           </Button>
         </CardFooter>
