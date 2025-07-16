@@ -1,9 +1,16 @@
 import { FormEvent, useState } from 'react'
 import { router } from '@inertiajs/react'
-import { Button } from '../ui/Button'
-import { Input } from '../ui/Input'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/Card'
-import { Alert, AlertDescription } from '../ui/Alert'
+import { Button } from '../ui/core/button'
+import { Input } from '../ui/core/input'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '../ui/core/card'
+import { Alert, AlertDescription } from '../ui/core/alert'
 import type { RegisterFormData } from '~/types'
 
 interface RegisterFormProps {
