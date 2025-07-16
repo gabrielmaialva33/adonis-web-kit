@@ -1,11 +1,11 @@
 import { Head } from '@inertiajs/react'
 
-import { AppLayout } from '~/components/layout/AppLayout'
+import { MainLayout } from '~/layouts/MainLayout'
 import { FileUpload } from '~/components/file/FileUpload'
 
 export default function FilesPage() {
   return (
-    <AppLayout>
+    <MainLayout>
       <Head title="Files" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -13,6 +13,6 @@ export default function FilesPage() {
 
         <FileUpload />
       </div>
-    </AppLayout>
+    </MainLayout>
   )
 }

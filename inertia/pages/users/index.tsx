@@ -2,12 +2,12 @@ import { Head, Link, router } from '@inertiajs/react'
 import { Edit, Eye, MoreVertical, Plus, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
-import { MetronicLayout } from '~/components/layout/MetronicLayout'
-import { Card, CardContent, CardHeader, CardTitle, CardToolbar } from '~/components/ui/Card'
-import { Button } from '~/components/ui/Button'
-import { Input } from '~/components/ui/Input'
-import { Badge } from '~/components/ui/Badge'
-import { type Column, DataTable } from '~/components/ui/DataTable'
+import { MainLayout } from '~/layouts/MainLayout'
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/core/card'
+import { Button } from '~/components/ui/core/button'
+import { Input } from '~/components/ui/core/input'
+import { Badge } from '~/components/ui/core/badge'
+import { type Column, DataTable } from '~/components/ui/core/data-table'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +15,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '~/components/ui/DropdownMenu'
+} from '~/components/ui/core/dropdown-menu'
 import type { PaginatedResponse, User } from '~/types'
 
 import { formatDate } from '~/utils/api'
@@ -119,7 +119,7 @@ export default function UsersPage({ users }: UsersPageProps) {
   ]
 
   return (
-    <MetronicLayout>
+    <MainLayout>
       <Head title="Users" />
 
       <div className="space-y-6">
@@ -144,19 +144,17 @@ export default function UsersPage({ users }: UsersPageProps) {
           <CardHeader>
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <CardTitle>All Users</CardTitle>
-              <CardToolbar>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    type="search"
-                    placeholder="Search users..."
-                    className="pl-10 w-full sm:w-64"
-                    size="sm"
-                    value={searchTerm}
-                    onChange={(e) => handleSearch(e.target.value)}
-                  />
-                </div>
-              </CardToolbar>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="search"
+                  placeholder="Search users..."
+                  className="pl-10 w-full sm:w-64"
+                  size="sm"
+                  value={searchTerm}
+                  onChange={(e) => handleSearch(e.target.value)}
+                />
+              </div>
             </div>
           </CardHeader>
           <CardContent>
@@ -195,6 +193,6 @@ export default function UsersPage({ users }: UsersPageProps) {
           </CardContent>
         </Card>
       </div>
-    </MetronicLayout>
+    </MainLayout>
   )
 }

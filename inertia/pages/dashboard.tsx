@@ -10,7 +10,7 @@ import {
   Users,
 } from 'lucide-react'
 
-import { Demo1Layout } from '~/layouts/demo1/layout'
+import { MainLayout } from '~/layouts/MainLayout'
 import {
   Card,
   CardContent,
@@ -20,7 +20,7 @@ import {
 } from '~/components/ui/core/card'
 import { Button } from '~/components/ui/core/button'
 import { Badge } from '~/components/ui/core/badge'
-import { Alert, AlertDescription, AlertTitle } from '~/components/ui/Alert'
+import { Alert, AlertDescription, AlertTitle } from '~/components/ui/core/alert'
 import { useAuth } from '~/hooks/use_auth'
 
 export default function DashboardPage() {
@@ -58,7 +58,7 @@ export default function DashboardPage() {
   ]
 
   return (
-    <Demo1Layout>
+    <MainLayout>
       <Head title="Dashboard" />
 
       <div className="space-y-6">
@@ -174,6 +174,6 @@ export default function DashboardPage() {
           </Card>
         </div>
       </div>
-    </Demo1Layout>
+    </MainLayout>
   )
 }
