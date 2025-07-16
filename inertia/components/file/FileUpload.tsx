@@ -79,12 +79,12 @@ export function FileUpload() {
           </div>
         )}
 
-        <Button onClick={handleUpload} disabled={!selectedFile || loading} isLoading={loading}>
+        <Button onClick={handleUpload} disabled={!selectedFile || loading} loading={loading}>
           Upload File
         </Button>
 
         {error && (
-          <Alert variant="error">
+          <Alert variant="destructive">
             <AlertTitle>Upload Failed</AlertTitle>
             <AlertDescription>{error.message}</AlertDescription>
           </Alert>
