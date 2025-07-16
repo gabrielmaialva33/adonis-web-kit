@@ -31,7 +31,7 @@ export function LoginForm({ errors }: LoginFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {errors?.general && (
-        <Alert variant="error">
+        <Alert variant="destructive">
           <AlertDescription>{errors.general}</AlertDescription>
         </Alert>
       )}
