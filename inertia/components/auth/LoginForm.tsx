@@ -3,10 +3,7 @@ import { useForm, Link } from '@inertiajs/react'
 import { Mail, Lock } from 'lucide-react'
 
 import { Button } from '../ui/core/button'
-import { Input } from '../ui/core/input'
-import { Label } from '../ui/core/label'
-import { Alert, AlertDescription } from '../ui/core/alert'
-import type { LoginFormData } from '~/types'
+import { FormInput } from '~/components/ui/core/form-input'
 
 export function LoginForm() {
   const { data, setData, post, processing, errors } = useForm({
@@ -21,43 +18,37 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="uid">Email or Username</Label>
-        <Input
-          id="uid"
-          type="text"
-          name="uid"
-          value={data.uid}
-          onChange={(e) => setData('uid', e.target.value)}
-          error={!!errors.uid}
-          placeholder="john@example.com"
-          required
-          autoComplete="username"
-          leftIcon={<Mail className="h-4 w-4" />}
-        />
-        {errors.uid && <p className="text-sm text-destructive">{errors.uid}</p>}
-      </div>
+      <FormInput
+        label="Email or Username"
+        id="uid"
+        type="text"
+        name="uid"
+        value={data.uid}
+        onChange={(e) => setData('uid', e.target.value)}
+        errorMessage={errors.uid}
+        placeholder="john@example.com"
+        required
+        autoComplete="username"
+        leftIcon={<Mail className="h-4 w-4" />}
+      />
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="password">Password</Label>
-          <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+      <FormInput
+        label="Password"
+        id="password"
+        type="password"
+        name="password"
+        value={data.password}
+        onChange={(e) => setData('password', e.target.value)}
+        errorMessage={errors.password}
+        required
+        autoComplete="current-password"
+        leftIcon={<Lock className="h-4 w-4" />}
+        rightAdornment={
+          <Link href="/forgot-password" className="text-xs text-primary hover:underline">
             Forgot password?
           </Link>
-        </div>
-        <Input
-          id="password"
-          type="password"
-          name="password"
-          value={data.password}
-          onChange={(e) => setData('password', e.target.value)}
-          error={!!errors.password}
-          required
-          autoComplete="current-password"
-          leftIcon={<Lock className="h-4 w-4" />}
-        />
-        {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
-      </div>
+        }
+      />
 
       <div className="space-y-4">
         <Button

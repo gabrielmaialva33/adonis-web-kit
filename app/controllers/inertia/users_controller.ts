@@ -29,6 +29,8 @@ export default class InertiaUsersController {
     return inertia.render('users/index', {
       users: users.toJSON(),
       search: search || '',
+      sortBy,
+      direction,
     })
   }
 

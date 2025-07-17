@@ -3,6 +3,7 @@ import { Edit, Eye, MoreVertical, Plus, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { MainLayout } from '~/layouts/MainLayout'
+import { ConfirmDialog } from '~/components/ui/core/confirm-dialog'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/core/card'
 import { Button } from '~/components/ui/core/button'
 import { Input } from '~/components/ui/core/input'
@@ -22,25 +23,32 @@ import { formatDate } from '~/utils/formatters'
 
 interface UsersPageProps {
   users: PaginatedResponse<User>
+  search: string
+  sortBy: string
+  direction: 'asc' | 'desc'
 }
 
-export default function UsersPage({ users }: UsersPageProps) {
-  const [searchTerm, setSearchTerm] = useState('')
-  const [sortKey, setSortKey] = useState<string>('created_at')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+export default function UsersPage({ users, search, sortBy, direction }: UsersPageProps) {
+  const [userToDelete, setUserToDelete] = useState<User | null>(null)
 
-  const handleSort = (key: string, direction: 'asc' | 'desc') => {
-    setSortKey(key)
-    setSortDirection(direction)
-    router.get('/users', { sort_by: key, order: direction }, { preserveState: true })
+  const handleSort = (key: string, dir: 'asc' | 'desc') => {
+    router.get('/users', { search, sort_by: key, order: dir }, { preserveState: true })
   }
 
   const handleSearch = (value: string) => {
-    setSearchTerm(value)
-    if (value) {
-      router.get('/users', { search: value }, { preserveState: true })
-    } else {
-      router.get('/users')
+    router.get(
+      '/users',
+      { search: value, sort_by: sortBy, order: direction },
+      { preserveState: true }
+    )
+  }
+
+  const handleDelete = () => {
+    if (userToDelete) {
+      router.delete(`/users/${userToDelete.id}`, {
+        preserveScroll: true,
+        onSuccess: () => setUserToDelete(null),
+      })
     }
   }
 
@@ -89,7 +97,7 @@ export default function UsersPage({ users }: UsersPageProps) {
       key: 'actions',
       label: '',
       className: 'w-[50px]',
-      render: (_, _row) => (
+      render: (_, row) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -100,15 +108,19 @@ export default function UsersPage({ users }: UsersPageProps) {
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem>
-              <Eye className="h-4 w-4 mr-2" />
-              View Details
+              <Link href={`/users/${row.id}`} className="flex items-center">
+                <Eye className="h-4 w-4 mr-2" />
+                View Details
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
-              <Edit className="h-4 w-4 mr-2" />
-              Edit User
+              <Link href={`/users/${row.id}/edit`} className="flex items-center">
+                <Edit className="h-4 w-4 mr-2" />
+                Edit User
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
+            <DropdownMenuItem className="text-destructive" onSelect={() => setUserToDelete(row)}>
               <Trash2 className="h-4 w-4 mr-2" />
               Delete User
             </DropdownMenuItem>
@@ -121,6 +133,15 @@ export default function UsersPage({ users }: UsersPageProps) {
   return (
     <MainLayout>
       <Head title="Users" />
+
+      <ConfirmDialog
+        isOpen={!!userToDelete}
+        onClose={() => setUserToDelete(null)}
+        onConfirm={handleDelete}
+        title="Are you sure?"
+        description={`This will permanently delete the user "${userToDelete?.full_name}". This action cannot be undone.`}
+        confirmText="Yes, delete user"
+      />
 
       <div className="space-y-6">
         {/* Page Header */}
@@ -151,7 +172,7 @@ export default function UsersPage({ users }: UsersPageProps) {
                   placeholder="Search users..."
                   className="pl-10 w-full sm:w-64"
                   inputSize="sm"
-                  value={searchTerm}
+                  defaultValue={search}
                   onChange={(e) => handleSearch(e.target.value)}
                 />
               </div>
@@ -162,8 +183,8 @@ export default function UsersPage({ users }: UsersPageProps) {
               columns={columns}
               data={users.data}
               onSort={handleSort}
-              sortKey={sortKey}
-              sortDirection={sortDirection}
+              sortKey={sortBy}
+              sortDirection={direction}
             />
 
             {/* Pagination */}
@@ -174,14 +195,14 @@ export default function UsersPage({ users }: UsersPageProps) {
                 </p>
                 <div className="flex gap-2">
                   {users.meta.previous_page_url && (
-                    <Link href={users.meta.previous_page_url}>
+                    <Link href={users.meta.previous_page_url} preserveScroll>
                       <Button variant="outline" size="sm">
                         Previous
                       </Button>
                     </Link>
                   )}
                   {users.meta.next_page_url && (
-                    <Link href={users.meta.next_page_url}>
+                    <Link href={users.meta.next_page_url} preserveScroll>
                       <Button variant="outline" size="sm">
                         Next
                       </Button>

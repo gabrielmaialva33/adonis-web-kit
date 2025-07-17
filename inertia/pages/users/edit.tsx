@@ -4,8 +4,7 @@ import { MainLayout } from '~/layouts/MainLayout'
 
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/core/card'
 import { Button } from '~/components/ui/core/button'
-import { Input } from '~/components/ui/core/input'
-import { Label } from '~/components/ui/core/label'
+import { FormInput } from '~/components/ui/core/form-input'
 
 import type { User } from '~/types'
 
@@ -40,26 +39,26 @@ export default function EditUserPage({ user }: EditUserPageProps) {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid gap-2">
-                <Label htmlFor="full_name">Full Name</Label>
-                <Input
-                  id="full_name"
-                  value={data.full_name}
-                  onChange={(e) => setData('full_name', e.target.value)}
-                />
-                {errors.full_name && <p className="text-sm text-destructive">{errors.full_name}</p>}
-              </div>
+              <FormInput
+                label="Full Name"
+                id="full_name"
+                value={data.full_name}
+                onChange={(e) => setData('full_name', e.target.value)}
+                error={errors.full_name}
+                autoComplete="name"
+                required
+              />
 
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={data.email}
-                  onChange={(e) => setData('email', e.target.value)}
-                />
-                {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
-              </div>
+              <FormInput
+                label="Email"
+                id="email"
+                type="email"
+                value={data.email}
+                onChange={(e) => setData('email', e.target.value)}
+                error={errors.email}
+                autoComplete="email"
+                required
+              />
 
               <div className="flex justify-end">
                 <Button type="submit" disabled={processing}>

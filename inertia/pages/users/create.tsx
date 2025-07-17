@@ -4,8 +4,7 @@ import { MainLayout } from '~/layouts/MainLayout'
 
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/core/card'
 import { Button } from '~/components/ui/core/button'
-import { Input } from '~/components/ui/core/input'
-import { Label } from '~/components/ui/core/label'
+import { FormInput } from '~/components/ui/core/form-input'
 
 export default function CreateUserPage() {
   const { data, setData, post, processing, errors } = useForm({
@@ -36,47 +35,48 @@ export default function CreateUserPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid gap-2">
-                <Label htmlFor="full_name">Full Name</Label>
-                <Input
-                  id="full_name"
-                  value={data.full_name}
-                  onChange={(e) => setData('full_name', e.target.value)}
-                />
-                {errors.full_name && <p className="text-sm text-destructive">{errors.full_name}</p>}
-              </div>
+              <FormInput
+                label="Full Name"
+                id="full_name"
+                value={data.full_name}
+                onChange={(e) => setData('full_name', e.target.value)}
+                error={errors.full_name}
+                autoComplete="name"
+                required
+              />
 
-              <div className="grid gap-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={data.email}
-                  onChange={(e) => setData('email', e.target.value)}
-                />
-                {errors.email && <p className="text-sm text-destructive">{errors.email}</p>}
-              </div>
+              <FormInput
+                label="Email"
+                id="email"
+                type="email"
+                value={data.email}
+                onChange={(e) => setData('email', e.target.value)}
+                error={errors.email}
+                autoComplete="email"
+                required
+              />
 
-              <div className="grid gap-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={data.password}
-                  onChange={(e) => setData('password', e.target.value)}
-                />
-                {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
-              </div>
+              <FormInput
+                label="Password"
+                id="password"
+                type="password"
+                value={data.password}
+                onChange={(e) => setData('password', e.target.value)}
+                error={errors.password}
+                autoComplete="new-password"
+                required
+              />
 
-              <div className="grid gap-2">
-                <Label htmlFor="password_confirmation">Confirm Password</Label>
-                <Input
-                  id="password_confirmation"
-                  type="password"
-                  value={data.password_confirmation}
-                  onChange={(e) => setData('password_confirmation', e.target.value)}
-                />
-              </div>
+              <FormInput
+                label="Confirm Password"
+                id="password_confirmation"
+                type="password"
+                value={data.password_confirmation}
+                onChange={(e) => setData('password_confirmation', e.target.value)}
+                error={errors.password_confirmation}
+                autoComplete="new-password"
+                required
+              />
 
               <div className="flex justify-end">
                 <Button type="submit" disabled={processing}>
