@@ -2,25 +2,24 @@ import { router } from '@inertiajs/react'
 import type { ApiErrorResponse } from '~/types'
 
 export class ApiClient {
-  private baseURL = '/api/v1'
-  private readonly token?: string
+  private baseURL = import.meta.env.VITE_API_URL || '/api/v1'
 
-  constructor(token?: string) {
-    this.token = token
+  private getToken(): string | null {
+    return localStorage.getItem('auth_token')
   }
 
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
     const url = `${this.baseURL}${path}`
+    const token = this.getToken()
 
-    const headers: HeadersInit = {
+    const headers = new Headers({
       'Content-Type': 'application/json',
       'Accept': 'application/json',
       ...options.headers,
-    }
+    })
 
-    if (this.token) {
-      // @ts-ignore
-      headers['Authorization'] = `Bearer ${this.token}`
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`)
     }
 
     const response = await fetch(url, {
@@ -29,6 +28,10 @@ export class ApiClient {
     })
 
     if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.removeItem('auth_token')
+        router.visit('/login')
+      }
       const error = (await response.json()) as ApiErrorResponse
       throw new ApiError(error, response.status)
     }
@@ -61,17 +64,27 @@ export class ApiClient {
   async upload<T>(path: string, file: File): Promise<T> {
     const formData = new FormData()
     formData.append('file', file)
+    const token = this.getToken()
+
+    const headers = new Headers({
+      Accept: 'application/json',
+    })
+
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`)
+    }
 
     const response = await fetch(`${this.baseURL}${path}`, {
       method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
-      },
+      headers,
       body: formData,
     })
 
     if (!response.ok) {
+      if (response.status === 401) {
+        localStorage.removeItem('auth_token')
+        router.visit('/login')
+      }
       const error = (await response.json()) as ApiErrorResponse
       throw new ApiError(error, response.status)
     }
@@ -98,29 +111,4 @@ export class ApiError extends Error {
     })
     return fieldErrors
   }
-}
-
-// Helper to handle Inertia navigation with proper types
-export function navigate(url: string, options?: any) {
-  router.visit(url, options)
-}
-
-// Helper to format dates
-export function formatDate(date: string): string {
-  return new Date(date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  })
-}
-
-// Helper to format date and time
-export function formatDateTime(date: string): string {
-  return new Date(date).toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
 }

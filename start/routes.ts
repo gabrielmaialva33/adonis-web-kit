@@ -16,9 +16,10 @@ import router from '@adonisjs/core/services/router'
 import '#routes/files/index'
 import '#routes/roles/index'
 import '#routes/users/index'
-import '#routes/users/session_routes'
 import '#routes/permissions/index'
 import '#routes/health/index'
+
+router.group(() => import('#routes/api')).prefix('/api')
 
 import '#routes/inertia/index'
 
