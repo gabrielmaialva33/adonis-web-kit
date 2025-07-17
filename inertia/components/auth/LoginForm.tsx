@@ -1,50 +1,38 @@
-import { FormEvent, useState, useEffect } from 'react'
-import { Link } from '@inertiajs/react'
+import { FormEvent, useState } from 'react'
+import { router, Link } from '@inertiajs/react'
 import { Mail, Lock } from 'lucide-react'
 
 import { Button } from '../ui/core/button'
 import { Input } from '../ui/core/input'
 import { Label } from '../ui/core/label'
 import { Alert, AlertDescription } from '../ui/core/alert'
-import { useAuth } from '~/hooks/use_auth'
 import type { LoginFormData } from '~/types'
 
 interface LoginFormProps {
   errors?: Record<string, string>
 }
 
-export function LoginForm({ errors: initialErrors }: LoginFormProps) {
-  const { login, loading, error, clearError } = useAuth()
+export function LoginForm({ errors }: LoginFormProps) {
   const [data, setData] = useState<LoginFormData>({
     uid: '',
     password: '',
   })
-  const [formErrors, setFormErrors] = useState(initialErrors)
+  const [processing, setProcessing] = useState(false)
 
-  useEffect(() => {
-    if (error) {
-      const fieldErrors = error.getFieldErrors()
-      if (Object.keys(fieldErrors).length > 0) {
-        setFormErrors(fieldErrors)
-      } else {
-        setFormErrors({ general: error.message })
-      }
-    } else {
-      setFormErrors(initialErrors)
-    }
-  }, [error, initialErrors])
-
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    clearError()
-    await login(data)
+    setProcessing(true)
+
+    router.post('/api/v1/sessions/sign-in', data, {
+      onFinish: () => setProcessing(false),
+    })
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {formErrors?.general && (
+      {errors?.general && (
         <Alert variant="destructive">
-          <AlertDescription>{formErrors.general}</AlertDescription>
+          <AlertDescription>{errors.general}</AlertDescription>
         </Alert>
       )}
 
@@ -56,13 +44,13 @@ export function LoginForm({ errors: initialErrors }: LoginFormProps) {
           name="uid"
           value={data.uid}
           onChange={(e) => setData({ ...data, uid: e.target.value })}
-          error={!!formErrors?.uid}
+          error={!!errors?.uid}
           placeholder="john@example.com"
           required
           autoComplete="username"
           leftIcon={<Mail className="h-4 w-4" />}
         />
-        {formErrors?.uid && <p className="text-sm text-destructive">{formErrors.uid}</p>}
+        {errors?.uid && <p className="text-sm text-destructive">{errors.uid}</p>}
       </div>
 
       <div className="space-y-2">
@@ -78,16 +66,22 @@ export function LoginForm({ errors: initialErrors }: LoginFormProps) {
           name="password"
           value={data.password}
           onChange={(e) => setData({ ...data, password: e.target.value })}
-          error={!!formErrors?.password}
+          error={!!errors?.password}
           required
           autoComplete="current-password"
           leftIcon={<Lock className="h-4 w-4" />}
         />
-        {formErrors?.password && <p className="text-sm text-destructive">{formErrors.password}</p>}
+        {errors?.password && <p className="text-sm text-destructive">{errors.password}</p>}
       </div>
 
       <div className="space-y-4">
-        <Button type="submit" loading={loading} disabled={loading} className="w-full" size="lg">
+        <Button
+          type="submit"
+          loading={processing}
+          disabled={processing}
+          className="w-full"
+          size="lg"
+        >
           Sign in
         </Button>
 

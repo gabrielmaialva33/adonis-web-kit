@@ -86,12 +86,7 @@ export interface AuthResponse {
 // Form Data Types
 export interface LoginFormData {
   uid: string
-  password?: string
-}
-
-export interface LoginResponse {
-  token: string
-  user: User
+  password: string
 }
 
 export interface RegisterFormData {
