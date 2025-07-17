@@ -1,11 +1,12 @@
 import { useCallback, useState } from 'react'
 import { ApiClient, ApiError } from '~/utils/api'
 
+// Create a single, shared instance of the API client.
+const apiClient = new ApiClient()
+
 export function useApi() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<ApiError | null>(null)
-
-  const client = new ApiClient()
 
   const request = useCallback(async <T>(requestFn: () => Promise<T>): Promise<T | null> => {
     setLoading(true)
@@ -27,7 +28,7 @@ export function useApi() {
   }, [])
 
   return {
-    client,
+    client: apiClient,
     loading,
     error,
     request,
