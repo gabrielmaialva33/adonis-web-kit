@@ -50,7 +50,7 @@
     "@japa/openapi-assertions": "^0.1.1",
     "@japa/plugin-adonisjs": "^4.0.0",
     "@japa/runner": "^4.2.0",
-    "@stylistic/eslint-plugin": "^5.1.0",
+    "@stylistic/eslint-plugin": "^5.2.0",
     "@swc/core": "1.12.14",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/luxon": "^3.6.2",
@@ -64,7 +64,7 @@
     "prettier": "^3.6.2",
     "ts-node-maintained": "^10.9.5",
     "typescript": "~5.8.3",
-    "vite": "^7.0.4"
+    "vite": "^7.0.5"
   },
   "dependencies": {
     "@adonisjs/ally": "^5.1.0",
@@ -73,7 +73,7 @@
     "@adonisjs/core": "^6.19.0",
     "@adonisjs/cors": "^2.2.1",
     "@adonisjs/drive": "^3.4.1",
-    "@adonisjs/i18n": "^2.2.1",
+    "@adonisjs/i18n": "^2.2.2",
     "@adonisjs/inertia": "^3.1.1",
     "@adonisjs/limiter": "^2.4.0",
     "@adonisjs/lucid": "^21.7.0",
