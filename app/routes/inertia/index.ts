@@ -39,8 +39,15 @@ router
 
     // Users - with permission check
     router
-      .get('/users', [InertiaUsersController, 'index'])
-      .as('users.index')
+      .group(() => {
+        router.get('/', [InertiaUsersController, 'index']).as('users.index')
+        router.get('/create', [InertiaUsersController, 'create']).as('users.create')
+        router.post('/', [InertiaUsersController, 'store']).as('users.store')
+        router.get('/:id/edit', [InertiaUsersController, 'edit']).as('users.edit')
+        router.put('/:id', [InertiaUsersController, 'update']).as('users.update')
+        router.delete('/:id', [InertiaUsersController, 'destroy']).as('users.destroy')
+      })
+      .prefix('/users')
       .use(
         middleware.permission({
           permissions: 'users.list',
