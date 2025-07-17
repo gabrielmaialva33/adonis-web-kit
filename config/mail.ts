@@ -2,7 +2,7 @@ import { defineConfig, transports } from '@adonisjs/mail'
 import env from '#start/env'
 
 const mailConfig = defineConfig({
-  default: env.get('MAIL_MAILER', 'mailgun'),
+  default: env.get('MAIL_MAILER', 'mailgun') as 'smtp' | 'mailgun',
 
   /**
    * A static address for the "from" property. It will be
@@ -21,19 +21,19 @@ const mailConfig = defineConfig({
    */
   mailers: {
     smtp: transports.smtp({
-      host: env.get('SMTP_HOST'),
+      host: env.get('SMTP_HOST', 'localhost'),
       port: env.get('SMTP_PORT'),
       secure: env.get('SMTP_PORT') === '465',
       auth: {
         type: 'login',
-        user: env.get('SMTP_USER'),
-        pass: env.get('SMTP_PASS'),
+        user: env.get('SMTP_USER', ''),
+        pass: env.get('SMTP_PASS', ''),
       },
     }),
 
     mailgun: transports.mailgun({
-      key: env.get('MAILGUN_API_KEY'),
-      domain: env.get('MAILGUN_DOMAIN'),
+      key: env.get('MAILGUN_API_KEY', ''),
+      domain: env.get('MAILGUN_DOMAIN', ''),
       baseUrl: env.get('MAILGUN_BASE_URL', 'https://api.mailgun.net/v3'),
     }),
   },
