@@ -18,7 +18,7 @@ import {
 } from '~/components/ui/core/dropdown-menu'
 import type { PaginatedResponse, User } from '~/types'
 
-import { formatDate } from '~/utils/api'
+import { formatDate } from '~/utils/formatters'
 
 interface UsersPageProps {
   users: PaginatedResponse<User>
@@ -83,7 +83,7 @@ export default function UsersPage({ users }: UsersPageProps) {
       key: 'created_at',
       label: 'Created',
       sortable: true,
-      render: (value) => formatDate(value),
+      render: (value: string) => formatDate(value),
     },
     {
       key: 'actions',
@@ -150,7 +150,7 @@ export default function UsersPage({ users }: UsersPageProps) {
                   type="search"
                   placeholder="Search users..."
                   className="pl-10 w-full sm:w-64"
-                  size="sm"
+                  inputSize="sm"
                   value={searchTerm}
                   onChange={(e) => handleSearch(e.target.value)}
                 />
@@ -167,10 +167,10 @@ export default function UsersPage({ users }: UsersPageProps) {
             />
 
             {/* Pagination */}
-            {users.meta.last_page > 1 && (
+            {Number(users.meta.last_page) > 1 && (
               <div className="flex items-center justify-between mt-6 pt-6 border-t">
                 <p className="text-sm text-muted-foreground">
-                  Showing {users.meta.current_page} of {users.meta.last_page} pages
+                  Showing page {Number(users.meta.current_page)} of {Number(users.meta.last_page)}
                 </p>
                 <div className="flex gap-2">
                   {users.meta.previous_page_url && (

@@ -1,5 +1,5 @@
-import { FormEvent, useState } from 'react'
-import { router, Link } from '@inertiajs/react'
+import { FormEvent } from 'react'
+import { useForm, Link } from '@inertiajs/react'
 import { Mail, Lock } from 'lucide-react'
 
 import { Button } from '../ui/core/button'
@@ -8,34 +8,19 @@ import { Label } from '../ui/core/label'
 import { Alert, AlertDescription } from '../ui/core/alert'
 import type { LoginFormData } from '~/types'
 
-interface LoginFormProps {
-  errors?: Record<string, string>
-}
-
-export function LoginForm({ errors }: LoginFormProps) {
-  const [data, setData] = useState<LoginFormData>({
+export function LoginForm() {
+  const { data, setData, post, processing, errors } = useForm({
     uid: '',
     password: '',
   })
-  const [processing, setProcessing] = useState(false)
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    setProcessing(true)
-
-    router.post('/api/v1/sessions/sign-in', data, {
-      onFinish: () => setProcessing(false),
-    })
+    post('/api/v1/sessions/sign-in')
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {errors?.general && (
-        <Alert variant="destructive">
-          <AlertDescription>{errors.general}</AlertDescription>
-        </Alert>
-      )}
-
       <div className="space-y-2">
         <Label htmlFor="uid">Email or Username</Label>
         <Input
@@ -43,14 +28,14 @@ export function LoginForm({ errors }: LoginFormProps) {
           type="text"
           name="uid"
           value={data.uid}
-          onChange={(e) => setData({ ...data, uid: e.target.value })}
-          error={!!errors?.uid}
+          onChange={(e) => setData('uid', e.target.value)}
+          error={!!errors.uid}
           placeholder="john@example.com"
           required
           autoComplete="username"
           leftIcon={<Mail className="h-4 w-4" />}
         />
-        {errors?.uid && <p className="text-sm text-destructive">{errors.uid}</p>}
+        {errors.uid && <p className="text-sm text-destructive">{errors.uid}</p>}
       </div>
 
       <div className="space-y-2">
@@ -65,13 +50,13 @@ export function LoginForm({ errors }: LoginFormProps) {
           type="password"
           name="password"
           value={data.password}
-          onChange={(e) => setData({ ...data, password: e.target.value })}
-          error={!!errors?.password}
+          onChange={(e) => setData('password', e.target.value)}
+          error={!!errors.password}
           required
           autoComplete="current-password"
           leftIcon={<Lock className="h-4 w-4" />}
         />
-        {errors?.password && <p className="text-sm text-destructive">{errors.password}</p>}
+        {errors.password && <p className="text-sm text-destructive">{errors.password}</p>}
       </div>
 
       <div className="space-y-4">

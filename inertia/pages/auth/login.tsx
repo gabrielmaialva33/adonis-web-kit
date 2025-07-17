@@ -1,13 +1,10 @@
 import { Head, Link } from '@inertiajs/react'
+
 import { LoginForm } from '~/components/auth/LoginForm'
 import { ThemeToggle } from '~/components/theme/theme-toggle'
 import { Card } from '~/components/ui/core/card'
 
-interface LoginPageProps {
-  errors?: Record<string, string>
-}
-
-export default function LoginPage({ errors }: LoginPageProps) {
+export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
       <Head title="Login" />
@@ -35,7 +32,7 @@ export default function LoginPage({ errors }: LoginPageProps) {
             </div>
 
             <Card className="p-0 shadow-none border-0">
-              <LoginForm errors={errors} />
+              <LoginForm />
             </Card>
 
             <div className="mt-6 text-center text-sm">

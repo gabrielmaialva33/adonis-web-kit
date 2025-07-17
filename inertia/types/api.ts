@@ -51,10 +51,10 @@ export interface PaginationMeta {
   current_page: number
   last_page: number
   first_page: number
-  first_page_url: string
-  last_page_url: string
-  next_page_url?: string
-  previous_page_url?: string
+  first_page_url: string | null
+  last_page_url: string | null
+  next_page_url: string | null
+  previous_page_url: string | null
 }
 
 export interface PaginatedResponse<T> {
@@ -87,6 +87,7 @@ export interface AuthResponse {
 export interface LoginFormData {
   uid: string
   password: string
+  [key: string]: any
 }
 
 export interface RegisterFormData {

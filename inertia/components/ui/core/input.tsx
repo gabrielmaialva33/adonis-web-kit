@@ -6,7 +6,7 @@ const inputVariants = cva(
   'flex w-full rounded-md border border-input bg-background text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
   {
     variants: {
-      size: {
+      inputSize: {
         default: 'h-10 px-3 py-2',
         sm: 'h-8 px-2 py-1 text-xs',
         lg: 'h-12 px-4 py-3',
@@ -18,7 +18,7 @@ const inputVariants = cva(
       },
     },
     defaultVariants: {
-      size: 'default',
+      inputSize: 'default',
       variant: 'default',
     },
   }
@@ -33,7 +33,7 @@ export interface InputProps
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ className, type, size, variant, leftIcon, rightIcon, error, ...props }, ref) => {
+  ({ className, type, inputSize: size, variant, leftIcon, rightIcon, error, ...props }, ref) => {
     if (leftIcon || rightIcon) {
       return (
         <div className="relative">
@@ -45,7 +45,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <input
             type={type}
             className={cn(
-              inputVariants({ size, variant }),
+              inputVariants({ inputSize: size, variant }),
               leftIcon && 'pl-10',
               rightIcon && 'pr-10',
               error && 'border-destructive focus-visible:ring-destructive',
@@ -67,7 +67,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
       <input
         type={type}
         className={cn(
-          inputVariants({ size, variant }),
+          inputVariants({ inputSize: size, variant }),
           error && 'border-destructive focus-visible:ring-destructive',
           className
         )}

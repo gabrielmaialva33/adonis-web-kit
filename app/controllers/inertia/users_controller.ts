@@ -9,7 +9,7 @@ export default class InertiaUsersController {
     const users = await User.query().orderBy('created_at', 'desc').paginate(page, perPage)
 
     return inertia.render('users/index', {
-      users: users.serialize(),
+      users: users.toJSON(),
     })
   }
 }
