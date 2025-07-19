@@ -13,7 +13,7 @@ export function LoginForm() {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    post('/api/v1/sessions/sign-in')
+    post('/login')
   }
 
   return (

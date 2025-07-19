@@ -17,6 +17,7 @@ const InertiaFilesController = () => import('#controllers/inertia/files_controll
 
 // Public routes
 router.get('/login', [InertiaAuthController, 'showLogin']).as('login')
+router.post('/login', [InertiaAuthController, 'login']).as('login.post')
 router.get('/register', [InertiaAuthController, 'showRegister']).as('register')
 
 // Root route redirects to dashboard if authenticated, otherwise to login
