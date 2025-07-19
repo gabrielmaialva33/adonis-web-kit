@@ -37,6 +37,13 @@ router
     // Dashboard
     router.get('/dashboard', [InertiaDashboardController, 'index']).as('dashboard')
 
+    // UI Demo Page
+    router
+      .get('/ui-demo', async ({ inertia }) => {
+        return inertia.render('ui-demo')
+      })
+      .as('ui-demo')
+
     // Users - with permission check
     router
       .group(() => {
