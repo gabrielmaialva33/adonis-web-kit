@@ -2,7 +2,7 @@ import { Paintbrush } from 'lucide-react'
 import { Button } from '~/components/ui/core/button'
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/core/popover'
 import { Label } from '~/components/ui/core/label'
-import { useThemeConfig, type ThemeColor, type ThemeRadius } from '~/hooks/use-theme-config'
+import { useThemeConfig, type ThemeColor, type ThemeRadius } from '~/hooks/use_theme_config'
 import { cn } from '~/utils/cn'
 
 export function ThemeCustomizer() {

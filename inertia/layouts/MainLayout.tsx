@@ -2,7 +2,7 @@ import { useState, ReactNode } from 'react'
 import { Header } from './main/components/header'
 import { Sidebar } from './main/components/sidebar'
 import { cn } from '~/utils/cn'
-import { useIsMobile } from '~/hooks/use-mobile'
+import { useIsMobile } from '~/hooks/use_mobile'
 
 interface MainLayoutProps {
   children: ReactNode
