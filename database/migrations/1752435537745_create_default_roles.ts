@@ -12,6 +12,6 @@ export default class extends BaseSchema {
   }
 
   async down() {
-    this.schema.raw('TRUNCATE TABLE roles CASCADE')
+    await this.db.from('roles').delete()
   }
 }

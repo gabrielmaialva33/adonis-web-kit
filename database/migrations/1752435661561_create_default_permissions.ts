@@ -18,8 +18,8 @@ export default class extends BaseSchema {
 
   async down() {
     // Remove all permission associations
-    this.db.raw('TRUNCATE TABLE role_permissions CASCADE')
-    this.db.raw('TRUNCATE TABLE user_permissions CASCADE')
-    this.db.raw('TRUNCATE TABLE permissions CASCADE')
+    await this.db.from('role_permissions').delete()
+    await this.db.from('user_permissions').delete()
+    await this.db.from('permissions').delete()
   }
 }
