@@ -1,3 +1,4 @@
+// Existing components
 export * from './alert'
 export * from './badge'
 export * from './button'
@@ -10,3 +11,12 @@ export * from './input'
 export * from './label'
 export * from './select'
 export * from './tooltip'
+
+// New components
+export * from './drawer'
+export * from './stepper'
+export * from './timeline'
+export * from './empty-state'
+export * from './stats-card'
+export * from './tabs'
+export * from './data-table'

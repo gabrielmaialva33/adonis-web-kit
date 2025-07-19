@@ -73,7 +73,7 @@ export function Sidebar({ isOpen, onClose, isCollapsed = false }: SidebarProps) 
   }
 
   const isActive = (href?: string) => {
-    if (!href) return false
+    if (!href || !url) return false
     return url === href || url.startsWith(href + '/')
   }
 

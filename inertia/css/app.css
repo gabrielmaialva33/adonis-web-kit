@@ -42,6 +42,13 @@
 
     --info: 199.7 89% 48.4%;
     --info-foreground: 210 40% 98%;
+
+    /* Chart colors */
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
   }
 
   .dark {
@@ -82,6 +89,13 @@
 
     --info: 213.1 93.9% 67.8%;
     --info-foreground: 216.9 91.4% 12.9%;
+
+    /* Chart colors for dark mode */
+    --chart-1: 220 70% 60%;
+    --chart-2: 160 60% 55%;
+    --chart-3: 30 80% 65%;
+    --chart-4: 280 65% 70%;
+    --chart-5: 340 75% 65%;
   }
 }
 
@@ -136,7 +150,7 @@
     height: 1.75rem; /* 28px */
   }
 
-  .h-8\.5 {
+  .h-8-5 {
     height: 2.125rem; /* 34px */
   }
 
