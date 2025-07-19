@@ -5,6 +5,7 @@ import testUtils from '@adonisjs/core/services/test_utils'
 import { cuid } from '@adonisjs/core/helpers'
 import db from '@adonisjs/lucid/services/db'
 import app from '@adonisjs/core/services/app'
+import limiter from '@adonisjs/limiter/services/main'
 
 import User from '#models/user'
 import Role from '#models/role'
@@ -16,6 +17,11 @@ import IRole from '#interfaces/role_interface'
 
 test.group('Files upload', (group) => {
   group.each.setup(() => testUtils.db().withGlobalTransaction())
+  
+  group.each.setup(() => {
+    // Clear rate limiter storage before each test
+    return () => limiter.clear()
+  })
 
   // Helper function to create and assign permissions to a role
   async function assignPermissions(role: Role, actions: string[]) {
@@ -210,6 +216,7 @@ test.group('Files upload', (group) => {
 
     const response = await client
       .post('/api/v1/files/upload')
+      .header('Accept', 'application/json')
       .file('file', testFilePath)
       .loginAs(user)
 
@@ -258,6 +265,7 @@ test.group('Files upload', (group) => {
 
     const response = await client
       .post('/api/v1/files/upload')
+      .header('Accept', 'application/json')
       .file('file', testFilePath)
       .loginAs(user)
 

@@ -181,6 +181,7 @@ test.group('Users CRUD', (group) => {
 
     const response = await client
       .post('/api/v1/users')
+      .header('Accept', 'application/json')
       .json({
         full_name: 'New User',
         email: 'invalid-email',
@@ -352,7 +353,8 @@ test.group('Users CRUD', (group) => {
     // Check if soft deleted
     const deletedUser = await db.from('users').where('id', targetUser.id).first()
     assert.isNotNull(deletedUser)
-    assert.isTrue(deletedUser!.is_deleted)
+    // SQLite returns 0/1 for booleans, so we need to check for truthy value
+    assert.isTrue(!!deletedUser!.is_deleted)
 
     // Check if not found with normal query due to soft delete scope
     const notFoundUser = await User.find(targetUser.id)

@@ -12,7 +12,10 @@ test.group('Basic API', () => {
   })
 
   test('should check if CSRF is properly disabled for API routes', async ({ client }) => {
-    const response = await client.post('/api/v1/sessions/sign-in').json({})
+    const response = await client
+      .post('/api/v1/sessions/sign-in')
+      .header('Accept', 'application/json')
+      .json({})
 
     // Should get validation error, not CSRF error
     response.assertStatus(422)

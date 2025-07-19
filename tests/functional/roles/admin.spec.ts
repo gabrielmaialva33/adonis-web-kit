@@ -185,7 +185,10 @@ test.group('Roles admin', (group) => {
 
     await adminUser.related('roles').sync([adminRole.id])
 
-    const response = await client.put('/api/v1/admin/roles/attach').json({}).loginAs(adminUser)
+    const response = await client.put('/api/v1/admin/roles/attach')
+      .header('Accept', 'application/json')
+      .json({})
+      .loginAs(adminUser)
 
     response.assertStatus(422)
     response.assertBodyContains({

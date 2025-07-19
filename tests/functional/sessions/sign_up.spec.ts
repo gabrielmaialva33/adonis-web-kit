@@ -62,13 +62,15 @@ test.group('Sessions sign up', (group) => {
       password: 'hashedpassword',
     })
 
-    const response = await client.post('/api/v1/sessions/sign-up').json({
-      full_name: 'Jane Doe',
-      email: 'john@example.com',
-      username: 'janedoe',
-      password: 'password123',
-      password_confirmation: 'password123',
-    })
+    const response = await client.post('/api/v1/sessions/sign-up')
+      .header('Accept', 'application/json')
+      .json({
+        full_name: 'Jane Doe',
+        email: 'john@example.com',
+        username: 'janedoe',
+        password: 'password123',
+        password_confirmation: 'password123',
+      })
 
     response.assertStatus(422)
     response.assertBodyContains({
@@ -89,13 +91,15 @@ test.group('Sessions sign up', (group) => {
       password: 'hashedpassword',
     })
 
-    const response = await client.post('/api/v1/sessions/sign-up').json({
-      full_name: 'Jane Doe',
-      email: 'jane@example.com',
-      username: 'johndoe',
-      password: 'password123',
-      password_confirmation: 'password123',
-    })
+    const response = await client.post('/api/v1/sessions/sign-up')
+      .header('Accept', 'application/json')
+      .json({
+        full_name: 'Jane Doe',
+        email: 'jane@example.com',
+        username: 'johndoe',
+        password: 'password123',
+        password_confirmation: 'password123',
+      })
 
     response.assertStatus(422)
     response.assertBodyContains({
@@ -109,7 +113,9 @@ test.group('Sessions sign up', (group) => {
   })
 
   test('should validate required fields', async ({ client }) => {
-    const response = await client.post('/api/v1/sessions/sign-up').json({})
+    const response = await client.post('/api/v1/sessions/sign-up')
+      .header('Accept', 'application/json')
+      .json({})
 
     response.assertStatus(422)
     response.assertBodyContains({
@@ -134,13 +140,15 @@ test.group('Sessions sign up', (group) => {
   })
 
   test('should validate email format', async ({ client }) => {
-    const response = await client.post('/api/v1/sessions/sign-up').json({
-      full_name: 'Jane Doe',
-      email: 'invalid-email',
-      username: 'janedoe',
-      password: 'password123',
-      password_confirmation: 'password123',
-    })
+    const response = await client.post('/api/v1/sessions/sign-up')
+      .header('Accept', 'application/json')
+      .json({
+        full_name: 'Jane Doe',
+        email: 'invalid-email',
+        username: 'janedoe',
+        password: 'password123',
+        password_confirmation: 'password123',
+      })
 
     response.assertStatus(422)
     response.assertBodyContains({
@@ -154,13 +162,15 @@ test.group('Sessions sign up', (group) => {
   })
 
   test('should validate password minimum length', async ({ client }) => {
-    const response = await client.post('/api/v1/sessions/sign-up').json({
-      full_name: 'Jane Doe',
-      email: 'jane@example.com',
-      username: 'janedoe',
-      password: '12345',
-      password_confirmation: '12345',
-    })
+    const response = await client.post('/api/v1/sessions/sign-up')
+      .header('Accept', 'application/json')
+      .json({
+        full_name: 'Jane Doe',
+        email: 'jane@example.com',
+        username: 'janedoe',
+        password: '12345',
+        password_confirmation: '12345',
+      })
 
     response.assertStatus(422)
     response.assertBodyContains({
