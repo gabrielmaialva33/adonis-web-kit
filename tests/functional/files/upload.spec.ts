@@ -17,7 +17,7 @@ import IRole from '#interfaces/role_interface'
 
 test.group('Files upload', (group) => {
   group.each.setup(() => testUtils.db().withGlobalTransaction())
-  
+
   group.each.setup(() => {
     // Clear rate limiter storage before each test
     return () => limiter.clear()

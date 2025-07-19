@@ -81,7 +81,8 @@ test.group('Sessions sign in', (group) => {
   })
 
   test('should validate required fields', async ({ client }) => {
-    const response = await client.post('/api/v1/sessions/sign-in')
+    const response = await client
+      .post('/api/v1/sessions/sign-in')
       .header('Accept', 'application/json')
       .json({})
 

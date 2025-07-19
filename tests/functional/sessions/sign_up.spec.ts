@@ -62,7 +62,8 @@ test.group('Sessions sign up', (group) => {
       password: 'hashedpassword',
     })
 
-    const response = await client.post('/api/v1/sessions/sign-up')
+    const response = await client
+      .post('/api/v1/sessions/sign-up')
       .header('Accept', 'application/json')
       .json({
         full_name: 'Jane Doe',
@@ -91,7 +92,8 @@ test.group('Sessions sign up', (group) => {
       password: 'hashedpassword',
     })
 
-    const response = await client.post('/api/v1/sessions/sign-up')
+    const response = await client
+      .post('/api/v1/sessions/sign-up')
       .header('Accept', 'application/json')
       .json({
         full_name: 'Jane Doe',
@@ -113,7 +115,8 @@ test.group('Sessions sign up', (group) => {
   })
 
   test('should validate required fields', async ({ client }) => {
-    const response = await client.post('/api/v1/sessions/sign-up')
+    const response = await client
+      .post('/api/v1/sessions/sign-up')
       .header('Accept', 'application/json')
       .json({})
 
@@ -140,7 +143,8 @@ test.group('Sessions sign up', (group) => {
   })
 
   test('should validate email format', async ({ client }) => {
-    const response = await client.post('/api/v1/sessions/sign-up')
+    const response = await client
+      .post('/api/v1/sessions/sign-up')
       .header('Accept', 'application/json')
       .json({
         full_name: 'Jane Doe',
@@ -162,7 +166,8 @@ test.group('Sessions sign up', (group) => {
   })
 
   test('should validate password minimum length', async ({ client }) => {
-    const response = await client.post('/api/v1/sessions/sign-up')
+    const response = await client
+      .post('/api/v1/sessions/sign-up')
       .header('Accept', 'application/json')
       .json({
         full_name: 'Jane Doe',

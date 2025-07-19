@@ -185,7 +185,8 @@ test.group('Roles admin', (group) => {
 
     await adminUser.related('roles').sync([adminRole.id])
 
-    const response = await client.put('/api/v1/admin/roles/attach')
+    const response = await client
+      .put('/api/v1/admin/roles/attach')
       .header('Accept', 'application/json')
       .json({})
       .loginAs(adminUser)

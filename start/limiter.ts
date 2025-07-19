@@ -79,7 +79,6 @@ export const apiThrottle = limiter.define('api', async (ctx) => {
  * - Blocks for 1 hour after exhausting attempts
  */
 export const uploadThrottle = limiter.define('upload', async (ctx) => {
-
   try {
     const isAuthenticated = await ctx.auth.check()
 
