@@ -53,7 +53,7 @@
     "@japa/plugin-adonisjs": "^4.0.0",
     "@japa/runner": "^4.2.0",
     "@stylistic/eslint-plugin": "^5.2.0",
-    "@swc/core": "1.13.0",
+    "@swc/core": "1.13.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@testing-library/user-event": "^14.6.1",
