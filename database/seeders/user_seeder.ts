@@ -5,6 +5,8 @@ export default class extends BaseSeeder {
   static environment = ['development']
 
   async run() {
-    await UserFactory.createMany(10)
+    await UserFactory.merge({
+      password: '123456',
+    }).createMany(10)
   }
 }
