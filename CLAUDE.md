@@ -2,6 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## ⚠️ CRITICAL RULE: ALWAYS USE ADONISJS COMMANDS
+
+**NEVER manually create files in this project.** Always use AdonisJS Ace commands:
+
+- `node ace make:controller` for controllers
+- `node ace make:model` for models
+- `node ace make:migration` for migrations
+- `node ace make:service` for services
+- See "AdonisJS Commands Reference" section below for complete list
+
+This ensures proper file structure, naming conventions, and boilerplate code.
+
 ## Common Development Commands
 
 ### Development
@@ -133,3 +145,269 @@ Services are organized by domain with specific use cases:
 - `app/services/upload/` - File upload handling
 
 This structure promotes maintainability and clear separation of business logic.
+
+## AdonisJS Commands Reference (MUST USE)
+
+### File Generation Commands
+
+#### Controllers
+
+```bash
+node ace make:controller User
+# Creates: app/controllers/users_controller.ts
+
+node ace make:controller Post --resource
+# Creates controller with all RESTful methods
+```
+
+#### Models
+
+```bash
+node ace make:model User
+# Creates: app/models/user.ts
+
+node ace make:model Post -m
+# Creates model with migration
+```
+
+#### Migrations
+
+```bash
+node ace make:migration users
+# Creates: database/migrations/[timestamp]_create_users_table.ts
+
+node ace make:migration add_email_to_users --alter
+# Creates migration for altering existing table
+```
+
+#### Services
+
+```bash
+node ace make:service users/CreateUser
+# Creates: app/services/users/create_user.ts
+
+node ace make:service auth/VerifyEmail
+# Creates: app/services/auth/verify_email.ts
+```
+
+#### Middleware
+
+```bash
+node ace make:middleware Auth
+# Creates: app/middleware/auth_middleware.ts
+
+node ace make:middleware RateLimit --stack=router
+# Creates middleware for router stack
+```
+
+#### Validators
+
+```bash
+node ace make:validator CreateUser
+# Creates: app/validators/create_user.ts
+
+node ace make:validator users/UpdateProfile
+# Creates: app/validators/users/update_profile.ts
+```
+
+#### Tests
+
+```bash
+node ace make:test UserController --suite=functional
+# Creates: tests/functional/user_controller.spec.ts
+
+node ace make:test UserService --suite=unit
+# Creates: tests/unit/user_service.spec.ts
+```
+
+#### Other Resources
+
+```bash
+node ace make:factory User
+# Creates: database/factories/user_factory.ts
+
+node ace make:seeder User
+# Creates: database/seeders/user_seeder.ts
+
+node ace make:event UserRegistered
+# Creates: app/events/user_registered.ts
+
+node ace make:listener SendWelcomeEmail
+# Creates: app/listeners/send_welcome_email.ts
+
+node ace make:mail VerifyEmail
+# Creates: app/mails/verify_email.ts
+
+node ace make:exception ValidationException
+# Creates: app/exceptions/validation_exception.ts
+
+node ace make:provider AppProvider
+# Creates: providers/app_provider.ts
+
+node ace make:command SendEmails
+# Creates: commands/send_emails.ts
+
+node ace make:job ProcessPayment
+# Creates: app/jobs/process_payment.ts
+
+node ace make:preload redis
+# Creates: start/redis.ts
+
+node ace make:view users/index
+# Creates: resources/views/users/index.edge
+```
+
+### Migration Commands
+
+```bash
+# Run pending migrations
+node ace migration:run
+
+# Rollback last batch
+node ace migration:rollback
+
+# Rollback all migrations
+node ace migration:reset
+
+# Drop all tables and re-migrate
+node ace migration:fresh
+
+# Rollback and re-run all migrations
+node ace migration:refresh
+
+# Check migration status
+node ace migration:status
+
+# Rollback to specific batch
+node ace migration:rollback --batch=2
+```
+
+### Package Management
+
+```bash
+# Install and configure a package
+node ace add @adonisjs/lucid
+
+# Configure already installed package
+node ace configure @adonisjs/lucid
+```
+
+## REPL (Read-Eval-Print Loop) Usage
+
+### Starting REPL
+
+```bash
+# Start interactive REPL session
+node ace repl
+```
+
+### Common REPL Operations
+
+#### Import Models and Services
+
+```javascript
+// Import default export
+const User = await importDefault('#models/user')
+
+// Alternative import syntax
+const { default: User } = await import('#models/user')
+
+// Import services
+const UserService = await importDefault('#services/users/create_user')
+```
+
+#### Working with Models
+
+```javascript
+// Query users
+const users = await User.all()
+const user = await User.find(1)
+
+// Create user
+const newUser = await User.create({
+  email: 'test@example.com',
+  password: 'secret',
+})
+
+// Update user
+user.email = 'newemail@example.com'
+await user.save()
+```
+
+#### Load Application Services
+
+```javascript
+// Load specific services
+await loadApp() // Access app service
+await loadRouter() // Access router service
+await loadConfig() // Access config service
+await loadHash() // Access hash service
+await loadHelpers() // Access helpers module
+```
+
+### REPL Best Practices
+
+1. **Use for debugging and data exploration**
+   - Test queries before implementing
+   - Inspect data relationships
+   - Debug service methods
+
+2. **Common Use Cases**
+   - Testing model queries
+   - Debugging service logic
+   - Inspecting configuration
+   - Running one-off data migrations
+   - Testing email templates
+   - Verifying queue jobs
+
+### REPL Tips
+
+- Use `importDefault()` for cleaner imports
+- Access configs via `await loadConfig()`
+- Test services interactively before implementing
+- Use `.ls` to list all available methods
+- Press Tab for auto-completion
+- Use `.exit` or Ctrl+C twice to quit
+
+## Important Instructions for AI Assistants
+
+1. **ALWAYS USE COMMANDS** - Never create files manually
+   - Use `node ace make:controller` not manual file creation
+   - Use `node ace make:migration` not manual database files
+   - Use `node ace make:service` not manual service files
+
+2. **Follow the Architecture**
+   - Controller → Service → Repository → Model flow
+   - Use dependency injection with `@inject()` decorator
+   - Keep business logic in services, not controllers
+
+3. **Use Import Aliases**
+   - Always use `#controllers/*`, `#services/*`, etc.
+   - Never use relative imports like `../../`
+
+4. **Test Before Committing**
+   - Run `pnpm lint` - Must pass
+   - Run `pnpm typecheck` - Must pass
+   - Run `pnpm test` - Must pass
+
+5. **Suggest REPL for Debugging**
+   - When users need to explore data
+   - When testing queries before implementation
+   - When debugging service methods
+
+6. **Example Workflow**
+
+   ```bash
+   # User asks: "Create a new product feature"
+
+   # Execute in order:
+   node ace make:model Product -m
+   node ace make:controller Product --resource
+   node ace make:validator CreateProduct
+   node ace make:service products/CreateProduct
+   node ace make:service products/UpdateProduct
+   node ace make:service products/DeleteProduct
+   node ace make:factory Product
+   node ace make:test ProductController --suite=functional
+   node ace migration:run
+   ```
