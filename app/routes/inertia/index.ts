@@ -15,10 +15,19 @@ const InertiaDashboardController = () => import('#controllers/inertia/dashboard_
 const InertiaUsersController = () => import('#controllers/inertia/users_controller')
 const InertiaFilesController = () => import('#controllers/inertia/files_controller')
 
-// Public routes
-router.get('/login', [InertiaAuthController, 'showLogin']).as('login')
-router.post('/login', [InertiaAuthController, 'login']).as('login.post')
-router.get('/register', [InertiaAuthController, 'showRegister']).as('register')
+// Public routes - with guest middleware to redirect authenticated users
+router
+  .get('/login', [InertiaAuthController, 'showLogin'])
+  .as('login')
+  .use(middleware.guest({ guards: ['jwt'] }))
+router
+  .post('/login', [InertiaAuthController, 'login'])
+  .as('login.post')
+  .use(middleware.guest({ guards: ['jwt'] }))
+router
+  .get('/register', [InertiaAuthController, 'showRegister'])
+  .as('register')
+  .use(middleware.guest({ guards: ['jwt'] }))
 
 // Root route redirects to dashboard if authenticated, otherwise to login
 router
