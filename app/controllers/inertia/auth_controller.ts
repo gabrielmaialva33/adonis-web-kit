@@ -1,7 +1,7 @@
-import type { HttpContext } from '@adonisjs/core/http'
+import { HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
 import { signInValidator } from '#validations/users_validator'
-import SignInService from '#services/users/sign_in_service'
+import UsersRepository from '#repositories/users_repository'
 
 export default class InertiaAuthController {
   async showLogin({ inertia }: HttpContext) {
@@ -13,15 +13,16 @@ export default class InertiaAuthController {
   }
 
   async login(ctx: HttpContext) {
-    const { request, response, session } = ctx
+    const { request, response, session, auth } = ctx
     const { uid, password } = await request.validateUsing(signInValidator)
 
     try {
-      const service = await app.container.make(SignInService)
-      const payload = await service.run({ uid, password, ctx })
+      // Verify credentials using the repository directly
+      const usersRepository = await app.container.make(UsersRepository)
+      const user = await usersRepository.verifyCredentials(uid, password)
 
-      // Store the token in session for the web interface
-      session.put('authToken', payload.auth.access_token)
+      // Use the JWT guard to generate and set the token as cookie
+      await auth.use('jwt').generate(user)
 
       // Redirect to dashboard after successful login
       return response.redirect('/dashboard')
