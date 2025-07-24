@@ -1,5 +1,6 @@
 import { assert } from '@japa/assert'
 import { apiClient } from '@japa/api-client'
+import { browserClient } from '@japa/browser-client'
 import app from '@adonisjs/core/services/app'
 import type { Config } from '@japa/runner/types'
 import { pluginAdonisJS } from '@japa/plugin-adonisjs'
@@ -23,6 +24,7 @@ export const plugins: Config['plugins'] = [
   apiClient({
     baseURL: `http://${env.get('HOST')}:${env.get('PORT')}`,
   }),
+  browserClient({}),
   pluginAdonisJS(app),
   authApiClient(app),
   sessionApiClient(app),
