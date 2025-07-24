@@ -161,7 +161,7 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
     "xlsx": "^0.18.5",
-    "zod": "^4.0.8"
+    "zod": "^4.0.9"
   },
   "hotHook": {
     "boundaries": [
