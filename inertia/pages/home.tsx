@@ -633,73 +633,153 @@ export default function Home() {
           </motion.div>
 
           <motion.div
-            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 max-w-5xl mx-auto"
+            className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 max-w-6xl mx-auto"
             variants={containerVariants}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true }}
           >
-            <motion.div variants={itemVariants} className="text-center">
-              <div className="h-24 w-24 bg-gradient-to-br from-primary/10 to-primary/30 border border-primary/40 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/15 to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <span className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-primary to-violet-500">
-                  A
-                </span>
+            <motion.div variants={itemVariants} className="text-center group cursor-pointer">
+              <div className="h-28 w-28 bg-muted/50 dark:bg-muted/30 backdrop-blur border border-border rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg relative overflow-hidden group-hover:scale-110 group-hover:shadow-xl transition-all duration-300">
+                <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-violet-500 rounded-2xl opacity-0 group-hover:opacity-20 blur transition-opacity duration-300"></div>
+                <div className="relative z-10 p-4">
+                  <img 
+                    src="https://avatars.githubusercontent.com/u/13810373" 
+                    alt="AdonisJS" 
+                    className="h-16 w-16 rounded-lg"
+                  />
+                </div>
               </div>
-              <h3 className="font-semibold text-base">AdonisJS v6</h3>
-              <p className="text-sm text-muted-foreground">Backend Framework</p>
+              <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">AdonisJS v6</h3>
+              <p className="text-sm text-muted-foreground">Full-Stack Framework</p>
             </motion.div>
 
-            <motion.div variants={itemVariants} className="text-center">
-              <div className="h-24 w-24 bg-gradient-to-br from-blue-500/10 to-blue-500/30 border border-blue-500/40 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/15 to-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <span className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-blue-400 to-blue-600">
-                  R
-                </span>
+            <motion.div variants={itemVariants} className="text-center group cursor-pointer">
+              <div className="h-28 w-28 bg-muted/50 dark:bg-muted/30 backdrop-blur border border-border rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg relative overflow-hidden group-hover:scale-110 group-hover:shadow-xl transition-all duration-300">
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-400 to-blue-600 rounded-2xl opacity-0 group-hover:opacity-20 blur transition-opacity duration-300"></div>
+                <div className="relative z-10 p-4">
+                  <img 
+                    src="https://skillicons.dev/icons?i=react" 
+                    alt="React" 
+                    className="h-16 w-16"
+                  />
+                </div>
               </div>
-              <h3 className="font-semibold text-base">React 19</h3>
-              <p className="text-sm text-muted-foreground">UI Framework</p>
+              <h3 className="font-bold text-lg mb-1 group-hover:text-blue-500 transition-colors">React 19</h3>
+              <p className="text-sm text-muted-foreground">UI Library</p>
             </motion.div>
 
-            <motion.div variants={itemVariants} className="text-center">
-              <div className="h-24 w-24 bg-gradient-to-br from-teal-500/10 to-teal-500/30 border border-teal-500/40 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-teal-500/15 to-teal-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <span className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-teal-400 to-teal-600">
-                  I
-                </span>
+            <motion.div variants={itemVariants} className="text-center group cursor-pointer">
+              <div className="h-28 w-28 bg-muted/50 dark:bg-muted/30 backdrop-blur border border-border rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg relative overflow-hidden group-hover:scale-110 group-hover:shadow-xl transition-all duration-300">
+                <div className="absolute inset-0 bg-gradient-to-t from-teal-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-400 to-teal-600 rounded-2xl opacity-0 group-hover:opacity-20 blur transition-opacity duration-300"></div>
+                <div className="relative z-10 p-4">
+                  <img 
+                    src="https://avatars.githubusercontent.com/u/47703742" 
+                    alt="Inertia.js" 
+                    className="h-16 w-16 rounded-lg border border-gray-300 dark:border-gray-600"
+                  />
+                </div>
               </div>
-              <h3 className="font-semibold text-base">Inertia.js</h3>
-              <p className="text-sm text-muted-foreground">SSR Framework</p>
+              <h3 className="font-bold text-lg mb-1 group-hover:text-teal-500 transition-colors">Inertia.js</h3>
+              <p className="text-sm text-muted-foreground">SSR Bridge</p>
             </motion.div>
 
-            <motion.div variants={itemVariants} className="text-center">
-              <div className="h-24 w-24 bg-gradient-to-br from-blue-600/10 to-blue-600/30 border border-blue-600/40 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-600/15 to-blue-600/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <span className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-blue-400 to-blue-700">
-                  TS
-                </span>
+            <motion.div variants={itemVariants} className="text-center group cursor-pointer">
+              <div className="h-28 w-28 bg-muted/50 dark:bg-muted/30 backdrop-blur border border-border rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg relative overflow-hidden group-hover:scale-110 group-hover:shadow-xl transition-all duration-300">
+                <div className="absolute inset-0 bg-gradient-to-t from-blue-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-blue-700 rounded-2xl opacity-0 group-hover:opacity-20 blur transition-opacity duration-300"></div>
+                <div className="relative z-10 p-4">
+                  <img 
+                    src="https://skillicons.dev/icons?i=typescript" 
+                    alt="TypeScript" 
+                    className="h-16 w-16"
+                  />
+                </div>
               </div>
-              <h3 className="font-semibold text-base">TypeScript</h3>
+              <h3 className="font-bold text-lg mb-1 group-hover:text-blue-600 transition-colors">TypeScript</h3>
               <p className="text-sm text-muted-foreground">Type Safety</p>
             </motion.div>
 
-            <motion.div variants={itemVariants} className="text-center">
-              <div className="h-24 w-24 bg-gradient-to-br from-cyan-500/10 to-cyan-500/30 border border-cyan-500/40 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-md relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/15 to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                <span className="text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-br from-cyan-400 to-cyan-600">
-                  Pg
-                </span>
+            <motion.div variants={itemVariants} className="text-center group cursor-pointer">
+              <div className="h-28 w-28 bg-muted/50 dark:bg-muted/30 backdrop-blur border border-border rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg relative overflow-hidden group-hover:scale-110 group-hover:shadow-xl transition-all duration-300">
+                <div className="absolute inset-0 bg-gradient-to-t from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-400 to-cyan-600 rounded-2xl opacity-0 group-hover:opacity-20 blur transition-opacity duration-300"></div>
+                <div className="relative z-10 p-4">
+                  <img 
+                    src="https://skillicons.dev/icons?i=postgresql" 
+                    alt="PostgreSQL" 
+                    className="h-16 w-16"
+                  />
+                </div>
               </div>
-              <h3 className="font-semibold text-base">PostgreSQL</h3>
+              <h3 className="font-bold text-lg mb-1 group-hover:text-cyan-500 transition-colors">PostgreSQL</h3>
               <p className="text-sm text-muted-foreground">Database</p>
             </motion.div>
+          </motion.div>
+
+          {/* Additional Tech Stack */}
+          <motion.div 
+            className="mt-12 text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.5, duration: 0.5 }}
+          >
+            <p className="text-muted-foreground mb-6">And many more amazing tools...</p>
+            <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
+              <motion.div 
+                whileHover={{ scale: 1.1 }}
+                className="h-12 w-12 rounded-lg overflow-hidden shadow-md"
+              >
+                <img src="https://skillicons.dev/icons?i=vite" alt="Vite" className="h-full w-full" />
+              </motion.div>
+              <motion.div 
+                whileHover={{ scale: 1.1 }}
+                className="h-12 w-12 rounded-lg overflow-hidden shadow-md"
+              >
+                <img src="https://skillicons.dev/icons?i=tailwind" alt="Tailwind CSS" className="h-full w-full" />
+              </motion.div>
+              <motion.div 
+                whileHover={{ scale: 1.1 }}
+                className="h-12 w-12 rounded-lg overflow-hidden shadow-md"
+              >
+                <img src="https://skillicons.dev/icons?i=redis" alt="Redis" className="h-full w-full" />
+              </motion.div>
+              <motion.div 
+                whileHover={{ scale: 1.1 }}
+                className="h-12 w-12 rounded-lg overflow-hidden shadow-md"
+              >
+                <img src="https://skillicons.dev/icons?i=docker" alt="Docker" className="h-full w-full" />
+              </motion.div>
+              <motion.div 
+                whileHover={{ scale: 1.1 }}
+                className="h-12 w-12 rounded-lg overflow-hidden shadow-md"
+              >
+                <img src="https://skillicons.dev/icons?i=git" alt="Git" className="h-full w-full" />
+              </motion.div>
+              <motion.div 
+                whileHover={{ scale: 1.1 }}
+                className="h-12 w-12 rounded-lg overflow-hidden shadow-md"
+              >
+                <img src="https://skillicons.dev/icons?i=github" alt="GitHub" className="h-full w-full" />
+              </motion.div>
+            </div>
           </motion.div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-primary to-blue-500 text-primary-foreground relative overflow-hidden">
-        <div className="absolute inset-0 bg-grid-white/10 bg-[size:20px_20px] opacity-20"></div>
+      <section className="py-32 px-4 sm:px-6 lg:px-8 relative overflow-hidden bg-gradient-to-br from-slate-900 via-primary/20 to-slate-900">
+        {/* Background Effects */}
+        <div className="absolute inset-0">
+          <div className="absolute inset-0 bg-grid-white/[0.05] bg-[size:30px_30px]"></div>
+          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/20 rounded-full blur-3xl"></div>
+        </div>
+        
         <div className="container mx-auto text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -707,35 +787,91 @@ export default function Home() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              Ready to Build Something Amazing?
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+              className="mb-8"
+            >
+              <span className="px-4 py-2 rounded-full text-sm font-medium bg-primary/20 text-primary border border-primary/30 inline-block">
+                Start Building Today
+              </span>
+            </motion.div>
+            
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white">
+              Ready to Build Something{' '}
+              <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400">
+                Amazing?
+              </span>
             </h2>
-            <p className="text-xl mb-8 opacity-90 max-w-2xl mx-auto">
-              Get started with AdonisKit and launch your next AI-powered project faster than ever
-              before.
+            
+            <p className="text-xl mb-10 text-gray-300 max-w-2xl mx-auto leading-relaxed">
+              Get started with AdonisKit and launch your next AI-powered project 
+              <span className="text-white font-medium"> faster than ever before</span>.
             </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link href="/register">
-                <Button size="lg" variant="secondary" className="gap-2">
-                  Create Your Account
-                  <ArrowRight className="size-4" />
-                </Button>
-              </Link>
-              <a
-                href="https://github.com/gabrielmaialva33/base-web-kit"
-                target="_blank"
-                rel="noopener noreferrer"
+            
+            <div className="flex flex-col sm:flex-row justify-center gap-6">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="bg-transparent border-white/20 hover:bg-white/10 text-white"
+                <Link href="/register">
+                  <Button 
+                    size="lg" 
+                    className="bg-white hover:bg-gray-100 text-slate-900 font-semibold px-8 py-6 text-lg gap-2 shadow-xl"
+                  >
+                    Create Your Account
+                    <ArrowRight className="size-5" />
+                  </Button>
+                </Link>
+              </motion.div>
+              
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <a
+                  href="https://github.com/gabrielmaialva33/base-web-kit"
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  <GitBranch className="size-4 mr-2" />
-                  Star on GitHub
-                </Button>
-              </a>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-white/30 bg-white/10 backdrop-blur hover:bg-white/20 text-white font-semibold px-8 py-6 text-lg"
+                  >
+                    <GitBranch className="size-5 mr-2" />
+                    Star on GitHub
+                  </Button>
+                </a>
+              </motion.div>
             </div>
+            
+            {/* Trust Indicators */}
+            <motion.div 
+              className="mt-16 pt-16 border-t border-white/10"
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+            >
+              <p className="text-sm text-gray-400 mb-4">Trusted by developers worldwide</p>
+              <div className="flex justify-center items-center gap-8 flex-wrap">
+                <div className="text-center">
+                  <p className="text-3xl font-bold text-white">1000+</p>
+                  <p className="text-sm text-gray-400">Active Projects</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-3xl font-bold text-white">50k+</p>
+                  <p className="text-sm text-gray-400">Downloads</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-3xl font-bold text-white">⭐ 4.9</p>
+                  <p className="text-sm text-gray-400">GitHub Rating</p>
+                </div>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
