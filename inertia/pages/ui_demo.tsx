@@ -11,8 +11,9 @@ import {
   AlertCircle,
 } from 'lucide-react'
 import { MainLayout } from '~/layouts/MainLayout'
-import { AnimatedPage } from '~/components/animated-page'
-import { ThemeCustomizer } from '~/components/theme-customizer'
+import { AnimatedPage } from '~/components/animated_page'
+import { ThemeCustomizer } from '~/components/theme_customizer'
+import { ThemeStatus } from '~/components/theme/theme_status'
 import { Button } from '~/components/ui/core/button'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/core/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/core/tabs'
@@ -35,9 +36,9 @@ import {
   TimelineTime,
   TimelineDescription,
 } from '~/components/ui/core/timeline'
-import { EmptyState } from '~/components/ui/core/empty-state'
-import { StatsCard, StatsGrid } from '~/components/ui/core/stats-card'
-import { DataTable } from '~/components/ui/core/data-table'
+import { EmptyState } from '~/components/ui/core/empty_state'
+import { StatsCard, StatsGrid } from '~/components/ui/core/stats_card'
+import { DataTable } from '~/components/ui/core/data_table'
 import { AreaChart, BarChart, PieChart } from '~/components/charts'
 
 // Sample data
@@ -192,6 +193,22 @@ export default function UiDemoPage() {
                     >
                       {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
                     </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Theme System Demo */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Theme System Status</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <p className="text-sm text-muted-foreground mb-4">
+                      The theme system automatically detects your OS preferences by default. You can
+                      override this by selecting a specific theme.
+                    </p>
+                    <ThemeStatus />
                   </div>
                 </CardContent>
               </Card>

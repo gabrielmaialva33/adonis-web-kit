@@ -194,15 +194,27 @@
 
   /* Tech stack card gradients with better visibility */
   .tech-gradient-primary {
-    background: linear-gradient(to bottom right, hsl(var(--primary) / 0.15), hsl(var(--primary) / 0.35));
+    background: linear-gradient(
+      to bottom right,
+      hsl(var(--primary) / 0.15),
+      hsl(var(--primary) / 0.35)
+    );
   }
 
   .tech-gradient-blue {
-    background: linear-gradient(to bottom right, rgba(59, 130, 246, 0.15), rgba(59, 130, 246, 0.35));
+    background: linear-gradient(
+      to bottom right,
+      rgba(59, 130, 246, 0.15),
+      rgba(59, 130, 246, 0.35)
+    );
   }
 
   .tech-gradient-teal {
-    background: linear-gradient(to bottom right, rgba(20, 184, 166, 0.15), rgba(20, 184, 166, 0.35));
+    background: linear-gradient(
+      to bottom right,
+      rgba(20, 184, 166, 0.15),
+      rgba(20, 184, 166, 0.35)
+    );
   }
 
   .tech-gradient-cyan {
@@ -211,15 +223,27 @@
 
   /* Dark mode tech gradients with higher opacity */
   .dark .tech-gradient-primary {
-    background: linear-gradient(to bottom right, hsl(var(--primary) / 0.25), hsl(var(--primary) / 0.45));
+    background: linear-gradient(
+      to bottom right,
+      hsl(var(--primary) / 0.25),
+      hsl(var(--primary) / 0.45)
+    );
   }
 
   .dark .tech-gradient-blue {
-    background: linear-gradient(to bottom right, rgba(59, 130, 246, 0.25), rgba(59, 130, 246, 0.45));
+    background: linear-gradient(
+      to bottom right,
+      rgba(59, 130, 246, 0.25),
+      rgba(59, 130, 246, 0.45)
+    );
   }
 
   .dark .tech-gradient-teal {
-    background: linear-gradient(to bottom right, rgba(20, 184, 166, 0.25), rgba(20, 184, 166, 0.45));
+    background: linear-gradient(
+      to bottom right,
+      rgba(20, 184, 166, 0.25),
+      rgba(20, 184, 166, 0.45)
+    );
   }
 
   .dark .tech-gradient-cyan {

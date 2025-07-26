@@ -4,7 +4,7 @@ import { MainLayout } from '~/layouts/MainLayout'
 
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/core/card'
 import { Button } from '~/components/ui/core/button'
-import { FormInput } from '~/components/ui/core/form-input'
+import { FormInput } from '~/components/ui/core/form_input'
 
 import type { User } from '~/types'
 

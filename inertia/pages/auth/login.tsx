@@ -1,7 +1,7 @@
 import { Head, Link } from '@inertiajs/react'
 
 import { LoginForm } from '~/components/auth/LoginForm'
-import { ThemeToggle } from '~/components/theme/theme-toggle'
+import { ThemeToggle } from '~/components/theme/theme_toggle'
 import { Card } from '~/components/ui/core/card'
 
 export default function LoginPage() {

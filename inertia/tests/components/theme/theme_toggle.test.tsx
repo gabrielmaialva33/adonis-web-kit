@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-import { ThemeToggle } from '~/components/theme/theme-toggle'
-import { render } from '~/tests/test-utils'
+import { ThemeToggle } from '~/components/theme/theme_toggle'
+import { render } from '~/tests/test_utils'
 
 // Mock the useTheme hook
 vi.mock('~/hooks/use_theme', () => ({

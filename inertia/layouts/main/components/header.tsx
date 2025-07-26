@@ -1,7 +1,7 @@
 import { Link, router, usePage } from '@inertiajs/react'
 import { Bell, FileText, LogOut, Menu, Search, Settings, User } from 'lucide-react'
 import { Button } from '~/components/ui/core/button'
-import { ThemeToggle } from '~/components/theme/theme-toggle'
+import { ThemeToggle } from '~/components/theme/theme_toggle'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +9,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '~/components/ui/core/dropdown-menu'
+} from '~/components/ui/core/dropdown_menu'
 import type { User as UserType } from '~/types'
 
 interface HeaderProps {

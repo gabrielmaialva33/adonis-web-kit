@@ -3,12 +3,12 @@ import { Edit, Eye, MoreVertical, Plus, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
 import { MainLayout } from '~/layouts/MainLayout'
-import { ConfirmDialog } from '~/components/ui/core/confirm-dialog'
+import { ConfirmDialog } from '~/components/ui/core/confirm_dialog'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/core/card'
 import { Button } from '~/components/ui/core/button'
 import { Input } from '~/components/ui/core/input'
 import { Badge } from '~/components/ui/core/badge'
-import { type Column, DataTable } from '~/components/ui/core/data-table'
+import { type Column, DataTable } from '~/components/ui/core/data_table'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +16,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '~/components/ui/core/dropdown-menu'
+} from '~/components/ui/core/dropdown_menu'
 import type { PaginatedResponse, User } from '~/types'
 
 import { formatDate } from '~/utils/formatters'

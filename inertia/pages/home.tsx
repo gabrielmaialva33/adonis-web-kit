@@ -644,14 +644,16 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-violet-500 rounded-2xl opacity-0 group-hover:opacity-20 blur transition-opacity duration-300"></div>
                 <div className="relative z-10 p-4">
-                  <img 
-                    src="https://avatars.githubusercontent.com/u/13810373" 
-                    alt="AdonisJS" 
+                  <img
+                    src="https://avatars.githubusercontent.com/u/13810373"
+                    alt="AdonisJS"
                     className="h-16 w-16 rounded-lg"
                   />
                 </div>
               </div>
-              <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">AdonisJS v6</h3>
+              <h3 className="font-bold text-lg mb-1 group-hover:text-primary transition-colors">
+                AdonisJS v6
+              </h3>
               <p className="text-sm text-muted-foreground">Full-Stack Framework</p>
             </motion.div>
 
@@ -660,14 +662,16 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-blue-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-400 to-blue-600 rounded-2xl opacity-0 group-hover:opacity-20 blur transition-opacity duration-300"></div>
                 <div className="relative z-10 p-4">
-                  <img 
-                    src="https://skillicons.dev/icons?i=react" 
-                    alt="React" 
+                  <img
+                    src="https://skillicons.dev/icons?i=react"
+                    alt="React"
                     className="h-16 w-16"
                   />
                 </div>
               </div>
-              <h3 className="font-bold text-lg mb-1 group-hover:text-blue-500 transition-colors">React 19</h3>
+              <h3 className="font-bold text-lg mb-1 group-hover:text-blue-500 transition-colors">
+                React 19
+              </h3>
               <p className="text-sm text-muted-foreground">UI Library</p>
             </motion.div>
 
@@ -676,14 +680,16 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-teal-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-400 to-teal-600 rounded-2xl opacity-0 group-hover:opacity-20 blur transition-opacity duration-300"></div>
                 <div className="relative z-10 p-4">
-                  <img 
-                    src="https://avatars.githubusercontent.com/u/47703742" 
-                    alt="Inertia.js" 
+                  <img
+                    src="https://avatars.githubusercontent.com/u/47703742"
+                    alt="Inertia.js"
                     className="h-16 w-16 rounded-lg border border-gray-300 dark:border-gray-600"
                   />
                 </div>
               </div>
-              <h3 className="font-bold text-lg mb-1 group-hover:text-teal-500 transition-colors">Inertia.js</h3>
+              <h3 className="font-bold text-lg mb-1 group-hover:text-teal-500 transition-colors">
+                Inertia.js
+              </h3>
               <p className="text-sm text-muted-foreground">SSR Bridge</p>
             </motion.div>
 
@@ -692,14 +698,16 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-blue-600/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-blue-700 rounded-2xl opacity-0 group-hover:opacity-20 blur transition-opacity duration-300"></div>
                 <div className="relative z-10 p-4">
-                  <img 
-                    src="https://skillicons.dev/icons?i=typescript" 
-                    alt="TypeScript" 
+                  <img
+                    src="https://skillicons.dev/icons?i=typescript"
+                    alt="TypeScript"
                     className="h-16 w-16"
                   />
                 </div>
               </div>
-              <h3 className="font-bold text-lg mb-1 group-hover:text-blue-600 transition-colors">TypeScript</h3>
+              <h3 className="font-bold text-lg mb-1 group-hover:text-blue-600 transition-colors">
+                TypeScript
+              </h3>
               <p className="text-sm text-muted-foreground">Type Safety</p>
             </motion.div>
 
@@ -708,20 +716,22 @@ export default function Home() {
                 <div className="absolute inset-0 bg-gradient-to-t from-cyan-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-400 to-cyan-600 rounded-2xl opacity-0 group-hover:opacity-20 blur transition-opacity duration-300"></div>
                 <div className="relative z-10 p-4">
-                  <img 
-                    src="https://skillicons.dev/icons?i=postgresql" 
-                    alt="PostgreSQL" 
+                  <img
+                    src="https://skillicons.dev/icons?i=postgresql"
+                    alt="PostgreSQL"
                     className="h-16 w-16"
                   />
                 </div>
               </div>
-              <h3 className="font-bold text-lg mb-1 group-hover:text-cyan-500 transition-colors">PostgreSQL</h3>
+              <h3 className="font-bold text-lg mb-1 group-hover:text-cyan-500 transition-colors">
+                PostgreSQL
+              </h3>
               <p className="text-sm text-muted-foreground">Database</p>
             </motion.div>
           </motion.div>
 
           {/* Additional Tech Stack */}
-          <motion.div 
+          <motion.div
             className="mt-12 text-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -730,41 +740,61 @@ export default function Home() {
           >
             <p className="text-muted-foreground mb-6">And many more amazing tools...</p>
             <div className="flex flex-wrap justify-center gap-4 max-w-4xl mx-auto">
-              <motion.div 
+              <motion.div
                 whileHover={{ scale: 1.1 }}
                 className="h-12 w-12 rounded-lg overflow-hidden shadow-md"
               >
-                <img src="https://skillicons.dev/icons?i=vite" alt="Vite" className="h-full w-full" />
+                <img
+                  src="https://skillicons.dev/icons?i=vite"
+                  alt="Vite"
+                  className="h-full w-full"
+                />
               </motion.div>
-              <motion.div 
+              <motion.div
                 whileHover={{ scale: 1.1 }}
                 className="h-12 w-12 rounded-lg overflow-hidden shadow-md"
               >
-                <img src="https://skillicons.dev/icons?i=tailwind" alt="Tailwind CSS" className="h-full w-full" />
+                <img
+                  src="https://skillicons.dev/icons?i=tailwind"
+                  alt="Tailwind CSS"
+                  className="h-full w-full"
+                />
               </motion.div>
-              <motion.div 
+              <motion.div
                 whileHover={{ scale: 1.1 }}
                 className="h-12 w-12 rounded-lg overflow-hidden shadow-md"
               >
-                <img src="https://skillicons.dev/icons?i=redis" alt="Redis" className="h-full w-full" />
+                <img
+                  src="https://skillicons.dev/icons?i=redis"
+                  alt="Redis"
+                  className="h-full w-full"
+                />
               </motion.div>
-              <motion.div 
+              <motion.div
                 whileHover={{ scale: 1.1 }}
                 className="h-12 w-12 rounded-lg overflow-hidden shadow-md"
               >
-                <img src="https://skillicons.dev/icons?i=docker" alt="Docker" className="h-full w-full" />
+                <img
+                  src="https://skillicons.dev/icons?i=docker"
+                  alt="Docker"
+                  className="h-full w-full"
+                />
               </motion.div>
-              <motion.div 
+              <motion.div
                 whileHover={{ scale: 1.1 }}
                 className="h-12 w-12 rounded-lg overflow-hidden shadow-md"
               >
                 <img src="https://skillicons.dev/icons?i=git" alt="Git" className="h-full w-full" />
               </motion.div>
-              <motion.div 
+              <motion.div
                 whileHover={{ scale: 1.1 }}
                 className="h-12 w-12 rounded-lg overflow-hidden shadow-md"
               >
-                <img src="https://skillicons.dev/icons?i=github" alt="GitHub" className="h-full w-full" />
+                <img
+                  src="https://skillicons.dev/icons?i=github"
+                  alt="GitHub"
+                  className="h-full w-full"
+                />
               </motion.div>
             </div>
           </motion.div>
@@ -779,7 +809,7 @@ export default function Home() {
           <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/20 rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-500/20 rounded-full blur-3xl"></div>
         </div>
-        
+
         <div className="container mx-auto text-center relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -798,27 +828,24 @@ export default function Home() {
                 Start Building Today
               </span>
             </motion.div>
-            
+
             <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white">
               Ready to Build Something{' '}
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400">
                 Amazing?
               </span>
             </h2>
-            
+
             <p className="text-xl mb-10 text-gray-300 max-w-2xl mx-auto leading-relaxed">
-              Get started with AdonisKit and launch your next AI-powered project 
+              Get started with AdonisKit and launch your next AI-powered project
               <span className="text-white font-medium"> faster than ever before</span>.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row justify-center gap-6">
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link href="/register">
-                  <Button 
-                    size="lg" 
+                  <Button
+                    size="lg"
                     className="bg-white hover:bg-gray-100 text-slate-900 font-semibold px-8 py-6 text-lg gap-2 shadow-xl"
                   >
                     Create Your Account
@@ -826,11 +853,8 @@ export default function Home() {
                   </Button>
                 </Link>
               </motion.div>
-              
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
+
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <a
                   href="https://github.com/gabrielmaialva33/base-web-kit"
                   target="_blank"
@@ -847,9 +871,9 @@ export default function Home() {
                 </a>
               </motion.div>
             </div>
-            
+
             {/* Trust Indicators */}
-            <motion.div 
+            <motion.div
               className="mt-16 pt-16 border-t border-white/10"
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}

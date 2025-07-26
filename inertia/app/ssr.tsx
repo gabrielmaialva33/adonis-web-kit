@@ -1,8 +1,8 @@
 import ReactDOMServer from 'react-dom/server'
 import { createInertiaApp } from '@inertiajs/react'
 
-import { ThemeProvider } from '~/providers/theme-provider'
-import { QueryProvider } from '~/providers/query-provider'
+import { ThemeProvider } from '~/providers/theme_provider'
+import { QueryProvider } from '~/providers/query_provider'
 
 export default function render(page: any) {
   return createInertiaApp({

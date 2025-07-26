@@ -50,7 +50,7 @@ router
     // UI Demo Page
     router
       .get('/ui-demo', async ({ inertia }) => {
-        return inertia.render('ui-demo')
+        return inertia.render('ui_demo')
       })
       .as('ui-demo')
 
