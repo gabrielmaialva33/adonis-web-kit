@@ -10,7 +10,7 @@ import {
   Clock,
   AlertCircle,
 } from 'lucide-react'
-import { MainLayout } from '~/layouts/MainLayout'
+import { MainLayout } from '~/layouts'
 import { AnimatedPage } from '~/components/animated_page'
 import { ThemeCustomizer } from '~/components/theme_customizer'
 import { ThemeStatus } from '~/components/theme/theme_status'

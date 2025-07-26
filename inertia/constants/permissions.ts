@@ -11,7 +11,7 @@ export const PERMISSIONS = {
     DELETE: 'users.delete',
     VIEW: 'users.view',
   },
-  
+
   // Roles
   ROLES: {
     LIST: 'roles.list',
@@ -20,7 +20,7 @@ export const PERMISSIONS = {
     DELETE: 'roles.delete',
     ASSIGN: 'roles.assign',
   },
-  
+
   // Permissions
   PERMISSIONS: {
     LIST: 'permissions.list',
@@ -29,7 +29,7 @@ export const PERMISSIONS = {
     DELETE: 'permissions.delete',
     ASSIGN: 'permissions.assign',
   },
-  
+
   // Files
   FILES: {
     LIST: 'files.list',
@@ -37,7 +37,7 @@ export const PERMISSIONS = {
     DOWNLOAD: 'files.download',
     DELETE: 'files.delete',
   },
-  
+
   // Admin
   ADMIN: {
     ACCESS: 'admin.access',

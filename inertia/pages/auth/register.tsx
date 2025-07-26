@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react'
-import { RegisterForm } from '~/components/auth/RegisterForm'
+import { RegisterForm } from '~/components/auth'
 import { ThemeToggle } from '~/components/theme/theme_toggle'
 import { Card } from '~/components/ui/core/card'
 

@@ -23,10 +23,7 @@ export const createUserSchema = z.object({
     .regex(/[A-Z]/, 'Senha deve ter pelo menos uma letra maiúscula')
     .regex(/[a-z]/, 'Senha deve ter pelo menos uma letra minúscula')
     .regex(/[0-9]/, 'Senha deve ter pelo menos um número'),
-  role_ids: z
-    .array(z.number())
-    .optional()
-    .default([]),
+  role_ids: z.array(z.number()).optional().default([]),
 })
 
 export const updateUserSchema = z.object({
@@ -47,9 +44,7 @@ export const updateUserSchema = z.object({
     .regex(/[a-z]/, 'Senha deve ter pelo menos uma letra minúscula')
     .regex(/[0-9]/, 'Senha deve ter pelo menos um número')
     .optional(),
-  role_ids: z
-    .array(z.number())
-    .optional(),
+  role_ids: z.array(z.number()).optional(),
 })
 
 export const userFiltersSchema = z.object({
@@ -57,7 +52,10 @@ export const userFiltersSchema = z.object({
   role_id: z.number().optional(),
   page: z.number().min(1).optional().default(1),
   per_page: z.number().min(1).max(100).optional().default(10),
-  sort_by: z.enum(['created_at', 'updated_at', 'full_name', 'email']).optional().default('created_at'),
+  sort_by: z
+    .enum(['created_at', 'updated_at', 'full_name', 'email'])
+    .optional()
+    .default('created_at'),
   sort_order: z.enum(['asc', 'desc']).optional().default('desc'),
 })
 

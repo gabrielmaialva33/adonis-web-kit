@@ -2,7 +2,7 @@ import { Head, Link, router } from '@inertiajs/react'
 import { Edit, Eye, MoreVertical, Plus, Search, Trash2 } from 'lucide-react'
 import { useState } from 'react'
 
-import { MainLayout } from '~/layouts/MainLayout'
+import { MainLayout } from '~/layouts'
 import { ConfirmDialog } from '~/components/ui/core/confirm_dialog'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/core/card'
 import { Button } from '~/components/ui/core/button'

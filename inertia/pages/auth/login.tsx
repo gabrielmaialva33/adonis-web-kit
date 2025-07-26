@@ -1,6 +1,6 @@
 import { Head, Link } from '@inertiajs/react'
 
-import { LoginForm } from '~/components/auth/LoginForm'
+import { LoginForm } from '~/components/auth'
 import { ThemeToggle } from '~/components/theme/theme_toggle'
 import { Card } from '~/components/ui/core/card'
 
