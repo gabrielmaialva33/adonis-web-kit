@@ -252,14 +252,14 @@
 
   /* Home page specific styles */
   .bg-grid-white {
-    background-image: 
+    background-image:
       linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
     background-size: 30px 30px;
   }
 
   .bg-grid-pattern {
-    background-image: 
+    background-image:
       linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px),
       linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px);
     background-size: 30px 30px;
@@ -267,24 +267,30 @@
 
   /* Animated gradient backgrounds for floating cards */
   .floating-card-1 {
-    background: linear-gradient(135deg, 
+    background: linear-gradient(
+      135deg,
       rgba(34, 197, 94, 0.1) 0%,
       rgba(34, 197, 94, 0.05) 50%,
-      transparent 100%);
+      transparent 100%
+    );
   }
 
   .floating-card-2 {
-    background: linear-gradient(135deg, 
+    background: linear-gradient(
+      135deg,
       rgba(168, 85, 247, 0.1) 0%,
       rgba(168, 85, 247, 0.05) 50%,
-      transparent 100%);
+      transparent 100%
+    );
   }
 
   .floating-card-3 {
-    background: linear-gradient(135deg, 
+    background: linear-gradient(
+      135deg,
       rgba(59, 130, 246, 0.1) 0%,
       rgba(59, 130, 246, 0.05) 50%,
-      transparent 100%);
+      transparent 100%
+    );
   }
 
   /* Gradient text utility */
