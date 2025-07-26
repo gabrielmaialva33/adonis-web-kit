@@ -158,6 +158,39 @@
   .shadow-xs {
     box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   }
+
+  /* Icon gradient backgrounds */
+  .icon-gradient-primary {
+    background: linear-gradient(to bottom right, hsl(var(--primary)), hsl(var(--primary) / 0.7));
+  }
+
+  .icon-gradient-blue {
+    background: linear-gradient(to bottom right, #2563eb, #60a5fa);
+  }
+
+  .icon-gradient-cyan {
+    background: linear-gradient(to bottom right, #0891b2, #67e8f9);
+  }
+
+  .icon-gradient-yellow {
+    background: linear-gradient(to bottom right, #facc15, #ca8a04);
+  }
+
+  .icon-gradient-indigo {
+    background: linear-gradient(to bottom right, #6366f1, #4f46e5);
+  }
+
+  .icon-gradient-green {
+    background: linear-gradient(to bottom right, #4ade80, #16a34a);
+  }
+
+  .icon-gradient-orange {
+    background: linear-gradient(to bottom right, #fb923c, #ea580c);
+  }
+
+  .icon-gradient-teal {
+    background: linear-gradient(to bottom right, #2dd4bf, #14b8a6);
+  }
 }
 
 * {
