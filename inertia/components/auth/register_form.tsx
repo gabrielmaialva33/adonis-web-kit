@@ -1,41 +1,31 @@
-import { FormEvent, useState } from 'react'
-import { router } from '@inertiajs/react'
+import { FormEvent } from 'react'
+import { useForm } from '@inertiajs/react'
 
-import { Button } from '../ui/core/button'
 import {
+  Alert,
+  AlertDescription,
+  Button,
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-} from '../ui/core/card'
-import { Alert, AlertDescription } from '../ui/core/alert'
+  FormInput,
+} from '~/components/ui/core'
 
-import type { RegisterFormData } from '~/types'
-import { FormInput } from '~/components/ui/core'
-
-interface RegisterFormProps {
-  errors?: Record<string, string>
-}
-
-export function RegisterForm({ errors }: RegisterFormProps) {
-  const [data, setData] = useState<RegisterFormData>({
+export function RegisterForm() {
+  const { data, setData, post, processing, errors } = useForm({
     full_name: '',
     email: '',
     username: '',
     password: '',
     password_confirmation: '',
   })
-  const [processing, setProcessing] = useState(false)
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    setProcessing(true)
-
-    router.post('/api/v1/sessions/sign-up', data as any, {
-      onFinish: () => setProcessing(false),
-    })
+    post('/register')
   }
 
   return (
@@ -58,8 +48,8 @@ export function RegisterForm({ errors }: RegisterFormProps) {
             type="text"
             name="full_name"
             value={data.full_name}
-            onChange={(e) => setData({ ...data, full_name: e.target.value })}
-            error={errors?.full_name}
+            onChange={(e) => setData('full_name', e.target.value)}
+            errorMessage={errors.full_name}
             placeholder="John Doe"
             required
             autoComplete="name"
@@ -70,8 +60,8 @@ export function RegisterForm({ errors }: RegisterFormProps) {
             type="email"
             name="email"
             value={data.email}
-            onChange={(e) => setData({ ...data, email: e.target.value })}
-            error={errors?.email}
+            onChange={(e) => setData('email', e.target.value)}
+            errorMessage={errors.email}
             placeholder="john@example.com"
             required
             autoComplete="email"
@@ -82,8 +72,8 @@ export function RegisterForm({ errors }: RegisterFormProps) {
             type="text"
             name="username"
             value={data.username}
-            onChange={(e) => setData({ ...data, username: e.target.value })}
-            error={errors?.username}
+            onChange={(e) => setData('username', e.target.value)}
+            errorMessage={errors.username}
             placeholder="johndoe"
             autoComplete="username"
           />
@@ -93,8 +83,8 @@ export function RegisterForm({ errors }: RegisterFormProps) {
             type="password"
             name="password"
             value={data.password}
-            onChange={(e) => setData({ ...data, password: e.target.value })}
-            error={errors?.password}
+            onChange={(e) => setData('password', e.target.value)}
+            errorMessage={errors.password}
             hint="Must be at least 8 characters"
             required
             autoComplete="new-password"
@@ -105,8 +95,8 @@ export function RegisterForm({ errors }: RegisterFormProps) {
             type="password"
             name="password_confirmation"
             value={data.password_confirmation}
-            onChange={(e) => setData({ ...data, password_confirmation: e.target.value })}
-            error={errors?.password_confirmation}
+            onChange={(e) => setData('password_confirmation', e.target.value)}
+            errorMessage={errors.password_confirmation}
             required
             autoComplete="new-password"
           />

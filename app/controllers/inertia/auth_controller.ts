@@ -1,7 +1,8 @@
 import { HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
-import { signInValidator } from '#validations/users_validator'
+import { signInValidator, createUserValidator } from '#validations/users_validator'
 import UsersRepository from '#repositories/users_repository'
+import SignUpService from '#services/users/sign_up_service'
 
 export default class InertiaAuthController {
   async showLogin({ inertia }: HttpContext) {
@@ -28,6 +29,31 @@ export default class InertiaAuthController {
       return response.redirect('/dashboard')
     } catch (error) {
       session.flash('errors', { general: error.message })
+      return response.redirect().back()
+    }
+  }
+
+  async register(ctx: HttpContext) {
+    const { request, response, session } = ctx
+
+    try {
+      const data = await request.validateUsing(createUserValidator)
+
+      // Use the SignUpService to create the user
+      const signUpService = await app.container.make(SignUpService)
+      await signUpService.run(data)
+
+      // SignUpService already handles JWT generation and login
+
+      // Redirect to dashboard after successful registration
+      return response.redirect('/dashboard')
+    } catch (error) {
+      // Handle validation errors
+      if (error.messages) {
+        session.flash('errors', error.messages)
+      } else {
+        session.flash('errors', { general: error.message })
+      }
       return response.redirect().back()
     }
   }

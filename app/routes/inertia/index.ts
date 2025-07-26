@@ -28,8 +28,12 @@ router
   .get('/register', [InertiaAuthController, 'showRegister'])
   .as('register')
   .use(middleware.guest({ guards: ['jwt'] }))
+router
+  .post('/register', [InertiaAuthController, 'register'])
+  .as('register.post')
+  .use(middleware.guest({ guards: ['jwt'] }))
 
-// Root route redirects to dashboard if authenticated, otherwise to login
+// Root route redirects to dashboard if authenticated, otherwise to log in
 router
   .get('/', async ({ auth, response, inertia }) => {
     try {

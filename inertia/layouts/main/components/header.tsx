@@ -21,7 +21,7 @@ export function Header({ onToggleSidebar, isMobile = false }: HeaderProps) {
   const { auth } = usePage().props as { auth?: { user?: UserType } }
 
   const handleLogout = () => {
-    router.post('/api/v1/sessions/logout')
+    router.post('/logout')
   }
 
   return (

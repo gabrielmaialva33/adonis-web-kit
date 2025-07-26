@@ -2,8 +2,9 @@
  * Exporta todos os services da aplicação
  */
 
-export { default as authService } from './auth_service'
+// Com Inertia.js, não precisamos de services para chamadas API no frontend
+// Toda a comunicação é feita através dos métodos do Inertia (useForm, router, etc)
 
-// Se houver mais services no futuro, adicionar aqui
-// export { default as userService } from './user_service'
-// export { default as fileService } from './file_service'
+// Se houver services utilitários no futuro, adicionar aqui
+// export { default as storageService } from './storage_service'
+// export { default as notificationService } from './notification_service'
