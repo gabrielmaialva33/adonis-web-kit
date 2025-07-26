@@ -64,7 +64,7 @@
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "@vitejs/plugin-react": "^4.7.0",
-    "eslint": "^9.31.0",
+    "eslint": "^9.32.0",
     "hot-hook": "^0.4.0",
     "jsdom": "^26.1.0",
     "msw": "^2.10.4",
@@ -96,7 +96,7 @@
     "@aws-sdk/client-s3": "^3.850.0",
     "@aws-sdk/s3-request-presigner": "^3.850.0",
     "@google-cloud/storage": "^7.16.0",
-    "@hookform/resolvers": "^5.1.1",
+    "@hookform/resolvers": "^5.2.0",
     "@inertiajs/react": "^2.0.17",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
@@ -161,7 +161,7 @@
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^1.1.2",
     "xlsx": "^0.18.5",
-    "zod": "^4.0.9"
+    "zod": "^4.0.10"
   },
   "hotHook": {
     "boundaries": [
