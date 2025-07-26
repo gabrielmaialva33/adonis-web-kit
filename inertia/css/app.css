@@ -249,6 +249,60 @@
   .dark .tech-gradient-cyan {
     background: linear-gradient(to bottom right, rgba(6, 182, 212, 0.25), rgba(6, 182, 212, 0.45));
   }
+
+  /* Home page specific styles */
+  .bg-grid-white {
+    background-image: 
+      linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  .bg-grid-pattern {
+    background-image: 
+      linear-gradient(to right, hsl(var(--border)) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(var(--border)) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  /* Animated gradient backgrounds for floating cards */
+  .floating-card-1 {
+    background: linear-gradient(135deg, 
+      rgba(34, 197, 94, 0.1) 0%,
+      rgba(34, 197, 94, 0.05) 50%,
+      transparent 100%);
+  }
+
+  .floating-card-2 {
+    background: linear-gradient(135deg, 
+      rgba(168, 85, 247, 0.1) 0%,
+      rgba(168, 85, 247, 0.05) 50%,
+      transparent 100%);
+  }
+
+  .floating-card-3 {
+    background: linear-gradient(135deg, 
+      rgba(59, 130, 246, 0.1) 0%,
+      rgba(59, 130, 246, 0.05) 50%,
+      transparent 100%);
+  }
+
+  /* Gradient text utility */
+  .text-gradient {
+    background: linear-gradient(to right, hsl(var(--primary)), #60a5fa, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Backdrop blur variations */
+  .backdrop-blur-xl {
+    backdrop-filter: blur(24px);
+  }
+
+  .backdrop-blur-2xl {
+    backdrop-filter: blur(40px);
+  }
 }
 
 * {

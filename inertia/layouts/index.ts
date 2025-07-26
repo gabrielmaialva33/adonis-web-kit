@@ -2,4 +2,4 @@
  * Exporta todos os layouts
  */
 
-export { default as MainLayout } from './main_layout'
+export { MainLayout } from './main_layout'
