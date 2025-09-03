@@ -1,5 +1,5 @@
 packages:
-  - '.'
+  - .
 
 onlyBuiltDependencies:
   - '@swc/core'
@@ -8,3 +8,4 @@ onlyBuiltDependencies:
   - better-sqlite3
   - esbuild
   - msgpackr-extract
+  - msw
