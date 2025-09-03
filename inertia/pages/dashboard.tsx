@@ -10,7 +10,7 @@ import {
   Users,
 } from 'lucide-react'
 
-import { MainLayout } from '~/layouts/MainLayout'
+import { MainLayout } from '~/layouts'
 import {
   Card,
   CardContent,

@@ -1,10 +1,10 @@
 import { Head, useForm } from '@inertiajs/react'
 
-import { MainLayout } from '~/layouts/MainLayout'
+import { MainLayout } from '~/layouts'
 
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/core/card'
 import { Button } from '~/components/ui/core/button'
-import { FormInput } from '~/components/ui/core/form-input'
+import { FormInput } from '~/components/ui/core/form_input'
 
 export default function CreateUserPage() {
   const { data, setData, post, processing, errors } = useForm({

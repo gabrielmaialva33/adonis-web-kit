@@ -1,3 +1,3 @@
-export * from './area-chart'
-export * from './bar-chart'
-export * from './pie-chart'
+export * from './area_chart'
+export * from './bar_chart'
+export * from './pie_chart'

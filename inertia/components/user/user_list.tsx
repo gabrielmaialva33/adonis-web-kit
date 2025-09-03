@@ -97,3 +97,5 @@ export function UserList({ users }: UserListProps) {
     </Card>
   )
 }
+
+export default UserList

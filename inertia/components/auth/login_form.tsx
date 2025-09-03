@@ -3,7 +3,7 @@ import { useForm, Link } from '@inertiajs/react'
 import { Mail, Lock } from 'lucide-react'
 
 import { Button } from '../ui/core/button'
-import { FormInput } from '~/components/ui/core/form-input'
+import { FormInput } from '~/components/ui/core/form_input'
 
 export function LoginForm() {
   const { data, setData, post, processing, errors } = useForm({
@@ -103,3 +103,5 @@ export function LoginForm() {
     </form>
   )
 }
+
+export default LoginForm

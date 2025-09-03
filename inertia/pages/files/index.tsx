@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react'
 
-import { MainLayout } from '~/layouts/MainLayout'
-import { FileUpload } from '~/components/file/FileUpload'
+import { MainLayout } from '~/layouts'
+import { FileUpload } from '~/components/file'
 
 export default function FilesPage() {
   return (

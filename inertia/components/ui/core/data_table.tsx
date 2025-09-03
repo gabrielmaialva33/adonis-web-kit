@@ -8,7 +8,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from './dropdown-menu'
+} from './dropdown_menu'
 import {
   Table,
   TableBody,

@@ -2,7 +2,6 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render as rtlRender } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { PropsWithChildren, ReactElement } from 'react'
-import { BrowserRouter } from 'react-router-dom'
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -16,15 +15,14 @@ export function render(
     reactStrictMode: true,
   }
 ) {
-  window.history.pushState({}, 'Test page', route)
+  // No need for window.history.pushState with Inertia
+  // Inertia manages all routing server-side
 
   return {
     user: userEvent.setup(),
     ...rtlRender(ui, {
       wrapper: ({ children }: PropsWithChildren) => (
-        <QueryClientProvider client={queryClient}>
-          <BrowserRouter>{children}</BrowserRouter>
-        </QueryClientProvider>
+        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
       ),
       ...options,
     }),

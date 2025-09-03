@@ -123,3 +123,5 @@ export function FileUpload() {
     </Card>
   )
 }
+
+export default FileUpload
