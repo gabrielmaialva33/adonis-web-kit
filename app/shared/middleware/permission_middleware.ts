@@ -3,7 +3,7 @@ import app from '@adonisjs/core/services/app'
 import type { NextFn } from '@adonisjs/core/types/http'
 
 import ForbiddenException from '#exceptions/forbidden_exception'
-import PermissionService from '#modules/permissions/services/optimized_permission_service'
+import PermissionService from '#modules/permissions/services/permission_service'
 import AuditService from '#modules/audits/services/audit_service'
 
 interface PermissionOptions {

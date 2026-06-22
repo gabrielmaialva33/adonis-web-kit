@@ -75,6 +75,10 @@ Isola breaking changes de framework antes de mexer em layout.
    - Auth v9→v10 (guards, jwt custom, tokens).
 7. Validar: `pnpm typecheck` + `pnpm test` (unit) + build.
 
+## ✅ FASE 2 — Reestruturação modular — CONCLUÍDA (commit 70b701e)
+> 108 arquivos, 76 renames. 93/93 testes, lint+typecheck verdes.
+> modules/{auth,users,roles,permissions,files,audits,health,web} + shared/. Rotas em modules/*/routes.ts.
+
 ## FASE 2 — Reestruturação modular  [commit: `refactor: modular architecture (app/modules + app/shared)`]
 Mover sem mudar lógica. Aliases: `#modules/*`, `#shared/*`, `#exceptions/*`.
 ```
