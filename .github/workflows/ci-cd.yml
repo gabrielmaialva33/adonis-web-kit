@@ -39,13 +39,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # The pnpm-workspace.yaml uses `allowBuilds` (pnpm 10.4+) to whitelist
-      # native build scripts (argon2, better-sqlite3, ...). Bump this if the CI
-      # logs ever show "Ignored build scripts".
+      # pnpm 11 is required: pnpm-workspace.yaml uses the `allowBuilds` format
+      # (pnpm 11) to whitelist native build scripts (argon2, better-sqlite3).
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 10.13.1
+          version: 11.3.0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

@@ -1,0 +1,80 @@
+# Local containerized environment for the AdonisJS web kit.
+# - `docker compose up postgres redis`  -> just the datastores (run the app on the host)
+# - `docker compose up --build`          -> full stack (app + datastores) in containers
+#
+# Generate a real APP_KEY once:  node ace generate:key  (then export APP_KEY=...).
+name: adonis-web-kit
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: adonis_web_kit
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d adonis_web_kit']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ['redis-server', '--requirepass', 'redis']
+    ports:
+      - '6379:6379'
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', '-a', 'redis', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      target: production
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - '3333:3333'
+    environment:
+      TZ: UTC
+      NODE_ENV: production
+      PORT: 3333
+      HOST: 0.0.0.0
+      LOG_LEVEL: info
+      # Dev placeholder — override with `export APP_KEY=...` (node ace generate:key).
+      APP_KEY: ${APP_KEY:-dev_app_key_change_me_32_chars_min}
+      SESSION_DRIVER: cookie
+      LIMITER_STORE: redis
+      DRIVE_DISK: fs
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_DATABASE: adonis_web_kit
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: redis
+      QUEUE_REDIS_HOST: redis
+      QUEUE_REDIS_PORT: 6379
+      QUEUE_REDIS_PASSWORD: redis
+      MAIL_MAILER: smtp
+      SMTP_HOST: localhost
+      SMTP_PORT: 1025
+
+volumes:
+  pgdata:
+  redisdata:
