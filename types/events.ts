@@ -5,7 +5,7 @@ import {
   type LogoutEventData,
   type TokenRefreshedEventData,
   type UserRegisteredEventData,
-} from '#events/auth_events'
+} from '#modules/auth/events/auth_events'
 
 declare module '@adonisjs/core/types' {
   interface EventsList {

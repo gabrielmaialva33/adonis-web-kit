@@ -55,6 +55,12 @@
 
 ---
 
+## ✅ FASE 1 — Upgrade v7 — CONCLUÍDA (commit 72d44cb)
+> 93/93 testes verdes, lint + typecheck limpos. Runtime v7 boota. Node 24 LTS.
+> Notas: `database/schema.ts` agora é auto-gerado (gitignored). `typecheck:frontend`
+> adiado p/ Fase 5 (frontend tem erros pré-existentes de path/escopo).
+> Containers de teste `awk-test-pg` (5432) e `awk-test-redis` (6379) rodando no docker.
+
 ## FASE 1 — Upgrade v7 (sobre estrutura ATUAL)  [commit: `chore: upgrade to adonisjs v7`]
 Isola breaking changes de framework antes de mexer em layout.
 1. Reescrever `package.json`: versões v7, scripts ts-exec, remover ts-node, +ts-exec. (aliases ficam pra Fase 2)

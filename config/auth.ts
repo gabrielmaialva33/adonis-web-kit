@@ -13,25 +13,25 @@ const authConfig = defineConfig({
     api: tokensGuard({
       provider: tokensUserProvider({
         tokens: 'accessTokens',
-        model: () => import('#models/user'),
+        model: () => import('#modules/users/models/user'),
       }),
     }),
     web: sessionGuard({
       useRememberMeTokens: false,
       provider: sessionUserProvider({
-        model: () => import('#models/user'),
+        model: () => import('#modules/users/models/user'),
       }),
     }),
     basicAuth: basicAuthGuard({
       provider: basicAuthUserProvider({
-        model: () => import('#models/user'),
+        model: () => import('#modules/users/models/user'),
       }),
     }),
     jwt: jwtGuard({
       tokenExpiresIn: '1h',
       useCookies: true,
       provider: sessionUserProvider({
-        model: () => import('#models/user'),
+        model: () => import('#modules/users/models/user'),
       }),
       content: <User>(user: JwtGuardUser<User>) => ({ userId: user.getId() }),
     }),

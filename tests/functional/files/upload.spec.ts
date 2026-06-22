@@ -7,13 +7,13 @@ import db from '@adonisjs/lucid/services/db'
 import app from '@adonisjs/core/services/app'
 import limiter from '@adonisjs/limiter/services/main'
 
-import User from '#models/user'
-import Role from '#models/role'
-import Permission from '#models/permission'
-import File from '#models/file'
+import User from '#modules/users/models/user'
+import Role from '#modules/roles/models/role'
+import Permission from '#modules/permissions/models/permission'
+import File from '#modules/files/models/file'
 
-import IPermission from '#interfaces/permission_interface'
-import IRole from '#interfaces/role_interface'
+import IPermission from '#modules/permissions/interfaces/permission_interface'
+import IRole from '#modules/roles/interfaces/role_interface'
 
 test.group('Files upload', (group) => {
   group.each.setup(() => testUtils.db().withGlobalTransaction())

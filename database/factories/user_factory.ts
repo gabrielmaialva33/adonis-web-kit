@@ -1,7 +1,7 @@
 import factory from '@adonisjs/lucid/factories'
 import { type FactoryContextContract } from '@adonisjs/lucid/types/factory'
 
-import User from '#models/user'
+import User from '#modules/users/models/user'
 import hash from '@adonisjs/core/services/hash'
 
 export const UserFactory = factory

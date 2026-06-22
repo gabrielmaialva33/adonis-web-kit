@@ -3,10 +3,10 @@ import testUtils from '@adonisjs/core/services/test_utils'
 
 import db from '@adonisjs/lucid/services/db'
 
-import Role from '#models/role'
-import User from '#models/user'
+import Role from '#modules/roles/models/role'
+import User from '#modules/users/models/user'
 
-import IRole from '#interfaces/role_interface'
+import IRole from '#modules/roles/interfaces/role_interface'
 
 test.group('Roles admin', (group) => {
   group.each.setup(() => testUtils.db().withGlobalTransaction())

@@ -3,12 +3,12 @@ import testUtils from '@adonisjs/core/services/test_utils'
 import app from '@adonisjs/core/services/app'
 import db from '@adonisjs/lucid/services/db'
 
-import Role from '#models/role'
-import User from '#models/user'
+import Role from '#modules/roles/models/role'
+import User from '#modules/users/models/user'
 
-import IRole from '#interfaces/role_interface'
+import IRole from '#modules/roles/interfaces/role_interface'
 
-import SignInService from '#services/users/sign_in_service'
+import SignInService from '#modules/auth/services/sign_in_service'
 
 test.group('SignInService', (group) => {
   group.each.setup(() => testUtils.db().withGlobalTransaction())

@@ -2,12 +2,12 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import limiter from '@adonisjs/limiter/services/main'
 
-import User from '#models/user'
-import Permission from '#models/permission'
-import Role from '#models/role'
+import User from '#modules/users/models/user'
+import Permission from '#modules/permissions/models/permission'
+import Role from '#modules/roles/models/role'
 
-import IRole from '#interfaces/role_interface'
-import IPermission from '#interfaces/permission_interface'
+import IRole from '#modules/roles/interfaces/role_interface'
+import IPermission from '#modules/permissions/interfaces/permission_interface'
 
 test.group('Rate Limiting', (group) => {
   group.each.setup(() => testUtils.db().withGlobalTransaction())
