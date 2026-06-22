@@ -29,3 +29,6 @@ yarn-error.log
 
 # AdonisJS specific
 storage/uploads/*
+
+# Lucid v7 auto-generated schema classes
+database/schema.ts

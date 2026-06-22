@@ -123,7 +123,7 @@ export default class OwnershipMiddleware {
           context,
           resourceId,
           result: 'denied',
-          reason: `Error checking ownership: ${error.message}`,
+          reason: `Error checking ownership: ${error instanceof Error ? error.message : 'unknown error'}`,
         },
         ctx
       )

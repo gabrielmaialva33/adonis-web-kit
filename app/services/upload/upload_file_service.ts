@@ -3,7 +3,7 @@ import drive from '@adonisjs/drive/services/main'
 import { HttpContext } from '@adonisjs/core/http'
 
 import { MultipartFile } from '@adonisjs/core/types/bodyparser'
-import { cuid } from '@adonisjs/core/helpers'
+import { randomUUID } from 'node:crypto'
 import env from '#start/env'
 import File from '#models/file'
 
@@ -13,7 +13,7 @@ export default class UploadFileService {
     const { auth } = HttpContext.getOrFail()
     const user = auth.use('jwt').user!
 
-    const key = `uploads/${cuid()}.${file.extname}`
+    const key = `uploads/${randomUUID()}.${file.extname}`
     await file.moveToDisk(key)
 
     const url = await drive.use().getUrl(key)

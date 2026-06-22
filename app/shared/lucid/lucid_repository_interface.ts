@@ -1,14 +1,14 @@
-import { BaseModel } from '@adonisjs/lucid/orm'
+import { type BaseModel } from '@adonisjs/lucid/orm'
 import {
-  ExtractScopes,
-  LucidModel,
-  LucidRow,
-  ModelAttributes,
-  ModelPaginatorContract,
-  ModelQueryBuilderContract,
+  type ExtractScopes,
+  type LucidModel,
+  type LucidRow,
+  type ModelAttributes,
+  type ModelPaginatorContract,
+  type ModelQueryBuilderContract,
 } from '@adonisjs/lucid/types/model'
-import { SimplePaginatorContract } from '@adonisjs/lucid/types/querybuilder'
-import { TransactionClientContract } from '@adonisjs/lucid/types/database'
+import { type SimplePaginatorContract } from '@adonisjs/lucid/types/querybuilder'
+import { type TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 /**
  * Repository interface for working with AdonisJS Lucid models.

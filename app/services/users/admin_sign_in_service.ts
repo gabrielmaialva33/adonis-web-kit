@@ -51,8 +51,9 @@ export default class AdminSignInService {
       return { ...userJson, auth }
     } catch (error) {
       // Emit login failed event if not already emitted
-      if (error.message !== i18n.t('errors.permission_denied')) {
-        AuthEventService.emitLoginFailed(uid, error.message || 'Invalid credentials', ctx)
+      const reason = error instanceof Error ? error.message : 'Invalid credentials'
+      if (reason !== i18n.t('errors.permission_denied')) {
+        AuthEventService.emitLoginFailed(uid, reason || 'Invalid credentials', ctx)
       }
       throw error
     }

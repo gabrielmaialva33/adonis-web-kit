@@ -1,17 +1,18 @@
 import stringHelpers from '@adonisjs/core/helpers/string'
 import { HttpContext } from '@adonisjs/core/http'
-import { BaseModel } from '@adonisjs/lucid/orm'
-import { ModelAttributes, ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
+import { type BaseModel } from '@adonisjs/lucid/orm'
+import { type ModelAttributes, type ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
 import ValidationException from '#exceptions/validation_exception'
-import { TransactionClientContract } from '@adonisjs/lucid/types/database'
+import { type TransactionClientContract } from '@adonisjs/lucid/types/database'
 
-import LucidRepositoryInterface, {
-  DefaultOptions,
-  ModelKeys,
-  OrderDirection,
-  PaginateOptions,
-  PaginateResult,
+import {
+  type DefaultOptions,
+  type ModelKeys,
+  type OrderDirection,
+  type PaginateOptions,
+  type PaginateResult,
 } from '#shared/lucid/lucid_repository_interface'
+import type LucidRepositoryInterface from '#shared/lucid/lucid_repository_interface'
 
 export default class LucidRepository<T extends typeof BaseModel>
   implements LucidRepositoryInterface<T>

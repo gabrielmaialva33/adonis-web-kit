@@ -44,7 +44,8 @@ export default class SignInService {
       return { ...userJson, auth } as SignInResponse
     } catch (error) {
       // Emit login failed event
-      AuthEventService.emitLoginFailed(uid, error.message || 'Invalid credentials', ctx)
+      const reason = error instanceof Error ? error.message : 'Invalid credentials'
+      AuthEventService.emitLoginFailed(uid, reason || 'Invalid credentials', ctx)
       throw error
     }
   }

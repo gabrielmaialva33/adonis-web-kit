@@ -1,7 +1,7 @@
-import { GuardConfigProvider } from '@adonisjs/auth/types'
+import { type GuardConfigProvider } from '@adonisjs/auth/types'
 import type { HttpContext } from '@adonisjs/core/http'
-import { Secret } from '@adonisjs/core/helpers'
-import { JwtGuardUser, JwtUserProviderContract } from './types.js'
+import { type Secret } from '@adonisjs/core/helpers'
+import { type JwtGuardUser, type JwtUserProviderContract } from './types.js'
 import { JwtGuard } from './jwt.js'
 
 export function jwtGuard<UserProvider extends JwtUserProviderContract<unknown>>(config: {

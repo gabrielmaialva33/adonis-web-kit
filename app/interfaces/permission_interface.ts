@@ -1,5 +1,5 @@
-import LucidRepositoryInterface from '#shared/lucid/lucid_repository_interface'
-import Permission from '#models/permission'
+import type LucidRepositoryInterface from '#shared/lucid/lucid_repository_interface'
+import type Permission from '#models/permission'
 
 namespace IPermission {
   export interface Repository extends LucidRepositoryInterface<typeof Permission> {

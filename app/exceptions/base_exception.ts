@@ -1,5 +1,5 @@
 import { Exception } from '@adonisjs/core/exceptions'
-import { HttpContext } from '@adonisjs/core/http'
+import { type HttpContext } from '@adonisjs/core/http'
 
 type ExceptionJSONResponse = {
   status: number

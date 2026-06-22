@@ -1,8 +1,8 @@
 import User from '#models/user'
 
-import IUser from '#interfaces/user_interface'
+import type IUser from '#interfaces/user_interface'
 import LucidRepository from '#shared/lucid/lucid_repository'
-import { AccessToken } from '@adonisjs/auth/access_tokens'
+import { type AccessToken } from '@adonisjs/auth/access_tokens'
 
 export default class UsersRepository
   extends LucidRepository<typeof User>

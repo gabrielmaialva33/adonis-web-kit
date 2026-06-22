@@ -54,7 +54,7 @@ export default class RolesController {
         message: 'Role attached successfully',
       })
     } catch (error) {
-      if (error.messages) {
+      if (error && typeof error === 'object' && 'messages' in error) {
         return response.unprocessableEntity({ errors: error.messages })
       }
       throw error

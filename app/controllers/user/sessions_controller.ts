@@ -1,4 +1,4 @@
-import { HttpContext } from '@adonisjs/core/http'
+import { type HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
 import { createUserValidator, signInValidator } from '#validations/users_validator'
 import SignInService from '#services/users/sign_in_service'
@@ -17,7 +17,7 @@ export default class SessionsController {
       return response.badRequest({
         errors: [
           {
-            message: error.message,
+            message: error instanceof Error ? error.message : 'Invalid credentials',
           },
         ],
       })

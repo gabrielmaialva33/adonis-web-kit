@@ -1,7 +1,7 @@
 import LucidRepository from '#shared/lucid/lucid_repository'
-import IPermission from '#interfaces/permission_interface'
+import type IPermission from '#interfaces/permission_interface'
 import Permission from '#models/permission'
-import { TransactionClientContract } from '@adonisjs/lucid/types/database'
+import { type TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 export default class PermissionRepository
   extends LucidRepository<typeof Permission>

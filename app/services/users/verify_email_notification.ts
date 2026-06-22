@@ -1,6 +1,6 @@
 import { BaseMail } from '@adonisjs/mail'
 import env from '#start/env'
-import User from '#models/user'
+import type User from '#models/user'
 
 export default class VerifyEmailNotification extends BaseMail {
   subject = 'Verify your email address'

@@ -1,8 +1,30 @@
 {
-  "extends": "@adonisjs/tsconfig/tsconfig.app.json",
   "compilerOptions": {
-    "rootDir": "./",
-    "outDir": "./build"
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "lib": ["ESNext"],
+    "outDir": "./build",
+    "rootDir": ".",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "rewriteRelativeImportExtensions": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true
   },
-  "exclude": ["./inertia/**/*", "node_modules", "build", "tmp"]
+  "include": [
+    "app/**/*.ts",
+    "config/**/*.ts",
+    "database/**/*.ts",
+    "start/**/*.ts",
+    "bin/**/*.ts",
+    "providers/**/*.ts",
+    "adonisrc.ts",
+    "tests/**/*.ts"
+  ],
+  "exclude": ["node_modules", "build", "inertia", "tmp"]
 }

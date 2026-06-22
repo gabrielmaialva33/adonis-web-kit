@@ -2,7 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 
 import ForbiddenException from '#exceptions/forbidden_exception'
-import IRole from '#interfaces/role_interface'
+import type IRole from '#interfaces/role_interface'
 
 export default class AclMiddleware {
   async handle({ auth, i18n }: HttpContext, next: NextFn, opts: { role_slugs: IRole.Slugs[] }) {

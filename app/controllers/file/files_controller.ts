@@ -1,4 +1,4 @@
-import { HttpContext } from '@adonisjs/core/http'
+import { type HttpContext } from '@adonisjs/core/http'
 
 import app from '@adonisjs/core/services/app'
 import UploadFileService from '#services/upload/upload_file_service'

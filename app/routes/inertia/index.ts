@@ -40,7 +40,7 @@ router
       await auth.use('jwt').authenticate()
       return response.redirect('/dashboard')
     } catch {
-      return inertia.render('home')
+      return inertia.render('home', {})
     }
   })
   .as('home')
@@ -54,7 +54,7 @@ router
     // UI Demo Page
     router
       .get('/ui-demo', async ({ inertia }) => {
-        return inertia.render('ui_demo')
+        return inertia.render('ui_demo', {})
       })
       .as('ui-demo')
 

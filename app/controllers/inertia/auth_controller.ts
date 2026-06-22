@@ -1,4 +1,4 @@
-import { HttpContext } from '@adonisjs/core/http'
+import { type HttpContext } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
 import { signInValidator, createUserValidator } from '#validations/users_validator'
 import UsersRepository from '#repositories/users_repository'
@@ -6,11 +6,11 @@ import SignUpService from '#services/users/sign_up_service'
 
 export default class InertiaAuthController {
   async showLogin({ inertia }: HttpContext) {
-    return inertia.render('auth/login')
+    return inertia.render('auth/login', {})
   }
 
   async showRegister({ inertia }: HttpContext) {
-    return inertia.render('auth/register')
+    return inertia.render('auth/register', {})
   }
 
   async login(ctx: HttpContext) {
@@ -28,7 +28,8 @@ export default class InertiaAuthController {
       // Redirect to dashboard after successful login
       return response.redirect('/dashboard')
     } catch (error) {
-      session.flash('errors', { general: error.message })
+      const message = error instanceof Error ? error.message : 'Invalid credentials'
+      session.flash('errors', { general: message })
       return response.redirect().back()
     }
   }
@@ -49,10 +50,11 @@ export default class InertiaAuthController {
       return response.redirect('/dashboard')
     } catch (error) {
       // Handle validation errors
-      if (error.messages) {
-        session.flash('errors', error.messages)
+      if (error && typeof error === 'object' && 'messages' in error) {
+        session.flash('errors', error.messages as Record<string, unknown>)
       } else {
-        session.flash('errors', { general: error.message })
+        const message = error instanceof Error ? error.message : 'Registration failed'
+        session.flash('errors', { general: message })
       }
       return response.redirect().back()
     }

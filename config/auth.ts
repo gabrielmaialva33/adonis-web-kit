@@ -5,7 +5,7 @@ import { basicAuthGuard, basicAuthUserProvider } from '@adonisjs/auth/basic_auth
 import { sessionGuard, sessionUserProvider } from '@adonisjs/auth/session'
 
 import { jwtGuard } from '#shared/jwt/define_config'
-import { JwtGuardUser } from '#shared/jwt/types'
+import { type JwtGuardUser } from '#shared/jwt/types'
 
 const authConfig = defineConfig({
   default: 'jwt',

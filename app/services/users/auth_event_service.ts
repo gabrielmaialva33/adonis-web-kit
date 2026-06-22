@@ -3,14 +3,14 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import {
   extractRequestMetadata,
-  LoginAttemptedEventData,
-  LoginFailedEventData,
-  LoginSucceededEventData,
-  LogoutEventData,
-  TokenRefreshedEventData,
-  UserRegisteredEventData,
+  type LoginAttemptedEventData,
+  type LoginFailedEventData,
+  type LoginSucceededEventData,
+  type LogoutEventData,
+  type TokenRefreshedEventData,
+  type UserRegisteredEventData,
 } from '#events/auth_events'
-import User from '#models/user'
+import type User from '#models/user'
 
 export default class AuthEventService {
   /**

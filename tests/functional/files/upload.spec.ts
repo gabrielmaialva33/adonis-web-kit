@@ -2,7 +2,7 @@ import { join } from 'node:path'
 
 import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
-import { cuid } from '@adonisjs/core/helpers'
+import { randomUUID } from 'node:crypto'
 import db from '@adonisjs/lucid/services/db'
 import app from '@adonisjs/core/services/app'
 import limiter from '@adonisjs/limiter/services/main'
@@ -210,7 +210,7 @@ test.group('Files upload', (group) => {
     await assignPermissions(userRole, [IPermission.Actions.CREATE])
 
     // Create a large test file (11MB - exceeds 10MB limit)
-    const testFilePath = join(app.tmpPath(), `test-${cuid()}.txt`)
+    const testFilePath = join(app.tmpPath(), `test-${randomUUID()}.txt`)
     const largeContent = 'a'.repeat(11 * 1024 * 1024) // 11MB
     await import('node:fs').then((fs) => fs.promises.writeFile(testFilePath, largeContent))
 
@@ -260,7 +260,7 @@ test.group('Files upload', (group) => {
     await assignPermissions(userRole, [IPermission.Actions.CREATE])
 
     // Create a test file with disallowed extension
-    const testFilePath = join(app.tmpPath(), `test-${cuid()}.exe`)
+    const testFilePath = join(app.tmpPath(), `test-${randomUUID()}.exe`)
     await import('node:fs').then((fs) => fs.promises.writeFile(testFilePath, 'malicious content'))
 
     const response = await client
@@ -309,8 +309,8 @@ test.group('Files upload', (group) => {
     await assignPermissions(userRole, [IPermission.Actions.CREATE])
 
     // Create test files
-    const testFile1Path = join(app.tmpPath(), `test1-${cuid()}.txt`)
-    const testFile2Path = join(app.tmpPath(), `test2-${cuid()}.txt`)
+    const testFile1Path = join(app.tmpPath(), `test1-${randomUUID()}.txt`)
+    const testFile2Path = join(app.tmpPath(), `test2-${randomUUID()}.txt`)
     await import('node:fs').then(async (fs) => {
       await fs.promises.writeFile(testFile1Path, 'Content 1')
       await fs.promises.writeFile(testFile2Path, 'Content 2')

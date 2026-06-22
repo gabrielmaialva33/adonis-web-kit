@@ -35,7 +35,7 @@ export default class InertiaUsersController {
   }
 
   async create({ inertia }: HttpContext) {
-    return inertia.render('users/create')
+    return inertia.render('users/create', {})
   }
 
   async store({ request, response }: HttpContext) {
@@ -43,7 +43,7 @@ export default class InertiaUsersController {
     const createUserService = await app.container.make(CreateUserService)
     await createUserService.run(payload)
 
-    return response.redirect().toRoute('users.index')
+    return response.redirect().toPath('/users')
   }
 
   async edit({ inertia, params }: HttpContext) {
@@ -62,13 +62,13 @@ export default class InertiaUsersController {
     const editUserService = await app.container.make(EditUserService)
     await editUserService.run(params.id, payload)
 
-    return response.redirect().toRoute('users.index')
+    return response.redirect().toPath('/users')
   }
 
   async destroy({ response, params }: HttpContext) {
     const deleteUserService = await app.container.make(DeleteUserService)
     await deleteUserService.run(params.id)
 
-    return response.redirect().toRoute('users.index')
+    return response.redirect().toPath('/users')
   }
 }

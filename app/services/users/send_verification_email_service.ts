@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import string from '@adonisjs/core/helpers/string'
 import mail from '@adonisjs/mail/services/main'
-import User from '#models/user'
+import type User from '#models/user'
 import VerifyEmailNotification from '#services/users/verify_email_notification'
 
 export default class SendVerificationEmailService {
