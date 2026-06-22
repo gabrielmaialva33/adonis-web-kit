@@ -5,6 +5,7 @@ import { MainLayout } from '~/layouts'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
 import { Field } from '~/components/forms/field'
+import { PageHeader } from '~/components/page_header'
 
 export default function CreateUserPage() {
   const { data, setData, post, processing, errors } = useForm({
@@ -23,21 +24,22 @@ export default function CreateUserPage() {
     <MainLayout>
       <Head title="Create user" />
 
-      <div className="mx-auto max-w-2xl space-y-6">
-        <div>
-          <Link
-            href="/users"
-            className="mb-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="size-4" />
-            Back to users
-          </Link>
-          <h1 className="text-2xl font-bold tracking-tight">Create new user</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Fill out the form to add a new user.</p>
-        </div>
+      <div className="space-y-6">
+        <PageHeader
+          title="Create new user"
+          description="Fill out the form to add a new user."
+          actions={
+            <Link href="/users">
+              <Button variant="outline">
+                <ArrowLeft className="size-4" />
+                Back to users
+              </Button>
+            </Link>
+          }
+        />
 
         <form onSubmit={handleSubmit}>
-          <Card>
+          <Card className="max-w-2xl">
             <CardHeader>
               <CardTitle>User details</CardTitle>
             </CardHeader>
@@ -89,7 +91,7 @@ export default function CreateUserPage() {
                   Cancel
                 </Button>
               </Link>
-              <Button type="submit" disabled={processing}>
+              <Button variant="primary" type="submit" disabled={processing}>
                 {processing ? 'Saving...' : 'Save user'}
               </Button>
             </CardFooter>

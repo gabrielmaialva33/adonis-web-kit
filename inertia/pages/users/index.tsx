@@ -46,6 +46,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '~/components/ui/alert-dialog'
+import { PageHeader } from '~/components/page_header'
 import type { PaginatedResponse } from '~/types'
 
 interface UserRole {
@@ -283,20 +284,18 @@ export default function UsersPage({ users, search, sortBy, direction }: UsersPag
       </AlertDialog>
 
       <div className="space-y-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Users</h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Manage your application users and their roles.
-            </p>
-          </div>
-          <Link href="/users/create">
-            <Button>
-              <Plus className="size-4" />
-              Add user
-            </Button>
-          </Link>
-        </div>
+        <PageHeader
+          title="Users"
+          description="Manage your application users and their roles."
+          actions={
+            <Link href="/users/create">
+              <Button variant="primary">
+                <Plus className="size-4" />
+                Add user
+              </Button>
+            </Link>
+          }
+        />
 
         <Card>
           <CardHeader>

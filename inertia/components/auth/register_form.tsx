@@ -1,18 +1,18 @@
 import { FormEvent } from 'react'
 import { useForm } from '@inertiajs/react'
+import { Loader2 } from 'lucide-react'
 
 import {
-  Alert,
-  AlertDescription,
-  Button,
   Card,
   CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
-  FormInput,
-} from '~/components/ui/core'
+} from '~/components/ui/card'
+import { Alert, AlertContent, AlertDescription } from '~/components/ui/alert'
+import { Button } from '~/components/ui/button'
+import { Field } from '~/components/forms/field'
 
 interface RegisterFormProps {
   errors?: Record<string, string>
@@ -44,72 +44,80 @@ export function RegisterForm({ errors: serverErrors }: RegisterFormProps = {}) {
 
         <CardContent className="space-y-4">
           {generalError && (
-            <Alert variant="destructive">
-              <AlertDescription>{generalError}</AlertDescription>
+            <Alert variant="destructive" appearance="light">
+              <AlertContent>
+                <AlertDescription>{generalError}</AlertDescription>
+              </AlertContent>
             </Alert>
           )}
 
-          <FormInput
+          <Field
             label="Full Name"
             type="text"
             name="full_name"
             value={data.full_name}
             onChange={(e) => setData('full_name', e.target.value)}
-            errorMessage={errors.full_name}
+            error={errors.full_name}
             placeholder="John Doe"
             required
             autoComplete="name"
           />
 
-          <FormInput
+          <Field
             label="Email"
             type="email"
             name="email"
             value={data.email}
             onChange={(e) => setData('email', e.target.value)}
-            errorMessage={errors.email}
+            error={errors.email}
             placeholder="john@example.com"
             required
             autoComplete="email"
           />
 
-          <FormInput
+          <Field
             label="Username (optional)"
             type="text"
             name="username"
             value={data.username}
             onChange={(e) => setData('username', e.target.value)}
-            errorMessage={errors.username}
+            error={errors.username}
             placeholder="johndoe"
             autoComplete="username"
           />
 
-          <FormInput
+          <Field
             label="Password"
             type="password"
             name="password"
             value={data.password}
             onChange={(e) => setData('password', e.target.value)}
-            errorMessage={errors.password}
+            error={errors.password}
             hint="Must be at least 8 characters"
             required
             autoComplete="new-password"
           />
 
-          <FormInput
+          <Field
             label="Confirm Password"
             type="password"
             name="password_confirmation"
             value={data.password_confirmation}
             onChange={(e) => setData('password_confirmation', e.target.value)}
-            errorMessage={errors.password_confirmation}
+            error={errors.password_confirmation}
             required
             autoComplete="new-password"
           />
         </CardContent>
 
         <CardFooter>
-          <Button type="submit" loading={processing} disabled={processing} className="w-full">
+          <Button
+            type="submit"
+            variant="primary"
+            disabled={processing}
+            className="w-full"
+          >
+            {processing && <Loader2 className="size-4 animate-spin" />}
             Create account
           </Button>
         </CardFooter>

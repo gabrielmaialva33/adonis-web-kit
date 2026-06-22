@@ -18,6 +18,7 @@ import { Sheet, SheetContent, SheetTrigger } from '~/components/ui/sheet'
 import { ThemeToggle } from '~/components/theme/theme_toggle'
 import { useAuth } from '~/hooks/use_auth'
 import { SidebarNav } from './sidebar'
+import { cn } from '~/lib/utils'
 
 function initialsOf(name: string) {
   return name
@@ -143,67 +144,83 @@ function UserMenu() {
 
 interface HeaderProps {
   onToggleSidebar: () => void
+  collapsed?: boolean
 }
 
-export function Header({ onToggleSidebar }: HeaderProps) {
+export function Header({ onToggleSidebar, collapsed = false }: HeaderProps) {
   return (
-    <header className="sticky top-0 z-50 flex h-16 w-full items-center gap-2 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60 sm:px-6">
-      {/* Mobile nav (Sheet) */}
-      <Sheet>
-        <SheetTrigger asChild>
-          <Button variant="ghost" mode="icon" className="lg:hidden">
-            <Menu className="size-5" />
-          </Button>
-        </SheetTrigger>
-        <SheetContent side="left" className="w-[280px] p-0">
-          <Link href="/dashboard" className="flex h-16 items-center gap-2 border-b px-5">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-primary">
-              <span className="font-bold text-primary-foreground">A</span>
-            </div>
-            <span className="text-lg font-semibold">AdonisKit</span>
-          </Link>
-          <SidebarNav />
-        </SheetContent>
-      </Sheet>
+    <header className="sticky top-0 z-50 flex h-16 w-full items-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      {/* Brand column — aligned with the sidebar column below it (same width + divider) */}
+      <div
+        className={cn(
+          'flex h-full items-center gap-2 border-e px-4 transition-[width] duration-300',
+          collapsed ? 'lg:w-[76px] lg:justify-center lg:px-0' : 'lg:w-[260px]'
+        )}
+      >
+        {/* Mobile nav (Sheet) */}
+        <Sheet>
+          <SheetTrigger asChild>
+            <Button variant="ghost" mode="icon" className="lg:hidden">
+              <Menu className="size-5" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[280px] p-0">
+            <Link href="/dashboard" className="flex h-16 items-center gap-2 border-b px-5">
+              <div className="flex size-8 items-center justify-center rounded-lg bg-primary">
+                <span className="font-bold text-primary-foreground">A</span>
+              </div>
+              <span className="text-lg font-semibold">AdonisKit</span>
+            </Link>
+            <SidebarNav />
+          </SheetContent>
+        </Sheet>
 
-      {/* Logo */}
-      <Link href="/dashboard" className="me-2 flex items-center gap-2">
-        <div className="flex size-8 items-center justify-center rounded-lg bg-primary">
-          <span className="font-bold text-primary-foreground">A</span>
-        </div>
-        <span className="hidden text-lg font-semibold sm:inline-block">AdonisKit</span>
-      </Link>
+        {/* Logo */}
+        <Link href="/dashboard" className="flex items-center gap-2 overflow-hidden">
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary">
+            <span className="font-bold text-primary-foreground">A</span>
+          </div>
+          <span className={cn('text-lg font-semibold', collapsed && 'lg:hidden')}>AdonisKit</span>
+        </Link>
+      </div>
 
-      {/* Desktop sidebar collapse toggle */}
-      <Button variant="ghost" mode="icon" className="hidden lg:flex" onClick={onToggleSidebar}>
-        <Menu className="size-5" />
-      </Button>
+      {/* Content bar — aligned with the page content area */}
+      <div className="flex h-full flex-1 items-center gap-3 px-4 sm:px-6">
+        {/* Desktop sidebar collapse toggle — sits at the start of the content area */}
+        <Button
+          variant="ghost"
+          mode="icon"
+          className="hidden shrink-0 lg:flex"
+          onClick={onToggleSidebar}
+          aria-label="Toggle sidebar"
+        >
+          <Menu className="size-5" />
+        </Button>
 
-      {/* Search */}
-      <div className="hidden flex-1 md:block">
-        <div className="relative max-w-sm">
+        {/* Search */}
+        <div className="relative hidden w-full max-w-md md:block">
           <Search className="absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input type="search" placeholder="Search..." className="ps-9" />
         </div>
-      </div>
 
-      {/* Right actions */}
-      <div className="ms-auto flex items-center gap-2">
-        <TenantSwitcher />
+        {/* Right actions */}
+        <div className="ms-auto flex items-center gap-2">
+          <TenantSwitcher />
 
-        <Separator orientation="vertical" className="hidden h-6 sm:block" />
+          <Separator orientation="vertical" className="hidden h-6 sm:block" />
 
-        <Button variant="ghost" mode="icon" className="relative">
-          <Bell className="size-5" />
-          <Badge
-            variant="destructive"
-            shape="circle"
-            className="absolute -end-0.5 -top-0.5 size-2 min-w-0 p-0"
-          />
-        </Button>
+          <Button variant="ghost" mode="icon" className="relative">
+            <Bell className="size-5" />
+            <Badge
+              variant="destructive"
+              shape="circle"
+              className="absolute -end-0.5 -top-0.5 size-2 min-w-0 p-0"
+            />
+          </Button>
 
-        <ThemeToggle />
-        <UserMenu />
+          <ThemeToggle />
+          <UserMenu />
+        </div>
       </div>
     </header>
   )

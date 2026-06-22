@@ -5,6 +5,7 @@ import { MainLayout } from '~/layouts'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/ui/card'
 import { Button } from '~/components/ui/button'
 import { Field } from '~/components/forms/field'
+import { PageHeader } from '~/components/page_header'
 import type { User } from '~/types'
 
 interface EditUserPageProps {
@@ -26,21 +27,22 @@ export default function EditUserPage({ user }: EditUserPageProps) {
     <MainLayout>
       <Head title={`Edit user: ${user.full_name}`} />
 
-      <div className="mx-auto max-w-2xl space-y-6">
-        <div>
-          <Link
-            href="/users"
-            className="mb-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
-          >
-            <ArrowLeft className="size-4" />
-            Back to users
-          </Link>
-          <h1 className="text-2xl font-bold tracking-tight">Edit user</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Update the user&apos;s details.</p>
-        </div>
+      <div className="space-y-6">
+        <PageHeader
+          title="Edit user"
+          description="Update the user's details."
+          actions={
+            <Link href="/users">
+              <Button variant="outline">
+                <ArrowLeft className="size-4" />
+                Back to users
+              </Button>
+            </Link>
+          }
+        />
 
         <form onSubmit={handleSubmit}>
-          <Card>
+          <Card className="max-w-2xl">
             <CardHeader>
               <CardTitle>User details</CardTitle>
             </CardHeader>
@@ -71,7 +73,7 @@ export default function EditUserPage({ user }: EditUserPageProps) {
                   Cancel
                 </Button>
               </Link>
-              <Button type="submit" disabled={processing}>
+              <Button variant="primary" type="submit" disabled={processing}>
                 {processing ? 'Saving...' : 'Save changes'}
               </Button>
             </CardFooter>

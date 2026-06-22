@@ -2,6 +2,7 @@ import { Head } from '@inertiajs/react'
 
 import { MainLayout } from '~/layouts'
 import { FileUpload } from '~/components/file'
+import { PageHeader } from '~/components/page_header'
 import { Card, CardContent, CardHeader, CardHeading, CardTitle } from '~/components/ui/card'
 
 export default function FilesPage() {
@@ -10,12 +11,10 @@ export default function FilesPage() {
       <Head title="Files" />
 
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">File management</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Upload and manage your files across providers.
-          </p>
-        </div>
+        <PageHeader
+          title="File management"
+          description="Upload and manage your files across providers."
+        />
 
         <Card>
           <CardHeader>

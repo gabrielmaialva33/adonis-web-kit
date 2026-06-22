@@ -27,6 +27,7 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from '~/components/ui/chart'
+import { PageHeader } from '~/components/page_header'
 import { useAuth } from '~/hooks/use_auth'
 
 interface DashboardStats {
@@ -108,25 +109,22 @@ export default function DashboardPage({ stats }: DashboardPageProps) {
       <Head title="Dashboard" />
 
       <div className="space-y-6">
-        {/* Header */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">
-              Welcome back, {user?.full_name ?? 'there'}
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {activeTenant
-                ? `You're working in ${activeTenant.name}.`
-                : "Here's what's happening across your workspace."}
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline">Download report</Button>
-            <Link href="/users/create">
-              <Button>Add user</Button>
-            </Link>
-          </div>
-        </div>
+        <PageHeader
+          title={`Welcome back, ${user?.full_name ?? 'there'}`}
+          description={
+            activeTenant
+              ? `You're working in ${activeTenant.name}.`
+              : "Here's what's happening across your workspace."
+          }
+          actions={
+            <>
+              <Button variant="outline">Download report</Button>
+              <Link href="/users/create">
+                <Button variant="primary">Add user</Button>
+              </Link>
+            </>
+          }
+        />
 
         {/* Stats */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

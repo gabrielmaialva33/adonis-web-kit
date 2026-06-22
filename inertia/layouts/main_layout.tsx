@@ -12,7 +12,7 @@ export function MainLayout({ children }: MainLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header onToggleSidebar={() => setCollapsed((value) => !value)} />
+      <Header onToggleSidebar={() => setCollapsed((value) => !value)} collapsed={collapsed} />
 
       <Sidebar isCollapsed={collapsed} />
 
