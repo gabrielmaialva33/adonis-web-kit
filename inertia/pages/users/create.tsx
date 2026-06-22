@@ -1,10 +1,10 @@
-import { Head, useForm } from '@inertiajs/react'
+import { Head, Link, useForm } from '@inertiajs/react'
+import { ArrowLeft } from 'lucide-react'
 
 import { MainLayout } from '~/layouts'
-
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/core/card'
-import { Button } from '~/components/ui/core/button'
-import { FormInput } from '~/components/ui/core/form_input'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/ui/card'
+import { Button } from '~/components/ui/button'
+import { Field } from '~/components/forms/field'
 
 export default function CreateUserPage() {
   const { data, setData, post, processing, errors } = useForm({
@@ -14,78 +14,87 @@ export default function CreateUserPage() {
     password_confirmation: '',
   })
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
     post('/users')
   }
 
   return (
     <MainLayout>
-      <Head title="Create User" />
+      <Head title="Create user" />
 
-      <div className="space-y-6">
+      <div className="mx-auto max-w-2xl space-y-6">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Create New User</h1>
-          <p className="text-muted-foreground mt-1">Fill out the form to add a new user.</p>
+          <Link
+            href="/users"
+            className="mb-3 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="size-4" />
+            Back to users
+          </Link>
+          <h1 className="text-2xl font-bold tracking-tight">Create new user</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Fill out the form to add a new user.</p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>User Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <FormInput
-                label="Full Name"
-                id="full_name"
+        <form onSubmit={handleSubmit}>
+          <Card>
+            <CardHeader>
+              <CardTitle>User details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <Field
+                label="Full name"
+                name="full_name"
                 value={data.full_name}
-                onChange={(e) => setData('full_name', e.target.value)}
-                errorMessage={errors.full_name}
+                onChange={(event) => setData('full_name', event.target.value)}
+                error={errors.full_name}
                 autoComplete="name"
                 required
               />
-
-              <FormInput
+              <Field
                 label="Email"
-                id="email"
+                name="email"
                 type="email"
                 value={data.email}
-                onChange={(e) => setData('email', e.target.value)}
-                errorMessage={errors.email}
+                onChange={(event) => setData('email', event.target.value)}
+                error={errors.email}
                 autoComplete="email"
                 required
               />
-
-              <FormInput
+              <Field
                 label="Password"
-                id="password"
+                name="password"
                 type="password"
                 value={data.password}
-                onChange={(e) => setData('password', e.target.value)}
-                errorMessage={errors.password}
+                onChange={(event) => setData('password', event.target.value)}
+                error={errors.password}
+                hint="Must be at least 8 characters"
                 autoComplete="new-password"
                 required
               />
-
-              <FormInput
-                label="Confirm Password"
-                id="password_confirmation"
+              <Field
+                label="Confirm password"
+                name="password_confirmation"
                 type="password"
                 value={data.password_confirmation}
-                onChange={(e) => setData('password_confirmation', e.target.value)}
-                errorMessage={errors.password_confirmation}
+                onChange={(event) => setData('password_confirmation', event.target.value)}
+                error={errors.password_confirmation}
                 autoComplete="new-password"
                 required
               />
-
-              <div className="flex justify-end">
-                <Button type="submit" disabled={processing}>
-                  {processing ? 'Saving...' : 'Save User'}
+            </CardContent>
+            <CardFooter className="justify-end gap-2 border-t pt-5">
+              <Link href="/users">
+                <Button variant="outline" type="button">
+                  Cancel
                 </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+              </Link>
+              <Button type="submit" disabled={processing}>
+                {processing ? 'Saving...' : 'Save user'}
+              </Button>
+            </CardFooter>
+          </Card>
+        </form>
       </div>
     </MainLayout>
   )

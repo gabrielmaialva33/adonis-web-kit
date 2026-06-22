@@ -1,47 +1,28 @@
-import { useState, ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { Header } from './main/components/header'
 import { Sidebar } from './main/components/sidebar'
-import { cn } from '~/utils/cn'
-import { useIsMobile } from '~/hooks/use_mobile'
+import { cn } from '~/lib/utils'
 
 interface MainLayoutProps {
   children: ReactNode
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
-  const isMobile = useIsMobile()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-
-  const toggleSidebar = () => {
-    if (isMobile) {
-      setSidebarOpen(!sidebarOpen)
-    } else {
-      setSidebarCollapsed(!sidebarCollapsed)
-    }
-  }
-
-  const closeSidebar = () => {
-    setSidebarOpen(false)
-  }
+  const [collapsed, setCollapsed] = useState(false)
 
   return (
     <div className="min-h-screen bg-background">
-      <Header onToggleSidebar={toggleSidebar} isMobile={isMobile} />
+      <Header onToggleSidebar={() => setCollapsed((value) => !value)} />
 
-      <Sidebar
-        isOpen={isMobile ? sidebarOpen : true}
-        onClose={closeSidebar}
-        isCollapsed={!isMobile && sidebarCollapsed}
-      />
+      <Sidebar isCollapsed={collapsed} />
 
       <main
         className={cn(
-          'min-h-[calc(100vh-4rem)] pt-16 transition-all duration-300',
-          !isMobile && (sidebarCollapsed ? 'lg:pl-[80px]' : 'lg:pl-[260px]')
+          'min-h-[calc(100vh-4rem)] transition-[padding] duration-300',
+          collapsed ? 'lg:ps-[76px]' : 'lg:ps-[260px]'
         )}
       >
-        <div className="container mx-auto p-4 sm:p-6 lg:p-8">{children}</div>
+        <div className="mx-auto w-full max-w-7xl p-4 sm:p-6 lg:p-8">{children}</div>
       </main>
     </div>
   )

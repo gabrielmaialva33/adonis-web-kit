@@ -1,178 +1,253 @@
 import { Head, Link } from '@inertiajs/react'
 import {
-  Activity,
-  AlertCircle,
-  CreditCard,
-  DollarSign,
+  ArrowUpRight,
+  Building2,
   FileText,
-  Settings,
-  TrendingUp,
+  ShieldCheck,
   Users,
+  type LucideIcon,
 } from 'lucide-react'
+import { Area, AreaChart, Bar, BarChart, CartesianGrid, XAxis } from 'recharts'
 
 import { MainLayout } from '~/layouts'
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
+  CardHeading,
   CardTitle,
-} from '~/components/ui/core/card'
-import { Button } from '~/components/ui/core/button'
-import { Badge } from '~/components/ui/core/badge'
-import { Alert, AlertDescription, AlertTitle } from '~/components/ui/core/alert'
+  CardToolbar,
+} from '~/components/ui/card'
+import { Button } from '~/components/ui/button'
+import { Badge } from '~/components/ui/badge'
+import { Avatar, AvatarFallback } from '~/components/ui/avatar'
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from '~/components/ui/chart'
 import { useAuth } from '~/hooks/use_auth'
 
-export default function DashboardPage() {
-  const { user } = useAuth()
+interface DashboardStats {
+  totals: { users: number; tenants: number; files: number; roles: number }
+  signups: { month: string; users: number }[]
+  recentUsers: {
+    id: number
+    full_name: string
+    email: string
+    created_at: string | null
+    roles: string[]
+  }[]
+}
 
-  const stats = [
-    {
-      title: 'Total Revenue',
-      value: '$45,231.89',
-      description: '+20.1% from last month',
-      icon: <DollarSign className="h-4 w-4 text-muted-foreground" />,
-      trend: 'up',
-    },
-    {
-      title: 'Active Users',
-      value: '2,350',
-      description: '+180 new users',
-      icon: <Users className="h-4 w-4 text-muted-foreground" />,
-      trend: 'up',
-    },
-    {
-      title: 'Sales',
-      value: '12,234',
-      description: '+19% from last month',
-      icon: <CreditCard className="h-4 w-4 text-muted-foreground" />,
-      trend: 'up',
-    },
-    {
-      title: 'Active Now',
-      value: '573',
-      description: 'In the last hour',
-      icon: <Activity className="h-4 w-4 text-muted-foreground" />,
-      trend: 'neutral',
-    },
-  ]
+interface DashboardPageProps {
+  stats: DashboardStats
+}
+
+const chartConfig = {
+  users: { label: 'New users', color: 'var(--color-primary)' },
+} satisfies ChartConfig
+
+function initialsOf(name: string) {
+  return name
+    .split(' ')
+    .map((part) => part.charAt(0))
+    .filter(Boolean)
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
+}
+
+function formatDate(iso: string | null) {
+  if (!iso) return '—'
+  return new Date(iso).toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  })
+}
+
+function StatCard({
+  title,
+  value,
+  icon: Icon,
+  href,
+}: {
+  title: string
+  value: number
+  icon: LucideIcon
+  href: string
+}) {
+  return (
+    <Card>
+      <CardContent className="flex items-center justify-between">
+        <div className="space-y-1.5">
+          <p className="text-sm font-medium text-muted-foreground">{title}</p>
+          <p className="text-2xl font-semibold tracking-tight">{value.toLocaleString()}</p>
+          <Link
+            href={href}
+            className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+          >
+            View all <ArrowUpRight className="size-3" />
+          </Link>
+        </div>
+        <div className="flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <Icon className="size-5" />
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+export default function DashboardPage({ stats }: DashboardPageProps) {
+  const { user, activeTenant } = useAuth()
 
   return (
     <MainLayout>
       <Head title="Dashboard" />
 
       <div className="space-y-6">
-        {/* Page Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+        {/* Header */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Welcome back, {user?.full_name}!</h1>
-            <p className="text-muted-foreground mt-1">
-              Here's what's happening with your business today.
+            <h1 className="text-2xl font-bold tracking-tight">
+              Welcome back, {user?.full_name ?? 'there'}
+            </h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {activeTenant
+                ? `You're working in ${activeTenant.name}.`
+                : "Here's what's happening across your workspace."}
             </p>
           </div>
-          <div className="flex gap-2 mt-4 sm:mt-0">
-            <Button variant="outline" size="sm">
-              Download Report
-            </Button>
-            <Button size="sm">
-              <TrendingUp className="h-4 w-4 mr-1" />
-              View Analytics
-            </Button>
+          <div className="flex gap-2">
+            <Button variant="outline">Download report</Button>
+            <Link href="/users/create">
+              <Button>Add user</Button>
+            </Link>
           </div>
         </div>
 
-        {/* Email Verification Alert */}
-        {user?.email_verified_at === null && (
-          <Alert variant="warning">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Verify Your Email</AlertTitle>
-            <AlertDescription>
-              Please verify your email address to access all features.
-              <Button variant="link" className="px-2 h-auto">
-                Resend verification email
-              </Button>
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Stats Grid */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {stats.map((stat) => (
-            <Card key={stat.title}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-                {stat.icon}
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground">{stat.description}</p>
-              </CardContent>
-            </Card>
-          ))}
+        {/* Stats */}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard title="Total users" value={stats.totals.users} icon={Users} href="/users" />
+          <StatCard
+            title="Tenants"
+            value={stats.totals.tenants}
+            icon={Building2}
+            href="/dashboard"
+          />
+          <StatCard title="Files" value={stats.totals.files} icon={FileText} href="/files" />
+          <StatCard title="Roles" value={stats.totals.roles} icon={ShieldCheck} href="/roles" />
         </div>
 
-        {/* Content Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {/* Charts */}
+        <div className="grid gap-6 lg:grid-cols-2">
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>User Management</CardTitle>
-                <Badge variant="info">Active</Badge>
-              </div>
-              <CardDescription>Manage users, roles, and permissions</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Link href="/users" className="block">
-                <Button variant="outline" className="w-full justify-start">
-                  <Users className="h-4 w-4 mr-2" />
-                  View Users
-                </Button>
-              </Link>
-              <Link href="/roles" className="block">
-                <Button variant="outline" className="w-full justify-start">
-                  <Settings className="h-4 w-4 mr-2" />
-                  Manage Roles
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <CardTitle>File Management</CardTitle>
-                <Badge variant="success">Updated</Badge>
-              </div>
-              <CardDescription>Upload and manage your files</CardDescription>
+              <CardHeading>
+                <CardTitle>New users</CardTitle>
+                <p className="text-sm text-muted-foreground">Sign-ups over the last 6 months</p>
+              </CardHeading>
             </CardHeader>
             <CardContent>
-              <Link href="/files" className="block">
-                <Button variant="outline" className="w-full justify-start">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Browse Files
-                </Button>
-              </Link>
+              <ChartContainer config={chartConfig} className="h-[260px] w-full">
+                <AreaChart data={stats.signups} margin={{ left: 4, right: 4 }}>
+                  <defs>
+                    <linearGradient id="fillUsers" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--color-users)" stopOpacity={0.3} />
+                      <stop offset="95%" stopColor="var(--color-users)" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                  <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Area
+                    dataKey="users"
+                    type="monotone"
+                    fill="url(#fillUsers)"
+                    stroke="var(--color-users)"
+                    strokeWidth={2}
+                  />
+                </AreaChart>
+              </ChartContainer>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Common tasks and shortcuts</CardDescription>
+              <CardHeading>
+                <CardTitle>Monthly activity</CardTitle>
+                <p className="text-sm text-muted-foreground">User registrations per month</p>
+              </CardHeading>
             </CardHeader>
-            <CardContent className="space-y-2">
-              <Button variant="secondary" className="w-full justify-start" size="sm">
-                Create New User
-              </Button>
-              <Button variant="secondary" className="w-full justify-start" size="sm">
-                Upload File
-              </Button>
-              <Button variant="secondary" className="w-full justify-start" size="sm">
-                Generate Report
-              </Button>
+            <CardContent>
+              <ChartContainer config={chartConfig} className="h-[260px] w-full">
+                <BarChart data={stats.signups} margin={{ left: 4, right: 4 }}>
+                  <CartesianGrid vertical={false} strokeDasharray="3 3" />
+                  <XAxis dataKey="month" tickLine={false} axisLine={false} tickMargin={8} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="users" fill="var(--color-users)" radius={[6, 6, 0, 0]} />
+                </BarChart>
+              </ChartContainer>
             </CardContent>
           </Card>
         </div>
+
+        {/* Recent users */}
+        <Card>
+          <CardHeader>
+            <CardHeading>
+              <CardTitle>Recent users</CardTitle>
+              <p className="text-sm text-muted-foreground">The latest people to join</p>
+            </CardHeading>
+            <CardToolbar>
+              <Link href="/users">
+                <Button variant="outline" size="sm">
+                  View all
+                </Button>
+              </Link>
+            </CardToolbar>
+          </CardHeader>
+          <CardContent className="p-0">
+            {stats.recentUsers.length === 0 ? (
+              <p className="p-5 text-sm text-muted-foreground">No users yet.</p>
+            ) : (
+              <ul className="divide-y divide-border">
+                {stats.recentUsers.map((recent) => (
+                  <li
+                    key={recent.id}
+                    className="flex items-center gap-3 px-5 py-3.5 transition-colors hover:bg-accent/50"
+                  >
+                    <Avatar className="size-9">
+                      <AvatarFallback className="bg-primary/10 text-primary">
+                        {initialsOf(recent.full_name)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium">{recent.full_name}</p>
+                      <p className="truncate text-xs text-muted-foreground">{recent.email}</p>
+                    </div>
+                    <div className="hidden gap-1 sm:flex">
+                      {recent.roles.length > 0 ? (
+                        recent.roles.map((role) => (
+                          <Badge key={role} variant="secondary" appearance="light" size="sm">
+                            {role}
+                          </Badge>
+                        ))
+                      ) : (
+                        <span className="text-xs text-muted-foreground">No role</span>
+                      )}
+                    </div>
+                    <span className="hidden text-xs text-muted-foreground md:block">
+                      {formatDate(recent.created_at)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </MainLayout>
   )

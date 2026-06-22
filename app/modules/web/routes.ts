@@ -14,6 +14,7 @@ const InertiaAuthController = () => import('#modules/web/controllers/auth_contro
 const InertiaDashboardController = () => import('#modules/web/controllers/dashboard_controller')
 const InertiaUsersController = () => import('#modules/web/controllers/users_controller')
 const InertiaFilesController = () => import('#modules/web/controllers/files_controller')
+const InertiaTenantController = () => import('#modules/web/controllers/tenant_controller')
 
 // Public routes - with guest middleware to redirect authenticated users
 router
@@ -84,6 +85,9 @@ router
           permissions: 'files.list',
         })
       )
+
+    // Switch the active tenant (re-mints the JWT cookie with the new tenantId)
+    router.post('/tenant/switch', [InertiaTenantController, 'switch']).as('tenant.switch')
 
     // Logout
     router

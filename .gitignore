@@ -32,3 +32,6 @@ storage/uploads/*
 
 # Lucid v7 auto-generated schema classes
 database/schema.ts
+
+# AdonisJS generated types
+.adonisjs

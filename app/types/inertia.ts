@@ -6,6 +6,8 @@
  * the props passed from the controller. Pages without page-specific props use
  * an empty object.
  */
+import type { DashboardStats } from '#modules/web/services/get_dashboard_stats_service'
+
 declare module '@adonisjs/inertia/types' {
   interface InertiaPages {
     // Auth
@@ -15,7 +17,7 @@ declare module '@adonisjs/inertia/types' {
     // Root / misc
     'home': Record<string, never>
     'ui_demo': Record<string, never>
-    'dashboard': Record<string, never>
+    'dashboard': { stats: DashboardStats }
 
     // Files
     'files/index': Record<string, never>
