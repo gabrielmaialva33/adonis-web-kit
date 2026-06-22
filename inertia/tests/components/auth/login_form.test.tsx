@@ -15,8 +15,7 @@ vi.mock('@inertiajs/react', async () => {
       const [data, setData] = React.useState<T>(initial)
       return {
         data,
-        setData: (key: keyof T, value: unknown) =>
-          setData((prev) => ({ ...prev, [key]: value })),
+        setData: (key: keyof T, value: unknown) => setData((prev) => ({ ...prev, [key]: value })),
         post: mockPost,
         processing: false,
         errors: {} as Record<string, string>,

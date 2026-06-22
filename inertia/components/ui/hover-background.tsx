@@ -1,19 +1,24 @@
-
-import * as React from 'react';
-import { HTMLMotionProps, motion, useMotionValue, useSpring } from 'motion/react';
-import { cn } from '~/lib/utils';
+import * as React from 'react'
+import { HTMLMotionProps, motion, useMotionValue, useSpring } from 'motion/react'
+import { cn } from '~/lib/utils'
 
 type HoverBackgroundProps = HTMLMotionProps<'div'> & {
-  objectCount?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
-  children?: React.ReactNode;
+  objectCount?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12
+  children?: React.ReactNode
   colors?: {
-    background?: string;
-    objects?: string[];
-    glow?: string;
-  };
-};
+    background?: string
+    objects?: string[]
+    glow?: string
+  }
+}
 
-function HoverBackground({ className, objectCount = 12, children, colors = {}, ...props }: HoverBackgroundProps) {
+function HoverBackground({
+  className,
+  objectCount = 12,
+  children,
+  colors = {},
+  ...props
+}: HoverBackgroundProps) {
   const {
     background = 'bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900',
     objects = [
@@ -25,13 +30,13 @@ function HoverBackground({ className, objectCount = 12, children, colors = {}, .
       'bg-indigo-400/20',
     ],
     glow = 'shadow-cyan-400/50',
-  } = colors;
+  } = colors
 
-  const [isHovered, setIsHovered] = React.useState(false);
+  const [isHovered, setIsHovered] = React.useState(false)
 
   // Mouse position tracking for parallax
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
+  const mouseX = useMotionValue(0)
+  const mouseY = useMotionValue(0)
 
   // Spring animations for smooth parallax with slower exit
   const springX = useSpring(mouseX, {
@@ -40,18 +45,18 @@ function HoverBackground({ className, objectCount = 12, children, colors = {}, .
     // Slower return to center when hover ends
     restSpeed: 0.1,
     restDelta: 0.1,
-  });
+  })
   const springY = useSpring(mouseY, {
     stiffness: 300,
     damping: 30,
     restSpeed: 0.1,
     restDelta: 0.1,
-  });
+  })
 
   const animatedObjects = React.useMemo(
     () =>
       Array.from({ length: objectCount }, (_, i) => {
-        const shape = Math.random() > 0.5 ? 'circle' : 'square';
+        const shape = Math.random() > 0.5 ? 'circle' : 'square'
         return {
           id: i,
           x: Math.random() * 90 + 5, // 5-95% to avoid edges
@@ -64,36 +69,36 @@ function HoverBackground({ className, objectCount = 12, children, colors = {}, .
           breathDuration: Math.random() * 3 + 3, // 3-6 seconds
           parallaxStrength: Math.random() * 0.5 + 0.3, // 0.3-0.8 for more varied parallax depth
           baseRotation: Math.random() * 360, // Random starting rotation offset
-        };
+        }
       }),
-    [objectCount, objects],
-  );
+    [objectCount, objects]
+  )
 
   const handleMouseMove = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (!isHovered) return;
+    if (!isHovered) return
 
-    const rect = event.currentTarget.getBoundingClientRect();
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
+    const rect = event.currentTarget.getBoundingClientRect()
+    const centerX = rect.width / 2
+    const centerY = rect.height / 2
 
     // Calculate mouse position relative to center (-1 to 1)
-    const x = (event.clientX - rect.left - centerX) / centerX;
-    const y = (event.clientY - rect.top - centerY) / centerY;
+    const x = (event.clientX - rect.left - centerX) / centerX
+    const y = (event.clientY - rect.top - centerY) / centerY
 
-    mouseX.set(x * 15); // Slightly reduced parallax range
-    mouseY.set(y * 15);
-  };
+    mouseX.set(x * 15) // Slightly reduced parallax range
+    mouseY.set(y * 15)
+  }
 
   const handleHoverStart = () => {
-    setIsHovered(true);
-  };
+    setIsHovered(true)
+  }
 
   const handleHoverEnd = () => {
-    setIsHovered(false);
+    setIsHovered(false)
     // Smooth return to center
-    mouseX.set(0);
-    mouseY.set(0);
-  };
+    mouseX.set(0)
+    mouseY.set(0)
+  }
 
   return (
     <motion.div
@@ -133,7 +138,7 @@ function HoverBackground({ className, objectCount = 12, children, colors = {}, .
           className={cn(
             'absolute backdrop-blur-sm border border-white/10',
             obj.color,
-            obj.shape === 'circle' ? 'rounded-full' : 'rounded-lg rotate-45',
+            obj.shape === 'circle' ? 'rounded-full' : 'rounded-lg rotate-45'
           )}
           style={{
             left: `${obj.x}%`,
@@ -205,7 +210,7 @@ function HoverBackground({ className, objectCount = 12, children, colors = {}, .
       {/* Content Layer */}
       <div className="relative z-10 size-full">{children}</div>
     </motion.div>
-  );
+  )
 }
 
-export { HoverBackground, type HoverBackgroundProps };
+export { HoverBackground, type HoverBackgroundProps }

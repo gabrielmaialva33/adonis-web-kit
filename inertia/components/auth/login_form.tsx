@@ -51,13 +51,7 @@ export function LoginForm() {
       />
 
       <div className="space-y-4">
-        <Button
-          type="submit"
-          variant="primary"
-          disabled={processing}
-          className="w-full"
-          size="lg"
-        >
+        <Button type="submit" variant="primary" disabled={processing} className="w-full" size="lg">
           {processing && <Loader2 className="size-4 animate-spin" />}
           Sign in
         </Button>

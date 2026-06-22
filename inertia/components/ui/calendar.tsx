@@ -1,11 +1,15 @@
+import * as React from 'react'
+import { cn } from '~/lib/utils'
+import { buttonVariants } from '~/components/ui/button'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
+import { DayPicker } from 'react-day-picker'
 
-import * as React from 'react';
-import { cn } from '~/lib/utils';
-import { buttonVariants } from '~/components/ui/button';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { DayPicker } from 'react-day-picker';
-
-function Calendar({ className, classNames, showOutsideDays = true, ...props }: React.ComponentProps<typeof DayPicker>) {
+function Calendar({
+  className,
+  classNames,
+  showOutsideDays = true,
+  ...props
+}: React.ComponentProps<typeof DayPicker>) {
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
@@ -18,11 +22,11 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: R
         nav: 'absolute top-0 flex w-full justify-between z-10',
         button_previous: cn(
           buttonVariants({ variant: 'ghost' }),
-          'size-8 text-muted-foreground/80 hover:text-foreground p-0',
+          'size-8 text-muted-foreground/80 hover:text-foreground p-0'
         ),
         button_next: cn(
           buttonVariants({ variant: 'ghost' }),
-          'size-8 text-muted-foreground/80 hover:text-foreground p-0',
+          'size-8 text-muted-foreground/80 hover:text-foreground p-0'
         ),
         weekday: 'size-8 p-0 text-xs font-medium text-muted-foreground/80',
         day_button:
@@ -33,7 +37,8 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: R
         range_middle: 'range-middle',
         today:
           '*:after:pointer-events-none *:after:absolute *:after:bottom-1 *:after:start-1/2 *:after:z-10 *:after:size-[3px] *:after:-translate-x-1/2 rtl:*:after:translate-x-1/2 *:after:rounded-full *:after:bg-primary [&[data-selected]:not(.range-middle)>*]:after:bg-background [&[data-disabled]>*]:after:bg-foreground/30 *:after:transition-colors',
-        outside: 'text-muted-foreground data-selected:bg-accent/50 data-selected:text-muted-foreground',
+        outside:
+          'text-muted-foreground data-selected:bg-accent/50 data-selected:text-muted-foreground',
         hidden: 'invisible',
         week_number: 'size-8 p-0 text-xs font-medium text-muted-foreground/80',
         ...classNames,
@@ -41,15 +46,15 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: R
       components={{
         Chevron: (props) => {
           if (props.orientation === 'left') {
-            return <ChevronLeft className="h-4 w-4 rtl:rotate-180" />;
+            return <ChevronLeft className="h-4 w-4 rtl:rotate-180" />
           } else {
-            return <ChevronRight className="h-4 w-4 rtl:rotate-180" />;
+            return <ChevronRight className="h-4 w-4 rtl:rotate-180" />
           }
         },
       }}
       {...props}
     />
-  );
+  )
 }
 
-export { Calendar };
+export { Calendar }

@@ -1,39 +1,45 @@
+import * as React from 'react'
+import {
+  AnimatePresence,
+  Easing,
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from 'motion/react'
+import { cn } from '~/lib/utils'
 
-import * as React from 'react';
-import { AnimatePresence, Easing, motion, useMotionValue, useSpring, useTransform } from 'motion/react';
-import { cn } from '~/lib/utils';
-
-type AnimationVariantType = 'spring' | 'tween' | 'inertia' | 'decay' | 'keyframes';
-type AnimationType = 'default' | 'flip' | 'reveal';
+type AnimationVariantType = 'spring' | 'tween' | 'inertia' | 'decay' | 'keyframes'
+type AnimationType = 'default' | 'flip' | 'reveal'
 
 interface AvatarGroupContextValue {
-  tooltipClassName?: string;
-  animation?: 'default' | 'flip' | 'reveal';
+  tooltipClassName?: string
+  animation?: 'default' | 'flip' | 'reveal'
 }
 
-const AvatarGroupContext = React.createContext<AvatarGroupContextValue | null>(null);
+const AvatarGroupContext = React.createContext<AvatarGroupContextValue | null>(null)
 
 interface AvatarGroupProps {
-  children: React.ReactNode;
-  className?: string;
-  tooltipClassName?: string;
-  animation?: AnimationType;
+  children: React.ReactNode
+  className?: string
+  tooltipClassName?: string
+  animation?: AnimationType
 }
 
 interface AvatarGroupItemProps {
-  children: React.ReactNode;
-  className?: string;
-  tooltipClassName?: string;
-  animation?: AnimationType;
+  children: React.ReactNode
+  className?: string
+  tooltipClassName?: string
+  animation?: AnimationType
 }
 
 interface AvatarGroupTooltipProps {
-  children: React.ReactNode;
-  className?: string;
+  children: React.ReactNode
+  className?: string
 }
 
 const StaggeredContent = ({ content }: { content: React.ReactNode }) => {
-  const children = React.Children.toArray(content);
+  const children = React.Children.toArray(content)
   return (
     <motion.div
       initial="initial"
@@ -56,20 +62,25 @@ const StaggeredContent = ({ content }: { content: React.ReactNode }) => {
         </motion.div>
       ))}
     </motion.div>
-  );
-};
+  )
+}
 
-export function AvatarGroup({ children, className, tooltipClassName, animation = 'default' }: AvatarGroupProps) {
+export function AvatarGroup({
+  children,
+  className,
+  tooltipClassName,
+  animation = 'default',
+}: AvatarGroupProps) {
   const contextValue: AvatarGroupContextValue = {
     tooltipClassName,
     animation,
-  };
+  }
 
   return (
     <AvatarGroupContext.Provider value={contextValue}>
       <div className={cn('flex -space-x-2.5', className)}>{children}</div>
     </AvatarGroupContext.Provider>
-  );
+  )
 }
 
 export function AvatarGroupItem({
@@ -78,37 +89,37 @@ export function AvatarGroupItem({
   tooltipClassName,
   animation: itemAnimation,
 }: AvatarGroupItemProps) {
-  const context = React.useContext(AvatarGroupContext);
-  const [hoveredIndex, setHoveredIndex] = React.useState<boolean>(false);
-  const springConfig = { stiffness: 100, damping: 5 };
-  const x = useMotionValue(0);
+  const context = React.useContext(AvatarGroupContext)
+  const [hoveredIndex, setHoveredIndex] = React.useState<boolean>(false)
+  const springConfig = { stiffness: 100, damping: 5 }
+  const x = useMotionValue(0)
 
-  const animation = itemAnimation || context?.animation || 'default';
-  const finalTooltipClassName = tooltipClassName || context?.tooltipClassName;
+  const animation = itemAnimation || context?.animation || 'default'
+  const finalTooltipClassName = tooltipClassName || context?.tooltipClassName
 
   // rotate the tooltip
-  const rotate = useSpring(useTransform(x, [-100, 100], [-45, 45]), springConfig);
+  const rotate = useSpring(useTransform(x, [-100, 100], [-45, 45]), springConfig)
   // translate the tooltip
-  const translateX = useSpring(useTransform(x, [-100, 100], [-50, 50]), springConfig);
+  const translateX = useSpring(useTransform(x, [-100, 100], [-50, 50]), springConfig)
 
   // Extract tooltip from children
   const tooltipChild = React.Children.toArray(children).find(
-    (child) => React.isValidElement(child) && child.type === AvatarGroupTooltip,
-  );
+    (child) => React.isValidElement(child) && child.type === AvatarGroupTooltip
+  )
 
   const otherChildren = React.Children.toArray(children).filter(
-    (child) => !(React.isValidElement(child) && child.type === AvatarGroupTooltip),
-  );
+    (child) => !(React.isValidElement(child) && child.type === AvatarGroupTooltip)
+  )
 
   const tooltipContent =
     tooltipChild && React.isValidElement(tooltipChild)
       ? (tooltipChild.props as AvatarGroupTooltipProps).children
-      : null;
+      : null
 
   const handleMouseMove = (event: React.MouseEvent) => {
-    const halfWidth = (event.target as HTMLElement).offsetWidth / 2;
-    x.set((event.nativeEvent as MouseEvent).offsetX - halfWidth);
-  };
+    const halfWidth = (event.target as HTMLElement).offsetWidth / 2
+    x.set((event.nativeEvent as MouseEvent).offsetX - halfWidth)
+  }
 
   const animationVariants = {
     default: {
@@ -158,9 +169,9 @@ export function AvatarGroupItem({
       animate: { opacity: 1, scale: 1, transition: { duration: 0.15, ease: 'easeOut' as Easing } },
       exit: { opacity: 0, scale: 0.95, transition: { duration: 0.1, ease: 'easeIn' as Easing } },
     },
-  };
+  }
 
-  const selectedVariant = animationVariants[animation];
+  const selectedVariant = animationVariants[animation]
 
   return (
     <div
@@ -182,7 +193,7 @@ export function AvatarGroupItem({
             }}
             className={cn(
               'absolute -top-16 left-1/2 z-50 flex -translate-x-1/2 flex-col items-center justify-center rounded-md bg-black px-4 py-2 text-xs font-medium text-white shadow-xl',
-              finalTooltipClassName,
+              finalTooltipClassName
             )}
           >
             <motion.div
@@ -199,7 +210,11 @@ export function AvatarGroupItem({
               exit={{ opacity: 0 }}
               transition={{ duration: 0.15 }}
             />
-            {animation === 'reveal' ? <StaggeredContent content={tooltipContent} /> : tooltipContent}
+            {animation === 'reveal' ? (
+              <StaggeredContent content={tooltipContent} />
+            ) : (
+              tooltipContent
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -218,7 +233,7 @@ export function AvatarGroupItem({
         {otherChildren}
       </motion.div>
     </div>
-  );
+  )
 }
 
 export function AvatarGroupTooltip({ children, className }: AvatarGroupTooltipProps) {
@@ -232,5 +247,5 @@ export function AvatarGroupTooltip({ children, className }: AvatarGroupTooltipPr
     >
       {children}
     </motion.div>
-  );
+  )
 }

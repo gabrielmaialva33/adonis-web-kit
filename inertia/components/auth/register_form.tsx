@@ -111,12 +111,7 @@ export function RegisterForm({ errors: serverErrors }: RegisterFormProps = {}) {
         </CardContent>
 
         <CardFooter>
-          <Button
-            type="submit"
-            variant="primary"
-            disabled={processing}
-            className="w-full"
-          >
+          <Button type="submit" variant="primary" disabled={processing} className="w-full">
             {processing && <Loader2 className="size-4 animate-spin" />}
             Create account
           </Button>

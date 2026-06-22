@@ -1,21 +1,20 @@
-
-import * as React from 'react';
-import { cn } from '~/lib/utils';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { Switch as SwitchPrimitive } from 'radix-ui';
+import * as React from 'react'
+import { cn } from '~/lib/utils'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { Switch as SwitchPrimitive } from 'radix-ui'
 
 // Define a context for `permanent` state
 const SwitchContext = React.createContext<{ permanent: boolean }>({
   permanent: false,
-});
+})
 
 const useSwitchContext = () => {
-  const context = React.useContext(SwitchContext);
+  const context = React.useContext(SwitchContext)
   if (!context) {
-    throw new Error('SwitchIndicator must be used within a Switch component');
+    throw new Error('SwitchIndicator must be used within a Switch component')
   }
-  return context;
-};
+  return context
+}
 
 // Define classes for variants
 const switchVariants = cva(
@@ -48,8 +47,8 @@ const switchVariants = cva(
       permanent: false,
       size: 'md',
     },
-  },
-);
+  }
+)
 
 const switchThumbVariants = cva(
   'pointer-events-none block bg-white w-1/2 h-[calc(100%-4px)] shadow-lg ring-0 transition-transform start-0 data-[state=unchecked]:translate-x-[2px] data-[state=checked]:translate-x-[calc(100%-2px)] rtl:data-[state=unchecked]:-translate-x-[2px] rtl:data-[state=checked]:-translate-x-[calc(100%-2px)]',
@@ -78,8 +77,8 @@ const switchThumbVariants = cva(
       shape: 'pill',
       size: 'md',
     },
-  },
-);
+  }
+)
 
 const switchIndicatorVariants = cva(
   'text-sm font-medium absolute mx-[2px] top-1/2 w-1/2 -translate-y-1/2 flex pointer-events-none items-center justify-center text-center transition-transform duration-300 [transition-timing-function:cubic-bezier(0.16,1,0.3,1)]',
@@ -122,8 +121,8 @@ const switchIndicatorVariants = cva(
       state: 'off',
       permanent: false,
     },
-  },
-);
+  }
+)
 
 function SwitchWrapper({
   className,
@@ -133,11 +132,15 @@ function SwitchWrapper({
 }: React.HTMLAttributes<HTMLDivElement> & { permanent?: boolean }) {
   return (
     <SwitchContext.Provider value={{ permanent }}>
-      <div data-slot="switch-wrapper" className={cn('relative inline-flex items-center', className)} {...props}>
+      <div
+        data-slot="switch-wrapper"
+        className={cn('relative inline-flex items-center', className)}
+        {...props}
+      >
         {children}
       </div>
     </SwitchContext.Provider>
-  );
+  )
 }
 
 function Switch({
@@ -148,8 +151,8 @@ function Switch({
   ...props
 }: React.ComponentProps<typeof SwitchPrimitive.Root> &
   VariantProps<typeof switchVariants> & { thumbClassName?: string }) {
-  const context = useSwitchContext();
-  const permanent = context?.permanent ?? false;
+  const context = useSwitchContext()
+  const permanent = context?.permanent ?? false
 
   return (
     <SwitchPrimitive.Root
@@ -159,7 +162,7 @@ function Switch({
     >
       <SwitchPrimitive.Thumb className={cn(switchThumbVariants({ shape, size }), thumbClassName)} />
     </SwitchPrimitive.Root>
-  );
+  )
 }
 
 function SwitchIndicator({
@@ -167,8 +170,8 @@ function SwitchIndicator({
   state,
   ...props
 }: React.HTMLAttributes<HTMLSpanElement> & VariantProps<typeof switchIndicatorVariants>) {
-  const context = useSwitchContext();
-  const permanent = context?.permanent ?? false;
+  const context = useSwitchContext()
+  const permanent = context?.permanent ?? false
 
   return (
     <span
@@ -176,7 +179,7 @@ function SwitchIndicator({
       className={cn(switchIndicatorVariants({ state, permanent }), className)}
       {...props}
     />
-  );
+  )
 }
 
-export { Switch, SwitchIndicator, SwitchWrapper };
+export { Switch, SwitchIndicator, SwitchWrapper }

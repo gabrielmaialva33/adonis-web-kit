@@ -1,7 +1,6 @@
-
-import * as React from 'react';
-import { cn } from '~/lib/utils';
-import { ScrollArea as ScrollAreaPrimitive } from 'radix-ui';
+import * as React from 'react'
+import { cn } from '~/lib/utils'
+import { ScrollArea as ScrollAreaPrimitive } from 'radix-ui'
 
 function ScrollArea({
   className,
@@ -10,11 +9,15 @@ function ScrollArea({
   viewportRef,
   ...props
 }: React.ComponentProps<typeof ScrollAreaPrimitive.Root> & {
-  viewportRef?: React.Ref<HTMLDivElement>;
-  viewportClassName?: string;
+  viewportRef?: React.Ref<HTMLDivElement>
+  viewportClassName?: string
 }) {
   return (
-    <ScrollAreaPrimitive.Root data-slot="scroll-area" className={cn('relative overflow-hidden', className)} {...props}>
+    <ScrollAreaPrimitive.Root
+      data-slot="scroll-area"
+      className={cn('relative overflow-hidden', className)}
+      {...props}
+    >
       <ScrollAreaPrimitive.Viewport
         ref={viewportRef}
         className={cn('h-full w-full rounded-[inherit]', viewportClassName)}
@@ -24,7 +27,7 @@ function ScrollArea({
       <ScrollBar />
       <ScrollAreaPrimitive.Corner />
     </ScrollAreaPrimitive.Root>
-  );
+  )
 }
 
 function ScrollBar({
@@ -40,13 +43,13 @@ function ScrollBar({
         'flex touch-none select-none transition-colors',
         orientation === 'vertical' && 'h-full w-2 border-l border-l-transparent p-[1px]',
         orientation === 'horizontal' && 'h-2 flex-col border-t border-t-transparent p-[1px]',
-        className,
+        className
       )}
       {...props}
     >
       <ScrollAreaPrimitive.ScrollAreaThumb className="relative flex-1 rounded-full bg-border" />
     </ScrollAreaPrimitive.ScrollAreaScrollbar>
-  );
+  )
 }
 
-export { ScrollArea, ScrollBar };
+export { ScrollArea, ScrollBar }

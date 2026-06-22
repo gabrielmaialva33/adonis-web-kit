@@ -1,9 +1,12 @@
+import * as React from 'react'
+import { cn } from '~/lib/utils'
+import { Slider as SliderPrimitive } from 'radix-ui'
 
-import * as React from 'react';
-import { cn } from '~/lib/utils';
-import { Slider as SliderPrimitive } from 'radix-ui';
-
-function Slider({ className, children, ...props }: React.ComponentProps<typeof SliderPrimitive.Root>) {
+function Slider({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof SliderPrimitive.Root>) {
   return (
     <SliderPrimitive.Root
       data-slot="slider"
@@ -15,7 +18,7 @@ function Slider({ className, children, ...props }: React.ComponentProps<typeof S
       </SliderPrimitive.Track>
       {children}
     </SliderPrimitive.Root>
-  );
+  )
 }
 
 function SliderThumb({ className, ...props }: React.ComponentProps<typeof SliderPrimitive.Thumb>) {
@@ -24,11 +27,11 @@ function SliderThumb({ className, ...props }: React.ComponentProps<typeof Slider
       data-slot="slider-thumb"
       className={cn(
         'box-content block size-4 shrink-0 cursor-pointer rounded-full border-[2px] border-primary bg-primary-foreground shadow-xs shadow-black/5 outline-hidden focus:outline-hidden',
-        className,
+        className
       )}
       {...props}
     />
-  );
+  )
 }
 
-export { Slider, SliderThumb };
+export { Slider, SliderThumb }

@@ -18,9 +18,21 @@ export default function RegisterPage({ errors }: RegisterPageProps) {
         panelTitle="Join AdonisKit today"
         panelDescription="Start building with a powerful toolkit: authentication, user management, file uploads and more."
         features={[
-          { title: 'Secure by default', description: 'Argon2 hashing and JWT sessions', icon: Lock },
-          { title: 'Batteries included', description: 'Files, audits and rate limiting', icon: Layers },
-          { title: 'Ship faster', description: 'Skip the boilerplate, build features', icon: Rocket },
+          {
+            title: 'Secure by default',
+            description: 'Argon2 hashing and JWT sessions',
+            icon: Lock,
+          },
+          {
+            title: 'Batteries included',
+            description: 'Files, audits and rate limiting',
+            icon: Layers,
+          },
+          {
+            title: 'Ship faster',
+            description: 'Skip the boilerplate, build features',
+            icon: Rocket,
+          },
         ]}
         footer={
           <>

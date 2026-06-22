@@ -1,15 +1,17 @@
-import * as React from 'react';
-import { useCopyToClipboard } from '~/hooks/use_copy_to_clipboard';
-import { cn } from '~/lib/utils';
-import { Button } from '~/components/ui/button';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { Check, Copy } from 'lucide-react';
-import { Slot as SlotPrimitive } from 'radix-ui';
+import * as React from 'react'
+import { useCopyToClipboard } from '~/hooks/use_copy_to_clipboard'
+import { cn } from '~/lib/utils'
+import { Button } from '~/components/ui/button'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { Check, Copy } from 'lucide-react'
+import { Slot as SlotPrimitive } from 'radix-ui'
 
-export interface CodeProps extends React.HTMLAttributes<HTMLElement>, VariantProps<typeof codeVariants> {
-  asChild?: boolean;
-  showCopyButton?: boolean;
-  copyText?: string;
+export interface CodeProps
+  extends React.HTMLAttributes<HTMLElement>,
+    VariantProps<typeof codeVariants> {
+  asChild?: boolean
+  showCopyButton?: boolean
+  copyText?: string
 }
 
 const codeVariants = cva('relative rounded-md bg-muted font-mono text-sm font-medium', {
@@ -29,7 +31,7 @@ const codeVariants = cva('relative rounded-md bg-muted font-mono text-sm font-me
     variant: 'default',
     size: 'default',
   },
-});
+})
 
 function Code({
   className,
@@ -41,9 +43,9 @@ function Code({
   children,
   ...props
 }: CodeProps) {
-  const { isCopied, copyToClipboard } = useCopyToClipboard();
-  const Comp = asChild ? SlotPrimitive.Slot : 'code';
-  const textToCopy = copyText || (typeof children === 'string' ? children : '');
+  const { isCopied, copyToClipboard } = useCopyToClipboard()
+  const Comp = asChild ? SlotPrimitive.Slot : 'code'
+  const textToCopy = copyText || (typeof children === 'string' ? children : '')
 
   return (
     <span className={cn('inline-flex items-center gap-2', className)} data-slot="code">
@@ -62,7 +64,7 @@ function Code({
         </Button>
       )}
     </span>
-  );
+  )
 }
 
-export { Code, codeVariants };
+export { Code, codeVariants }

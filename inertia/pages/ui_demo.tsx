@@ -1,14 +1,6 @@
 import { useState } from 'react'
 import { Head } from '@inertiajs/react'
-import {
-  FileText,
-  Users,
-  DollarSign,
-  TrendingUp,
-  Calendar,
-  CheckCircle,
-  Clock,
-} from 'lucide-react'
+import { FileText, Users, DollarSign, TrendingUp, Calendar, CheckCircle, Clock } from 'lucide-react'
 import { MainLayout } from '~/layouts'
 import { AnimatedPage } from '~/components/animated_page'
 import { ThemeCustomizer } from '~/components/theme_customizer'

@@ -1,19 +1,18 @@
-
-import { useEffect, useRef, useState } from 'react';
-import { motion, MotionProps, useInView, UseInViewOptions, Variants } from 'motion/react';
-import { cn } from '~/lib/utils';
+import { useEffect, useRef, useState } from 'react'
+import { motion, MotionProps, useInView, UseInViewOptions, Variants } from 'motion/react'
+import { cn } from '~/lib/utils'
 
 interface WordRotateProps extends Omit<MotionProps, 'children'> {
-  words: string[];
-  duration?: number; // ms each word is visible
-  animationStyle?: 'fade' | 'slide-up' | 'slide-down' | 'scale' | 'flip';
-  loop?: boolean;
-  pauseDuration?: number; // ms between word transitions
-  className?: string;
-  containerClassName?: string;
-  startOnView?: boolean;
-  once?: boolean;
-  inViewMargin?: UseInViewOptions['margin'];
+  words: string[]
+  duration?: number // ms each word is visible
+  animationStyle?: 'fade' | 'slide-up' | 'slide-down' | 'scale' | 'flip'
+  loop?: boolean
+  pauseDuration?: number // ms between word transitions
+  className?: string
+  containerClassName?: string
+  startOnView?: boolean
+  once?: boolean
+  inViewMargin?: UseInViewOptions['margin']
 }
 
 export function WordRotate({
@@ -29,15 +28,15 @@ export function WordRotate({
   inViewMargin,
   ...props
 }: WordRotateProps) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once, margin: inViewMargin as UseInViewOptions['margin'] });
-  const [hasAnimated, setHasAnimated] = useState(false);
-  const [currentWord, setCurrentWord] = useState(0);
-  const [show, setShow] = useState(true);
+  const ref = useRef<HTMLSpanElement>(null)
+  const isInView = useInView(ref, { once, margin: inViewMargin as UseInViewOptions['margin'] })
+  const [hasAnimated, setHasAnimated] = useState(false)
+  const [currentWord, setCurrentWord] = useState(0)
+  const [show, setShow] = useState(true)
 
   // Animation variants
   const variants: Record<string, Variants> = {
-    fade: {
+    'fade': {
       initial: { opacity: 0 },
       animate: {
         opacity: 1,
@@ -96,7 +95,7 @@ export function WordRotate({
         },
       },
     },
-    scale: {
+    'scale': {
       initial: { opacity: 0, scale: 0.8 },
       animate: {
         opacity: 1,
@@ -117,7 +116,7 @@ export function WordRotate({
         },
       },
     },
-    flip: {
+    'flip': {
       initial: { opacity: 0, rotateX: 90 },
       animate: {
         opacity: 1,
@@ -138,32 +137,36 @@ export function WordRotate({
         },
       },
     },
-  };
+  }
 
   // Determine if we should start animation
-  const shouldStart = !startOnView || (isInView && (!once || !hasAnimated));
+  const shouldStart = !startOnView || (isInView && (!once || !hasAnimated))
 
   useEffect(() => {
-    if (!shouldStart) return;
-    setHasAnimated(true);
+    if (!shouldStart) return
+    setHasAnimated(true)
     const interval = setInterval(() => {
-      setShow(false);
+      setShow(false)
       setTimeout(() => {
         setCurrentWord((prev) => {
           if (loop) {
-            return (prev + 1) % words.length;
+            return (prev + 1) % words.length
           } else {
-            return prev < words.length - 1 ? prev + 1 : prev;
+            return prev < words.length - 1 ? prev + 1 : prev
           }
-        });
-        setShow(true);
-      }, pauseDuration);
-    }, duration + pauseDuration);
-    return () => clearInterval(interval);
-  }, [shouldStart, duration, pauseDuration, words.length, loop]);
+        })
+        setShow(true)
+      }, pauseDuration)
+    }, duration + pauseDuration)
+    return () => clearInterval(interval)
+  }, [shouldStart, duration, pauseDuration, words.length, loop])
 
   return (
-    <motion.span ref={ref} className={cn('inline-block overflow-hidden', containerClassName)} {...props}>
+    <motion.span
+      ref={ref}
+      className={cn('inline-block overflow-hidden', containerClassName)}
+      {...props}
+    >
       <motion.span
         key={currentWord}
         initial="initial"
@@ -179,5 +182,5 @@ export function WordRotate({
         {words[currentWord]}
       </motion.span>
     </motion.span>
-  );
+  )
 }

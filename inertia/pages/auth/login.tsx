@@ -14,7 +14,11 @@ export default function LoginPage() {
         panelTitle="Welcome back to AdonisKit"
         panelDescription="A modern, full-stack starter kit built with AdonisJS and React. Auth, RBAC and multi-tenancy out of the box."
         features={[
-          { title: 'Role-based access', description: 'Granular permissions per tenant', icon: ShieldCheck },
+          {
+            title: 'Role-based access',
+            description: 'Granular permissions per tenant',
+            icon: ShieldCheck,
+          },
           { title: 'Multi-tenant', description: 'Switch workspaces in one click', icon: Users },
           { title: 'Production ready', description: 'JWT auth, queues and caching', icon: Zap },
         ]}

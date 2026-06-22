@@ -1,16 +1,16 @@
-import * as React from 'react';
-import { cn } from '~/lib/utils';
+import * as React from 'react'
+import { cn } from '~/lib/utils'
 
 interface SkeletonWithPatternProps extends React.ComponentProps<'div'> {
-  patternColor?: string;
-  patternOpacity?: number;
+  patternColor?: string
+  patternOpacity?: number
 }
 
-function SkeletonWithPattern({ 
-  className, 
-  patternColor = "#e5e7eb", 
+function SkeletonWithPattern({
+  className,
+  patternColor = '#e5e7eb',
   patternOpacity = 0.3,
-  ...props 
+  ...props
 }: SkeletonWithPatternProps) {
   const svgPattern = `
     <svg width="60" height="60" viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg">
@@ -37,22 +37,22 @@ function SkeletonWithPattern({
       </defs>
       <rect width="100%" height="100%" fill="url(#bend-lines)"/>
     </svg>
-  `;
+  `
 
-  const encodedSvg = encodeURIComponent(svgPattern);
+  const encodedSvg = encodeURIComponent(svgPattern)
 
   return (
-    <div 
-      data-slot="skeleton-with-pattern" 
-      className={cn('animate-pulse rounded-md bg-accent', className)} 
+    <div
+      data-slot="skeleton-with-pattern"
+      className={cn('animate-pulse rounded-md bg-accent', className)}
       style={{
         backgroundImage: `url("data:image/svg+xml,${encodedSvg}")`,
         backgroundSize: '60px 60px',
-        backgroundRepeat: 'repeat'
+        backgroundRepeat: 'repeat',
       }}
-      {...props} 
+      {...props}
     />
-  );
+  )
 }
 
-export { SkeletonWithPattern }; 
+export { SkeletonWithPattern }

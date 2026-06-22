@@ -65,9 +65,7 @@ function TenantSwitcher() {
             className="gap-2"
           >
             <Avatar className="size-6">
-              <AvatarFallback className="text-[0.625rem]">
-                {initialsOf(tenant.name)}
-              </AvatarFallback>
+              <AvatarFallback className="text-[0.625rem]">{initialsOf(tenant.name)}</AvatarFallback>
             </Avatar>
             <div className="flex min-w-0 flex-1 flex-col">
               <span className="truncate text-sm font-medium">{tenant.name}</span>

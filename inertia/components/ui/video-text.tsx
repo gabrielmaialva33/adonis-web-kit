@@ -1,68 +1,67 @@
-
-import * as React from 'react';
-import { ElementType, ReactNode, useEffect, useRef } from 'react';
-import { cn } from '~/lib/utils';
+import * as React from 'react'
+import { ElementType, ReactNode, useEffect, useRef } from 'react'
+import { cn } from '~/lib/utils'
 
 export interface VideoTextProps {
   /**
    * The video source URL or array of sources for multiple formats
    */
-  src: string | string[];
+  src: string | string[]
   /**
    * The content to display (will have the video "inside" it)
    */
-  children: ReactNode;
+  children: ReactNode
   /**
    * Additional className for the container
    */
-  className?: string;
+  className?: string
   /**
    * Whether to autoplay the video
    * @default true
    */
-  autoPlay?: boolean;
+  autoPlay?: boolean
   /**
    * Whether to mute the video
    * @default true
    */
-  muted?: boolean;
+  muted?: boolean
   /**
    * Whether to loop the video
    * @default true
    */
-  loop?: boolean;
+  loop?: boolean
   /**
    * Whether to preload the video
    * @default "auto"
    */
-  preload?: 'auto' | 'metadata' | 'none';
+  preload?: 'auto' | 'metadata' | 'none'
   /**
    * Font size for the text mask (in viewport width units or CSS units)
    * @default "20vw"
    */
-  fontSize?: string | number;
+  fontSize?: string | number
   /**
    * Font weight for the text mask
    * @default "bold"
    */
-  fontWeight?: string | number;
+  fontWeight?: string | number
   /**
    * The element type to render for the container
    * @default "div"
    */
-  as?: ElementType;
+  as?: ElementType
   /**
    * Callback when video starts playing
    */
-  onPlay?: () => void;
+  onPlay?: () => void
   /**
    * Callback when video is paused
    */
-  onPause?: () => void;
+  onPause?: () => void
   /**
    * Callback when video ends
    */
-  onEnded?: () => void;
+  onEnded?: () => void
 }
 
 /**
@@ -84,87 +83,91 @@ export function VideoText({
   onPause,
   onEnded,
 }: VideoTextProps) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const textRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const textRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const textElement = textRef.current;
-    const container = containerRef.current;
+    const video = videoRef.current
+    const canvas = canvasRef.current
+    const textElement = textRef.current
+    const container = containerRef.current
 
-    if (!video || !canvas || !textElement || !container) return;
+    if (!video || !canvas || !textElement || !container) return
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
 
-    let animationId: number;
+    let animationId: number
 
     const updateCanvas = () => {
       // Get text dimensions first
-      const text = textElement.textContent || '';
-      ctx.font = `${fontWeight} ${typeof fontSize === 'number' ? `${fontSize}px` : fontSize} system-ui, -apple-system, sans-serif`;
-      const textMetrics = ctx.measureText(text);
-      const textWidth = textMetrics.width;
-      const textHeight = typeof fontSize === 'number' ? fontSize : parseFloat(fontSize.replace(/[^\d.]/g, '')) || 100;
+      const text = textElement.textContent || ''
+      ctx.font = `${fontWeight} ${typeof fontSize === 'number' ? `${fontSize}px` : fontSize} system-ui, -apple-system, sans-serif`
+      const textMetrics = ctx.measureText(text)
+      const textWidth = textMetrics.width
+      const textHeight =
+        typeof fontSize === 'number' ? fontSize : parseFloat(fontSize.replace(/[^\d.]/g, '')) || 100
 
       // Set canvas size to accommodate full text with padding
-      const padding = 40;
-      canvas.width = Math.max(textWidth + padding * 2, 400);
-      canvas.height = Math.max(textHeight + padding * 2, 200);
+      const padding = 40
+      canvas.width = Math.max(textWidth + padding * 2, 400)
+      canvas.height = Math.max(textHeight + padding * 2, 200)
 
       // Clear canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       // Draw video frame to fill canvas
-      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
 
       // Set up text masking
-      ctx.globalCompositeOperation = 'destination-in';
+      ctx.globalCompositeOperation = 'destination-in'
 
       // Draw text as mask
-      ctx.fillStyle = 'white';
-      ctx.font = `${fontWeight} ${typeof fontSize === 'number' ? `${fontSize}px` : fontSize} system-ui, -apple-system, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
+      ctx.fillStyle = 'white'
+      ctx.font = `${fontWeight} ${typeof fontSize === 'number' ? `${fontSize}px` : fontSize} system-ui, -apple-system, sans-serif`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
 
-      ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+      ctx.fillText(text, canvas.width / 2, canvas.height / 2)
 
       // Reset composite operation
-      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalCompositeOperation = 'source-over'
 
-      animationId = requestAnimationFrame(updateCanvas);
-    };
+      animationId = requestAnimationFrame(updateCanvas)
+    }
 
     const handleVideoLoad = () => {
-      updateCanvas();
-    };
+      updateCanvas()
+    }
 
     const handleResize = () => {
-      updateCanvas();
-    };
+      updateCanvas()
+    }
 
-    video.addEventListener('loadeddata', handleVideoLoad);
-    video.addEventListener('play', updateCanvas);
-    window.addEventListener('resize', handleResize);
+    video.addEventListener('loadeddata', handleVideoLoad)
+    video.addEventListener('play', updateCanvas)
+    window.addEventListener('resize', handleResize)
 
     return () => {
-      video.removeEventListener('loadeddata', handleVideoLoad);
-      video.removeEventListener('play', updateCanvas);
-      window.removeEventListener('resize', handleResize);
+      video.removeEventListener('loadeddata', handleVideoLoad)
+      video.removeEventListener('play', updateCanvas)
+      window.removeEventListener('resize', handleResize)
       if (animationId) {
-        cancelAnimationFrame(animationId);
+        cancelAnimationFrame(animationId)
       }
-    };
-  }, [fontSize, fontWeight]);
+    }
+  }, [fontSize, fontWeight])
 
-  const sources = Array.isArray(src) ? src : [src];
-  const content = React.Children.toArray(children).join('');
+  const sources = Array.isArray(src) ? src : [src]
+  const content = React.Children.toArray(children).join('')
 
   return (
-    <Component ref={containerRef} className={cn('relative inline-block overflow-hidden', className)}>
+    <Component
+      ref={containerRef}
+      className={cn('relative inline-block overflow-hidden', className)}
+    >
       {/* Hidden video element */}
       <video
         ref={videoRef}
@@ -211,5 +214,5 @@ export function VideoText({
       {/* Screen reader text */}
       <span className="sr-only">{content}</span>
     </Component>
-  );
+  )
 }

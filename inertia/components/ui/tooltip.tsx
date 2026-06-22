@@ -1,11 +1,19 @@
+import * as React from 'react'
+import { cn } from '~/lib/utils'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { Tooltip as TooltipPrimitive } from 'radix-ui'
 
-import * as React from 'react';
-import { cn } from '~/lib/utils';
-import { cva, type VariantProps } from 'class-variance-authority';
-import { Tooltip as TooltipPrimitive } from 'radix-ui';
-
-function TooltipProvider({ delayDuration = 0, ...props }: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
-  return <TooltipPrimitive.Provider data-slot="tooltip-provider" delayDuration={delayDuration} {...props} />;
+function TooltipProvider({
+  delayDuration = 0,
+  ...props
+}: React.ComponentProps<typeof TooltipPrimitive.Provider>) {
+  return (
+    <TooltipPrimitive.Provider
+      data-slot="tooltip-provider"
+      delayDuration={delayDuration}
+      {...props}
+    />
+  )
 }
 
 function Tooltip({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Root>) {
@@ -13,11 +21,11 @@ function Tooltip({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Root
     <TooltipProvider>
       <TooltipPrimitive.Root data-slot="tooltip" {...props} />
     </TooltipProvider>
-  );
+  )
 }
 
 function TooltipTrigger({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Trigger>) {
-  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />;
+  return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />
 }
 
 const tooltipVariants = cva(
@@ -32,8 +40,8 @@ const tooltipVariants = cva(
     defaultVariants: {
       variant: 'dark',
     },
-  },
-);
+  }
+)
 
 function TooltipContent({
   className,
@@ -48,7 +56,7 @@ function TooltipContent({
       className={cn(tooltipVariants({ variant }), className)}
       {...props}
     />
-  );
+  )
 }
 
-export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger };
+export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger }

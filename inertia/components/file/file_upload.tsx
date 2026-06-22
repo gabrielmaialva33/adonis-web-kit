@@ -98,7 +98,9 @@ export function FileUpload() {
         {...getRootProps()}
         className={cn(
           'flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-input bg-background px-6 py-10 text-center transition-colors',
-          loading ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:border-primary/50 hover:bg-accent/40',
+          loading
+            ? 'cursor-not-allowed opacity-60'
+            : 'cursor-pointer hover:border-primary/50 hover:bg-accent/40',
           isDragActive && 'border-primary bg-primary/5'
         )}
       >

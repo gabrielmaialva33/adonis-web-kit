@@ -1,7 +1,6 @@
-
-import React, { useEffect, useRef, useState } from 'react';
-import { motion, useInView, Variants } from 'motion/react';
-import { cn } from '~/lib/utils';
+import React, { useEffect, useRef, useState } from 'react'
+import { motion, useInView, Variants } from 'motion/react'
+import { cn } from '~/lib/utils'
 
 type RevealVariant =
   | 'fade'
@@ -15,20 +14,20 @@ type RevealVariant =
   | 'wave'
   | 'stagger'
   | 'rotate'
-  | 'elastic';
+  | 'elastic'
 
 interface TextRevealProps {
-  children: string;
-  variant?: RevealVariant;
-  className?: string;
-  style?: React.CSSProperties;
-  delay?: number;
-  duration?: number;
-  staggerDelay?: number;
-  once?: boolean;
-  startOnView?: boolean;
-  wordLevel?: boolean;
-  onComplete?: () => void;
+  children: string
+  variant?: RevealVariant
+  className?: string
+  style?: React.CSSProperties
+  delay?: number
+  duration?: number
+  staggerDelay?: number
+  once?: boolean
+  startOnView?: boolean
+  wordLevel?: boolean
+  onComplete?: () => void
 }
 
 const containerVariants: Record<RevealVariant, Variants> = {
@@ -104,7 +103,7 @@ const containerVariants: Record<RevealVariant, Variants> = {
       transition: { staggerChildren: 0.07 },
     },
   },
-};
+}
 
 const itemVariants: Record<RevealVariant, Variants> = {
   fade: {
@@ -215,7 +214,7 @@ const itemVariants: Record<RevealVariant, Variants> = {
       },
     },
   },
-};
+}
 
 export function TextReveal({
   children,
@@ -229,16 +228,16 @@ export function TextReveal({
   startOnView = true,
   wordLevel = false,
 }: TextRevealProps) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once, margin: '-10%' });
-  const [hasAnimated, setHasAnimated] = useState(false);
+  const ref = useRef<HTMLDivElement>(null)
+  const isInView = useInView(ref, { once, margin: '-10%' })
+  const [hasAnimated, setHasAnimated] = useState(false)
 
-  const shouldAnimate = startOnView ? isInView : true;
+  const shouldAnimate = startOnView ? isInView : true
 
   // Split text into words or characters
   const elements = wordLevel
     ? children.split(' ').map((word, i, arr) => (i < arr.length - 1 ? `${word} ` : word))
-    : children.split('');
+    : children.split('')
 
   // Update container variants with custom stagger delay
   const customContainerVariants = {
@@ -249,10 +248,10 @@ export function TextReveal({
         delayChildren: delay,
       },
     },
-  };
+  }
 
   // Use original item variants - only override duration if explicitly different from default
-  const originalVariant = itemVariants[variant];
+  const originalVariant = itemVariants[variant]
   const customItemVariants =
     duration === 0.6
       ? originalVariant // Use original variant unchanged if default duration
@@ -261,19 +260,22 @@ export function TextReveal({
           visible: {
             ...originalVariant.visible,
             transition: {
-              ...((originalVariant.visible as Record<string, unknown>).transition as Record<string, unknown>),
+              ...((originalVariant.visible as Record<string, unknown>).transition as Record<
+                string,
+                unknown
+              >),
               duration,
             },
           },
-        };
+        }
 
   useEffect(() => {
     if (shouldAnimate && !hasAnimated) {
-      setHasAnimated(true);
+      setHasAnimated(true)
     }
-  }, [shouldAnimate, hasAnimated]);
+  }, [shouldAnimate, hasAnimated])
 
-  const MotionComponent = variant === 'typewriter' ? motion.div : motion.span;
+  const MotionComponent = variant === 'typewriter' ? motion.div : motion.span
 
   return (
     <motion.div
@@ -328,5 +330,5 @@ export function TextReveal({
         ))
       )}
     </motion.div>
-  );
+  )
 }

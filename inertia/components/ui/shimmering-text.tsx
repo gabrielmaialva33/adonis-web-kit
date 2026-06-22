@@ -1,33 +1,32 @@
-
-import React, { useMemo, useRef } from 'react';
-import { motion, useInView, UseInViewOptions } from 'motion/react';
-import { cn } from '~/lib/utils';
+import React, { useMemo, useRef } from 'react'
+import { motion, useInView, UseInViewOptions } from 'motion/react'
+import { cn } from '~/lib/utils'
 
 interface ShimmeringTextProps {
   /** Text to display with shimmer effect */
-  text: string;
+  text: string
   /** Animation duration in seconds */
-  duration?: number;
+  duration?: number
   /** Delay before starting animation */
-  delay?: number;
+  delay?: number
   /** Whether to repeat the animation */
-  repeat?: boolean;
+  repeat?: boolean
   /** Pause duration between repeats in seconds */
-  repeatDelay?: number;
+  repeatDelay?: number
   /** Custom className */
-  className?: string;
+  className?: string
   /** Whether to start animation when component enters viewport */
-  startOnView?: boolean;
+  startOnView?: boolean
   /** Whether to animate only once */
-  once?: boolean;
+  once?: boolean
   /** Margin for in-view detection (rootMargin) */
-  inViewMargin?: UseInViewOptions['margin'];
+  inViewMargin?: UseInViewOptions['margin']
   /** Shimmer spread multiplier */
-  spread?: number;
+  spread?: number
   /** Base text color */
-  color?: string;
+  color?: string
   /** Shimmer gradient color */
-  shimmerColor?: string;
+  shimmerColor?: string
 }
 
 export function ShimmeringText({
@@ -44,16 +43,16 @@ export function ShimmeringText({
   color,
   shimmerColor,
 }: ShimmeringTextProps) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once, margin: inViewMargin });
+  const ref = useRef<HTMLSpanElement>(null)
+  const isInView = useInView(ref, { once, margin: inViewMargin })
 
   // Calculate dynamic spread based on text length
   const dynamicSpread = useMemo(() => {
-    return text.length * spread;
-  }, [text, spread]);
+    return text.length * spread
+  }, [text, spread])
 
   // Determine if we should start animation
-  const shouldAnimate = !startOnView || isInView;
+  const shouldAnimate = !startOnView || isInView
 
   return (
     <motion.span
@@ -64,14 +63,14 @@ export function ShimmeringText({
         '[background-repeat:no-repeat,padding-box]',
         '[--shimmer-bg:linear-gradient(90deg,transparent_calc(50%-var(--spread)),var(--shimmer-color),transparent_calc(50%+var(--spread)))]',
         'dark:[--base-color:var(--color-zinc-600)] dark:[--shimmer-color:var(--color-white)]',
-        className,
+        className
       )}
       style={
         {
           '--spread': `${dynamicSpread}px`,
           ...(color && { '--base-color': color }),
           ...(shimmerColor && { '--shimmer-color': shimmerColor }),
-          backgroundImage: `var(--shimmer-bg), linear-gradient(var(--base-color), var(--base-color))`,
+          'backgroundImage': `var(--shimmer-bg), linear-gradient(var(--base-color), var(--base-color))`,
         } as React.CSSProperties
       }
       initial={{
@@ -102,5 +101,5 @@ export function ShimmeringText({
     >
       {text}
     </motion.span>
-  );
+  )
 }

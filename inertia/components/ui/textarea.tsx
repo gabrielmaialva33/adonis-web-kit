@@ -1,7 +1,6 @@
-
-import * as React from 'react';
-import { cn } from '~/lib/utils';
-import { cva, type VariantProps } from 'class-variance-authority';
+import * as React from 'react'
+import { cn } from '~/lib/utils'
+import { cva, type VariantProps } from 'class-variance-authority'
 
 // Define input size variants
 const textareaVariants = cva(
@@ -22,15 +21,21 @@ const textareaVariants = cva(
     defaultVariants: {
       variant: 'md',
     },
-  },
-);
+  }
+)
 
 function Textarea({
   className,
   variant,
   ...props
 }: React.ComponentProps<'textarea'> & VariantProps<typeof textareaVariants>) {
-  return <textarea data-slot="textarea" className={cn(textareaVariants({ variant }), className)} {...props} />;
+  return (
+    <textarea
+      data-slot="textarea"
+      className={cn(textareaVariants({ variant }), className)}
+      {...props}
+    />
+  )
 }
 
-export { Textarea, textareaVariants };
+export { Textarea, textareaVariants }

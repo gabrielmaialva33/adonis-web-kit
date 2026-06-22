@@ -1,36 +1,35 @@
-
-import * as React from 'react';
-import { ElementType, ReactNode, useEffect, useRef, useState } from 'react';
-import { cn } from '~/lib/utils';
+import * as React from 'react'
+import { ElementType, ReactNode, useEffect, useRef, useState } from 'react'
+import { cn } from '~/lib/utils'
 
 export interface SvgTextProps {
   /**
    * The SVG content to display inside the text
    */
-  svg: ReactNode;
+  svg: ReactNode
   /**
    * The content to display (will have the SVG "inside" it)
    */
-  children: ReactNode;
+  children: ReactNode
   /**
    * Additional className for the container
    */
-  className?: string;
+  className?: string
   /**
    * Font size for the text mask (in viewport width units or CSS units)
    * @default "20vw"
    */
-  fontSize?: string | number;
+  fontSize?: string | number
   /**
    * Font weight for the text mask
    * @default "bold"
    */
-  fontWeight?: string | number;
+  fontWeight?: string | number
   /**
    * The element type to render for the container
    * @default "div"
    */
-  as?: ElementType;
+  as?: ElementType
 }
 
 /**
@@ -45,33 +44,33 @@ export function SvgText({
   fontWeight = 'bold',
   as: Component = 'div',
 }: SvgTextProps) {
-  const textRef = useRef<HTMLDivElement>(null);
-  const [textDimensions, setTextDimensions] = useState({ width: 0, height: 0 });
-  const content = React.Children.toArray(children).join('');
-  const maskId = React.useId();
+  const textRef = useRef<HTMLDivElement>(null)
+  const [textDimensions, setTextDimensions] = useState({ width: 0, height: 0 })
+  const content = React.Children.toArray(children).join('')
+  const maskId = React.useId()
 
   useEffect(() => {
-    if (!textRef.current) return;
+    if (!textRef.current) return
 
     const updateDimensions = () => {
-      const rect = textRef.current?.getBoundingClientRect();
+      const rect = textRef.current?.getBoundingClientRect()
       if (rect) {
         setTextDimensions({
           width: Math.max(rect.width, 200),
           height: Math.max(rect.height, 100),
-        });
+        })
       }
-    };
+    }
 
     // Initial measurement
-    updateDimensions();
+    updateDimensions()
 
     // Use ResizeObserver for better performance
-    const resizeObserver = new ResizeObserver(updateDimensions);
-    resizeObserver.observe(textRef.current);
+    const resizeObserver = new ResizeObserver(updateDimensions)
+    resizeObserver.observe(textRef.current)
 
-    return () => resizeObserver.disconnect();
-  }, [content, fontSize, fontWeight]);
+    return () => resizeObserver.disconnect()
+  }, [content, fontSize, fontWeight])
 
   return (
     <Component className={cn('relative inline-block', className)}>
@@ -156,5 +155,5 @@ export function SvgText({
       {/* Screen reader text */}
       <span className="sr-only">{content}</span>
     </Component>
-  );
+  )
 }
