@@ -7,6 +7,15 @@
  * an empty object.
  */
 import type { DashboardStats } from '#modules/web/services/get_dashboard_stats_service'
+import type { WebRole } from '#modules/web/services/list_roles_with_permissions_service'
+import type { WebPermission } from '#modules/web/services/list_all_permissions_service'
+
+type SettingsProfile = {
+  id: number
+  full_name: string
+  email: string
+  username: string | null
+}
 
 declare module '@adonisjs/inertia/types' {
   interface InertiaPages {
@@ -21,6 +30,15 @@ declare module '@adonisjs/inertia/types' {
 
     // Files
     'files/index': Record<string, never>
+
+    // Roles
+    'roles/index': { roles: WebRole[] }
+
+    // Permissions
+    'permissions/index': { permissions: WebPermission[] }
+
+    // Settings
+    'settings/index': { profile: SettingsProfile }
 
     // Users
     'users/index': {

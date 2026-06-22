@@ -15,6 +15,9 @@ const InertiaDashboardController = () => import('#modules/web/controllers/dashbo
 const InertiaUsersController = () => import('#modules/web/controllers/users_controller')
 const InertiaFilesController = () => import('#modules/web/controllers/files_controller')
 const InertiaTenantController = () => import('#modules/web/controllers/tenant_controller')
+const InertiaRolesController = () => import('#modules/web/controllers/roles_controller')
+const InertiaPermissionsController = () => import('#modules/web/controllers/permissions_controller')
+const InertiaSettingsController = () => import('#modules/web/controllers/settings_controller')
 
 // Public routes - with guest middleware to redirect authenticated users
 router
@@ -85,6 +88,32 @@ router
           permissions: 'files.list',
         })
       )
+
+    // Roles - with permission check
+    router
+      .get('/roles', [InertiaRolesController, 'index'])
+      .as('roles.index')
+      .use(
+        middleware.permission({
+          permissions: 'roles.list',
+        })
+      )
+
+    // Permissions - with permission check
+    router
+      .get('/permissions', [InertiaPermissionsController, 'index'])
+      .as('permissions.index')
+      .use(
+        middleware.permission({
+          permissions: 'permissions.list',
+        })
+      )
+
+    // Settings - only needs auth (own profile + workspaces)
+    router.get('/settings', [InertiaSettingsController, 'index']).as('settings.index')
+    router
+      .post('/settings/profile', [InertiaSettingsController, 'updateProfile'])
+      .as('settings.profile.update')
 
     // Switch the active tenant (re-mints the JWT cookie with the new tenantId)
     router.post('/tenant/switch', [InertiaTenantController, 'switch']).as('tenant.switch')
