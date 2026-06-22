@@ -1,6 +1,7 @@
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import AuditLog from '#modules/audits/models/audit_log'
+import AuditRepository from '#modules/audits/repositories/audit_repository'
 
 export interface AuditLogData {
   userId?: number
@@ -16,6 +17,8 @@ export interface AuditLogData {
 
 @inject()
 export default class AuditService {
+  constructor(private auditRepository: AuditRepository) {}
+
   /**
    * Log permission check result
    */
@@ -44,7 +47,7 @@ export default class AuditService {
       auditData.request_data = this.sanitizeRequestData(ctx.request.all())
     }
 
-    return await AuditLog.create(auditData)
+    return await this.auditRepository.create(auditData)
   }
 
   /**
@@ -62,41 +65,7 @@ export default class AuditService {
       endDate?: Date
     } = {}
   ): Promise<{ logs: AuditLog[]; total: number }> {
-    const query = AuditLog.query().where('user_id', userId).orderBy('created_at', 'desc')
-
-    if (options.resource) {
-      query.where('resource', options.resource)
-    }
-
-    if (options.action) {
-      query.where('action', options.action)
-    }
-
-    if (options.result) {
-      query.where('result', options.result)
-    }
-
-    if (options.startDate && options.endDate) {
-      query.whereBetween('created_at', [options.startDate, options.endDate])
-    }
-
-    const totalQuery = query.clone()
-    const total = await totalQuery.count('* as total')
-
-    if (options.limit) {
-      query.limit(options.limit)
-    }
-
-    if (options.offset) {
-      query.offset(options.offset)
-    }
-
-    const logs = await query.preload('user')
-
-    return {
-      logs,
-      total: total[0].$extras.total,
-    }
+    return this.auditRepository.findUserLogs(userId, options)
   }
 
   /**
@@ -113,15 +82,13 @@ export default class AuditService {
     const alerts: any[] = []
 
     // Check for repeated failed attempts
-    const failedAttempts = await AuditLog.query()
-      .where('result', 'denied')
-      .where('created_at', '>=', new Date(Date.now() - hours * 60 * 60 * 1000))
-      .groupBy('user_id', 'ip_address')
-      .select('user_id', 'ip_address')
-      .count('* as attempts')
-      .having('attempts', '>=', maxFailedAttempts)
+    const since = new Date(Date.now() - hours * 60 * 60 * 1000)
+    const failedAttempts = await this.auditRepository.findRepeatedFailedAttempts(
+      since,
+      maxFailedAttempts
+    )
 
-    failedAttempts.forEach((attempt: any) => {
+    failedAttempts.forEach((attempt) => {
       alerts.push({
         type: 'repeated_failed_attempts',
         severity: 'high',
@@ -134,14 +101,12 @@ export default class AuditService {
 
     // Check for suspicious IPs
     if (suspiciousIps.length > 0) {
-      const suspiciousActivity = await AuditLog.query()
-        .whereIn('ip_address', suspiciousIps)
-        .where('created_at', '>=', new Date(Date.now() - hours * 60 * 60 * 1000))
-        .groupBy('ip_address')
-        .select('ip_address')
-        .count('* as activity')
+      const suspiciousActivity = await this.auditRepository.findSuspiciousIpActivity(
+        suspiciousIps,
+        since
+      )
 
-      suspiciousActivity.forEach((activity: any) => {
+      suspiciousActivity.forEach((activity) => {
         alerts.push({
           type: 'suspicious_ip_activity',
           severity: 'medium',
@@ -165,50 +130,7 @@ export default class AuditService {
     resource?: string
     groupBy?: 'user' | 'resource' | 'action' | 'day'
   }): Promise<any> {
-    const { startDate, endDate, userId, resource, groupBy = 'day' } = options
-
-    const query = AuditLog.query().whereBetween('created_at', [startDate, endDate])
-
-    if (userId) {
-      query.where('user_id', userId)
-    }
-
-    if (resource) {
-      query.where('resource', resource)
-    }
-
-    switch (groupBy) {
-      case 'user':
-        return await query
-          .groupBy('user_id')
-          .select('user_id')
-          .count('* as total')
-          .countDistinct('resource as resources_accessed')
-          .preload('user')
-
-      case 'resource':
-        return await query
-          .groupBy('resource')
-          .select('resource')
-          .count('* as total')
-          .countDistinct('user_id as unique_users')
-
-      case 'action':
-        return await query
-          .groupBy('action')
-          .select('action')
-          .count('* as total')
-          .countDistinct('user_id as unique_users')
-
-      case 'day':
-      default:
-        return await query
-          .groupByRaw('DATE(created_at)')
-          .select('created_at')
-          .count('* as total')
-          .countDistinct('user_id as unique_users')
-          .orderBy('created_at')
-    }
+    return this.auditRepository.generateGroupedReport(options)
   }
 
   /**
@@ -217,9 +139,7 @@ export default class AuditService {
   async cleanupOldLogs(daysToKeep: number = 90): Promise<number> {
     const cutoffDate = new Date(Date.now() - daysToKeep * 24 * 60 * 60 * 1000)
 
-    const deletedCount = await AuditLog.query().where('created_at', '<', cutoffDate).delete()
-
-    return deletedCount[0]
+    return this.auditRepository.deleteOlderThan(cutoffDate)
   }
 
   /**

@@ -1,9 +1,10 @@
+import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
 
-import User from '#modules/users/models/user'
-import Role from '#modules/roles/models/role'
-import Tenant from '#modules/tenants/models/tenant'
-import File from '#modules/files/models/file'
+import UsersRepository from '#modules/users/repositories/users_repository'
+import RolesRepository from '#modules/roles/repositories/roles_repository'
+import TenantRepository from '#modules/tenants/repositories/tenant_repository'
+import FileRepository from '#modules/files/repositories/file_repository'
 
 export type DashboardSignupPoint = {
   month: string
@@ -29,7 +30,15 @@ export type DashboardStats = {
   recentUsers: DashboardRecentUser[]
 }
 
+@inject()
 export default class GetDashboardStatsService {
+  constructor(
+    private usersRepository: UsersRepository,
+    private rolesRepository: RolesRepository,
+    private tenantRepository: TenantRepository,
+    private fileRepository: FileRepository
+  ) {}
+
   /**
    * Aggregates the numbers shown on the admin dashboard. Counts are real model
    * counts; the signups series is computed over the last 6 months in JS so it
@@ -37,10 +46,10 @@ export default class GetDashboardStatsService {
    */
   async run(): Promise<DashboardStats> {
     const [users, tenants, files, roles] = await Promise.all([
-      User.query().count('* as total'),
-      Tenant.query().count('* as total'),
-      File.query().count('* as total'),
-      Role.query().count('* as total'),
+      this.usersRepository.count(),
+      this.tenantRepository.count(),
+      this.fileRepository.count(),
+      this.rolesRepository.count(),
     ])
 
     const signups = await this.#buildSignupSeries()
@@ -48,26 +57,22 @@ export default class GetDashboardStatsService {
 
     return {
       totals: {
-        users: this.#count(users),
-        tenants: this.#count(tenants),
-        files: this.#count(files),
-        roles: this.#count(roles),
+        users,
+        tenants,
+        files,
+        roles,
       },
       signups,
       recentUsers,
     }
   }
 
-  #count(rows: { $extras: Record<string, unknown> }[]): number {
-    return Number(rows[0]?.$extras.total ?? 0)
-  }
-
   async #buildSignupSeries(): Promise<DashboardSignupPoint[]> {
     const start = DateTime.now().startOf('month').minus({ months: 5 })
 
-    const recent = await User.query()
-      .where('created_at', '>=', start.toSQL({ includeOffset: false })!)
-      .select('created_at')
+    const recent = await this.usersRepository.findCreatedSince(
+      start.toSQL({ includeOffset: false })!
+    )
 
     const buckets = new Map<string, number>()
     for (let i = 0; i < 6; i++) {
@@ -90,7 +95,7 @@ export default class GetDashboardStatsService {
   }
 
   async #buildRecentUsers(): Promise<DashboardRecentUser[]> {
-    const users = await User.query().preload('roles').orderBy('created_at', 'desc').limit(5)
+    const users = await this.usersRepository.listRecentWithRoles(5)
 
     return users.map((user) => ({
       id: user.id,

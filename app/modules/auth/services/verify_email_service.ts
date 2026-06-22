@@ -1,19 +1,21 @@
 import { DateTime } from 'luxon'
+import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 
 import NotFoundException from '#exceptions/not_found_exception'
-import User from '#modules/users/models/user'
+import UsersRepository from '#modules/users/repositories/users_repository'
+import type User from '#modules/users/models/user'
 import BadRequestException from '#exceptions/bad_request_exception'
 
+@inject()
 export default class VerifyEmailService {
+  constructor(private usersRepository: UsersRepository) {}
+
   async handle(token: string): Promise<User> {
     const { i18n } = HttpContext.getOrFail()
 
     // Find a user by verification token
-    const user = await User.query()
-      .whereRaw("metadata->>'email_verification_token' = ?", [token])
-      .where('is_deleted', false)
-      .first()
+    const user = await this.usersRepository.findByEmailVerificationToken(token)
 
     if (!user) {
       throw new NotFoundException(i18n.t('errors.invalid_verification_token'))

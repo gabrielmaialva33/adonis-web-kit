@@ -5,10 +5,12 @@ import { HttpContext } from '@adonisjs/core/http'
 import { MultipartFile } from '@adonisjs/core/types/bodyparser'
 import { randomUUID } from 'node:crypto'
 import env from '#start/env'
-import File from '#modules/files/models/file'
+import FileRepository from '#modules/files/repositories/file_repository'
 
 @inject()
 export default class UploadFileService {
+  constructor(private fileRepository: FileRepository) {}
+
   async run(file: MultipartFile) {
     const ctx = HttpContext.getOrFail()
     const { auth } = ctx
@@ -87,7 +89,7 @@ export default class UploadFileService {
     }
 
     // Create file record in database
-    await File.create({
+    await this.fileRepository.create({
       owner_id: user.id,
       tenant_id: tenantId,
       client_name: file.clientName?.replace(`.${file.extname}`, '') || '',
