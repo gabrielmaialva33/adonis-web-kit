@@ -158,6 +158,7 @@ The app is multi-tenant with an **N:N** relationship:
 
   It **always enforces membership** — resolving a tenant the user doesn't belong to throws
   `ForbiddenException`. If nothing resolves, the request continues without `ctx.tenant`.
+
 - **Endpoints:**
   - API: `GET /api/v1/tenants/me` (lists tenants + the user's role in each),
     `POST /api/v1/tenants/switch` (validates membership, mints fresh tokens with the new `tenantId`)
@@ -294,10 +295,10 @@ const user = await User.find(1)
 const newUser = await User.create({ email: 'test@example.com', password: 'secret' })
 
 // Load app services
-await loadApp()     // app service
-await loadRouter()  // router
-await loadConfig()  // config
-await loadHash()    // hash
+await loadApp() // app service
+await loadRouter() // router
+await loadConfig() // config
+await loadHash() // hash
 await loadHelpers() // helpers
 ```
 
