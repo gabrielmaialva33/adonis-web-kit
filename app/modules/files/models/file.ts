@@ -1,0 +1,58 @@
+import { DateTime } from 'luxon'
+import { BaseModel, belongsTo, column, SnakeCaseNamingStrategy } from '@adonisjs/lucid/orm'
+import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import User from '#modules/users/models/user'
+import Tenant from '#modules/tenants/models/tenant'
+
+export default class File extends BaseModel {
+  static table = 'files'
+  static namingStrategy = new SnakeCaseNamingStrategy()
+
+  @column({ isPrimary: true })
+  declare id: number
+
+  @column()
+  declare owner_id: number
+
+  @column()
+  declare tenant_id: number | null
+
+  @column()
+  declare client_name: string
+
+  @column()
+  declare file_name: string
+
+  @column()
+  declare file_size: number
+
+  @column()
+  declare file_type: string
+
+  @column()
+  declare file_category: string
+
+  @column()
+  declare url: string
+
+  @column.dateTime({ autoCreate: true })
+  declare created_at: DateTime
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updated_at: DateTime
+
+  /**
+   * ------------------------------------------------------
+   * Relationships
+   * ------------------------------------------------------
+   */
+  @belongsTo(() => User, {
+    foreignKey: 'owner_id',
+  })
+  declare owner: BelongsTo<typeof User>
+
+  @belongsTo(() => Tenant, {
+    foreignKey: 'tenant_id',
+  })
+  declare tenant: BelongsTo<typeof Tenant>
+}

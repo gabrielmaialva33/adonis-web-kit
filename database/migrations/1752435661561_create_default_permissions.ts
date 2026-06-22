@@ -1,7 +1,7 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
 import app from '@adonisjs/core/services/app'
 
-import AssignDefaultPermissionsService from '#services/permissions/assign_default_permissions_service'
+import AssignDefaultPermissionsService from '#modules/permissions/services/assign_default_permissions_service'
 
 export default class extends BaseSchema {
   async up() {

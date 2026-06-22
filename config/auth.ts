@@ -5,7 +5,7 @@ import { basicAuthGuard, basicAuthUserProvider } from '@adonisjs/auth/basic_auth
 import { sessionGuard, sessionUserProvider } from '@adonisjs/auth/session'
 
 import { jwtGuard } from '#shared/jwt/define_config'
-import { JwtGuardUser } from '#shared/jwt/types'
+import { type JwtGuardUser } from '#shared/jwt/types'
 
 const authConfig = defineConfig({
   default: 'jwt',
@@ -13,25 +13,25 @@ const authConfig = defineConfig({
     api: tokensGuard({
       provider: tokensUserProvider({
         tokens: 'accessTokens',
-        model: () => import('#models/user'),
+        model: () => import('#modules/users/models/user'),
       }),
     }),
     web: sessionGuard({
       useRememberMeTokens: false,
       provider: sessionUserProvider({
-        model: () => import('#models/user'),
+        model: () => import('#modules/users/models/user'),
       }),
     }),
     basicAuth: basicAuthGuard({
       provider: basicAuthUserProvider({
-        model: () => import('#models/user'),
+        model: () => import('#modules/users/models/user'),
       }),
     }),
     jwt: jwtGuard({
       tokenExpiresIn: '1h',
       useCookies: true,
       provider: sessionUserProvider({
-        model: () => import('#models/user'),
+        model: () => import('#modules/users/models/user'),
       }),
       content: <User>(user: JwtGuardUser<User>) => ({ userId: user.getId() }),
     }),

@@ -13,14 +13,15 @@ import { throttle } from '#start/limiter'
 
 import router from '@adonisjs/core/services/router'
 
-import '#routes/files/index'
-import '#routes/roles/index'
-import '#routes/users/index'
-import '#routes/users/session_routes'
-import '#routes/permissions/index'
-import '#routes/health/index'
+import '#modules/auth/routes'
+import '#modules/users/routes'
+import '#modules/roles/routes'
+import '#modules/permissions/routes'
+import '#modules/files/routes'
+import '#modules/tenants/routes'
+import '#modules/health/routes'
 
-import '#routes/inertia/index'
+import '#modules/web/routes'
 
 router
   .get('/version', async () => {

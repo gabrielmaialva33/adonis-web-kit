@@ -40,6 +40,10 @@ interface DataTableProps<T> {
   pageSize?: number
   className?: string
   onRowClick?: (row: T) => void
+  /** When provided, sorting is controlled externally (e.g. server-side) instead of in-memory. */
+  onSort?: (key: string, direction: 'asc' | 'desc') => void
+  sortKey?: string
+  sortDirection?: 'asc' | 'desc'
 }
 
 export function DataTable<T extends Record<string, any>>({
@@ -50,6 +54,9 @@ export function DataTable<T extends Record<string, any>>({
   pageSize = 10,
   className,
   onRowClick,
+  onSort,
+  sortKey,
+  sortDirection,
 }: DataTableProps<T>) {
   const [search, setSearch] = useState('')
   const [sortConfig, setSortConfig] = useState<{
@@ -136,7 +143,16 @@ export function DataTable<T extends Record<string, any>>({
     link.click()
   }
 
+  const isControlledSort = typeof onSort === 'function'
+
   const handleSort = (key: string) => {
+    if (isControlledSort) {
+      const nextDirection: 'asc' | 'desc' =
+        sortKey === key && sortDirection === 'asc' ? 'desc' : 'asc'
+      onSort(key, nextDirection)
+      return
+    }
+
     setSortConfig((prev) => ({
       key,
       direction:
@@ -151,13 +167,16 @@ export function DataTable<T extends Record<string, any>>({
   }
 
   const getSortIcon = (key: string) => {
-    if (sortConfig.key !== key) {
+    const activeKey = isControlledSort ? sortKey : sortConfig.key
+    const activeDirection = isControlledSort ? sortDirection : sortConfig.direction
+
+    if (activeKey !== key) {
       return <ChevronsUpDown className="h-4 w-4 opacity-50" />
     }
-    if (sortConfig.direction === 'asc') {
+    if (activeDirection === 'asc') {
       return <ChevronUp className="h-4 w-4" />
     }
-    if (sortConfig.direction === 'desc') {
+    if (activeDirection === 'desc') {
       return <ChevronDown className="h-4 w-4" />
     }
     return <ChevronsUpDown className="h-4 w-4 opacity-50" />

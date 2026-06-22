@@ -3,7 +3,7 @@ import mail from '@adonisjs/mail/services/main'
 import string from '@adonisjs/core/helpers/string'
 import { DateTime } from 'luxon'
 
-import User from '#models/user'
+import User from '#modules/users/models/user'
 
 test.group('Email verification', () => {
   test('should send verification email on sign up', async ({ client, assert, cleanup }) => {

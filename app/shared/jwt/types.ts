@@ -1,4 +1,4 @@
-import { symbols } from '@adonisjs/auth'
+import { type symbols } from '@adonisjs/auth'
 
 /**
  * The bridge between the User provider and the
@@ -41,6 +41,12 @@ export interface JwtUserProviderContract<RealUser> {
 
 export type BaseJwtContent = {
   userId: string | number | BigInt
+  /**
+   * The active tenant for this token. Optional: a user may have no tenant yet,
+   * and tokens minted by `authenticateAsClient` (Japa `loginAs`) omit it — in
+   * that case the tenant middleware falls back to the user's first tenant.
+   */
+  tenantId?: number
 }
 
 export type JwtGuardOptions<RealUser extends any = unknown> = {

@@ -1,0 +1,94 @@
+import { test } from '@japa/runner'
+import testUtils from '@adonisjs/core/services/test_utils'
+import jwt from 'jsonwebtoken'
+
+import User from '#modules/users/models/user'
+import Tenant from '#modules/tenants/models/tenant'
+import env from '#start/env'
+
+test.group('Tenants', (group) => {
+  group.each.setup(() => testUtils.db().withGlobalTransaction())
+
+  test('GET /me lists tenants the user belongs to with pivot role', async ({ client, assert }) => {
+    const user = await User.create({
+      full_name: 'Owner User',
+      email: 'owner@example.com',
+      username: 'owner',
+      password: 'password123',
+    })
+
+    const tenantA = await Tenant.create({ name: 'Alpha', slug: 'alpha', is_active: true })
+    const tenantB = await Tenant.create({ name: 'Beta', slug: 'beta', is_active: true })
+    await user.related('tenants').attach({
+      [tenantA.id]: { role: 'owner' },
+      [tenantB.id]: { role: 'member' },
+    })
+
+    const response = await client.get('/api/v1/tenants/me').loginAs(user)
+
+    response.assertStatus(200)
+    const body = response.body() as { data: Array<{ id: number; slug: string; role: string }> }
+    assert.lengthOf(body.data, 2)
+
+    const alpha = body.data.find((t) => t.slug === 'alpha')
+    const beta = body.data.find((t) => t.slug === 'beta')
+    assert.equal(alpha?.role, 'owner')
+    assert.equal(beta?.role, 'member')
+  })
+
+  test('POST /switch mints tokens carrying the requested tenant', async ({ client, assert }) => {
+    const user = await User.create({
+      full_name: 'Switcher',
+      email: 'switch@example.com',
+      username: 'switcher',
+      password: 'password123',
+    })
+
+    const tenantA = await Tenant.create({ name: 'Alpha', slug: 'alpha', is_active: true })
+    const tenantB = await Tenant.create({ name: 'Beta', slug: 'beta', is_active: true })
+    await user.related('tenants').attach({
+      [tenantA.id]: { role: 'owner' },
+      [tenantB.id]: { role: 'member' },
+    })
+
+    const response = await client
+      .post('/api/v1/tenants/switch')
+      .json({ tenant_id: tenantB.id })
+      .loginAs(user)
+
+    response.assertStatus(200)
+    const body = response.body() as {
+      tenant: { id: number; role: string }
+      auth: { access_token: string; refresh_token: string }
+    }
+    assert.equal(body.tenant.id, tenantB.id)
+    assert.equal(body.tenant.role, 'member')
+
+    const payload = jwt.verify(body.auth.access_token, env.get('APP_KEY')) as { tenantId?: number }
+    assert.equal(payload.tenantId, tenantB.id)
+  })
+
+  test('POST /switch rejects a tenant the user does not belong to', async ({ client }) => {
+    const user = await User.create({
+      full_name: 'No Access',
+      email: 'noaccess@example.com',
+      username: 'noaccess',
+      password: 'password123',
+    })
+
+    const foreign = await Tenant.create({ name: 'Foreign', slug: 'foreign', is_active: true })
+
+    const response = await client
+      .post('/api/v1/tenants/switch')
+      .header('Accept', 'application/json')
+      .json({ tenant_id: foreign.id })
+      .loginAs(user)
+
+    response.assertStatus(403)
+  })
+
+  test('GET /me requires authentication', async ({ client }) => {
+    const response = await client.get('/api/v1/tenants/me')
+    response.assertStatus(401)
+  })
+})

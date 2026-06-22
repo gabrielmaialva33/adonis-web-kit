@@ -1,0 +1,43 @@
+import router from '@adonisjs/core/services/router'
+import { middleware } from '#start/kernel'
+import { authThrottle } from '#start/limiter'
+
+const SessionsController = () => import('#modules/auth/controllers/sessions_controller')
+const EmailVerificationController = () =>
+  import('#modules/auth/controllers/email_verification_controller')
+const MeController = () => import('#modules/auth/controllers/me_controller')
+
+/**
+ * Sessions (sign in / sign up)
+ */
+router
+  .group(() => {
+    router.post('/sign-in', [SessionsController, 'signIn']).as('session.signIn').use(authThrottle)
+    router.post('/sign-up', [SessionsController, 'signUp']).as('session.signUp').use(authThrottle)
+  })
+  .prefix('/api/v1/sessions')
+
+/**
+ * Email verification
+ */
+router
+  .group(() => {
+    router.get('/verify-email', [EmailVerificationController, 'verify'])
+    router
+      .post('/resend-verification-email', [EmailVerificationController, 'resend'])
+      .use(middleware.auth({ guards: ['jwt'] }))
+  })
+  .prefix('/api/v1')
+
+/**
+ * Current authenticated user (me)
+ */
+router
+  .group(() => {
+    router.get('/', [MeController, 'profile']).as('me.profile')
+    router.get('/permissions', [MeController, 'permissions']).as('me.permissions')
+    router.get('/roles', [MeController, 'roles']).as('me.roles')
+  })
+  .prefix('/api/v1/me')
+  .use(middleware.auth())
+  .as('me')

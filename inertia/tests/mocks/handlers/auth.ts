@@ -1,9 +1,20 @@
 import { http, HttpResponse } from 'msw'
 
+interface SignInBody {
+  uid?: string
+  password?: string
+}
+
+interface SignUpBody {
+  email?: string
+  password?: string
+  full_name?: string
+}
+
 export const authHandlers = [
   // Mock login endpoint
   http.post('/api/v1/sessions/sign-in', async ({ request }) => {
-    const body = await request.json()
+    const body = (await request.json()) as SignInBody
 
     // Validate credentials
     if (body.uid === 'test@example.com' && body.password === 'password123') {
@@ -41,7 +52,7 @@ export const authHandlers = [
 
   // Mock register endpoint
   http.post('/api/v1/sessions/sign-up', async ({ request }) => {
-    const body = await request.json()
+    const body = (await request.json()) as SignUpBody
 
     // Validate required fields
     if (!body.email || !body.password || !body.full_name) {

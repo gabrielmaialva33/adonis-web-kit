@@ -2,12 +2,12 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import db from '@adonisjs/lucid/services/db'
 
-import Role from '#models/role'
-import Permission from '#models/permission'
-import User from '#models/user'
+import Role from '#modules/roles/models/role'
+import Permission from '#modules/permissions/models/permission'
+import User from '#modules/users/models/user'
 
-import IPermission from '#interfaces/permission_interface'
-import IRole from '#interfaces/role_interface'
+import IPermission from '#modules/permissions/interfaces/permission_interface'
+import IRole from '#modules/roles/interfaces/role_interface'
 
 test.group('Users list', (group) => {
   group.each.setup(() => testUtils.db().withGlobalTransaction())

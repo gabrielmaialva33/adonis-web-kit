@@ -2,9 +2,9 @@ import { test } from '@japa/runner'
 import { UserFactory } from '#database/factories/user_factory'
 
 test.group('Auth login', () => {
-  test('should display login page correctly', async ({ browserContext, route }) => {
+  test('should display login page correctly', async ({ browserContext }) => {
     const page = await browserContext.newPage()
-    await page.goto(route('login'))
+    await page.goto('/login')
 
     // Check page title
     await page.waitForSelector('h1')
@@ -20,12 +20,12 @@ test.group('Auth login', () => {
     await page.locator('a:has-text("Forgot password?")').waitFor()
   })
 
-  test('should login successfully with valid credentials', async ({ browserContext, route }) => {
+  test('should login successfully with valid credentials', async ({ browserContext }) => {
     // Create a test user with explicit password
     const user = await UserFactory.merge({ password: 'password123' }).create()
 
     const page = await browserContext.newPage()
-    await page.goto(route('login'))
+    await page.goto('/login')
 
     // Fill login form
     await page.fill('input[name="uid"]', user.email)
@@ -61,9 +61,9 @@ test.group('Auth login', () => {
     await page.waitForSelector('h1, h2, [data-testid="dashboard"]', { timeout: 10000 })
   })
 
-  test('should show error with invalid credentials', async ({ browserContext, route }) => {
+  test('should show error with invalid credentials', async ({ browserContext }) => {
     const page = await browserContext.newPage()
-    await page.goto(route('login'))
+    await page.goto('/login')
 
     // Fill form with invalid credentials
     await page.fill('input[name="uid"]', 'invalid@example.com')
@@ -86,9 +86,9 @@ test.group('Auth login', () => {
     }
   })
 
-  test('should show validation errors for empty fields', async ({ browserContext, route }) => {
+  test('should show validation errors for empty fields', async ({ browserContext }) => {
     const page = await browserContext.newPage()
-    await page.goto(route('login'))
+    await page.goto('/login')
 
     // Submit form without filling fields
     await page.click('button[type="submit"]:has-text("Sign in")')
@@ -101,9 +101,9 @@ test.group('Auth login', () => {
     await page.locator('input[name="password"]').waitFor()
   })
 
-  test('should navigate to register page', async ({ browserContext, route }) => {
+  test('should navigate to register page', async ({ browserContext }) => {
     const page = await browserContext.newPage()
-    await page.goto(route('login'))
+    await page.goto('/login')
 
     // Click on register link
     await page.click('a:has-text("Sign up")')
@@ -112,14 +112,14 @@ test.group('Auth login', () => {
     await page.waitForURL('/register')
   })
 
-  test('should redirect authenticated user to dashboard', async ({ browserContext, route }) => {
+  test('should redirect authenticated user to dashboard', async ({ browserContext }) => {
     // Create a user first with explicit password
     const user = await UserFactory.merge({ password: 'password123' }).create()
 
     const page = await browserContext.newPage()
 
     // First login through the UI
-    await page.goto(route('login'))
+    await page.goto('/login')
     await page.fill('input[name="uid"]', user.email)
     await page.fill('input[name="password"]', 'password123')
     await page.click('button[type="submit"]:has-text("Sign in")')
@@ -128,15 +128,15 @@ test.group('Auth login', () => {
     await page.waitForURL('**/dashboard', { timeout: 30000 })
 
     // Now try to access login page again
-    await page.goto(route('login'))
+    await page.goto('/login')
 
     // Should be redirected to dashboard since user is authenticated
     await page.waitForURL('**/dashboard', { timeout: 30000 })
   })
 
-  test('should handle form submission loading state', async ({ browserContext, route }) => {
+  test('should handle form submission loading state', async ({ browserContext }) => {
     const page = await browserContext.newPage()
-    await page.goto(route('login'))
+    await page.goto('/login')
 
     // Fill form
     await page.fill('input[name="uid"]', 'test@example.com')

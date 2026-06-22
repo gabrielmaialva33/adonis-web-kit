@@ -28,56 +28,58 @@
 ## :bookmark: About
 
 **Adonis Web Kit** is a modern, opinionated, and AI-first full-stack starter kit designed to accelerate the development of
-robust web applications. It combines a powerful **AdonisJS v6** backend with a dynamic **React 19** and **Inertia.js**
+robust web applications. It combines a powerful **AdonisJS v7** backend with a dynamic **React 19** and **Inertia.js**
 frontend, all within a unified monorepo structure.
 
 This project is not just a collection of technologies; it's a foundation engineered for efficiency, scalability, and
-seamless collaboration with AI development partners. By providing a well-defined architecture with features like
-authentication, role-based access control (RBAC), and file management out of the box, it allows developers (both human
-and AI) to focus on building unique business logic instead of boilerplate code.
+seamless collaboration with AI development partners. The backend is organized into **domain modules** and ships with
+multi-guard authentication, role-based access control (RBAC), **N:N multi-tenancy**, and file management out of the box —
+letting developers (both human and AI) focus on unique business logic instead of boilerplate.
 
 ### 🏗️ Architecture Overview
+
+The backend is **modular (domain-driven)**: each domain (`auth`, `users`, `roles`, `permissions`, `files`, `audits`,
+`tenants`, `health`, `web`) owns its controllers, services, repositories, models, validators, and routes under
+`app/modules/<domain>/`. Cross-cutting code (middleware, JWT guard, base repository/models) lives in `app/shared/`, and
+typed exceptions in `app/exceptions/`.
 
 ```mermaid
 graph TD
     subgraph "Frontend (Inertia.js)"
-        FE_UI[React Components & Pages]
-        FE_HOOKS["Hooks (useAuth, useApi)"]
-        FE_UTILS[Utilities & Types]
+        FE_UI[React 19 Pages]
+        FE_LAYOUT["Admin Shell (sidebar + tenant switcher)"]
+        FE_COMPONENTS["UI Components (Metronic / shadcn-style)"]
     end
 
-    subgraph "Backend (AdonisJS)"
-        BE_ROUTES[Routes]
-        BE_MW["Middleware (Auth, ACL)"]
+    subgraph "Backend — app/modules/* (AdonisJS v7)"
+        BE_ROUTES["Module routes.ts"]
         BE_CTRL[Controllers]
         BE_SERVICES[Services]
         BE_REPOS[Repositories]
         BE_MODELS[Lucid Models]
     end
 
-    subgraph "Shared"
-        SHARED_TYPES[TypeScript Types]
-        SHARED_CONFIG[Config Files]
+    subgraph "app/shared"
+        SH_MW["Middleware (auth, acl, permission, ownership, tenant)"]
+        SH_JWT[Custom JWT Guard]
     end
 
     subgraph "Data Layer"
         DB[(PostgreSQL)]
-        CACHE[(Redis)]
+        CACHE[(Redis — cache, sessions, queue)]
     end
 
     FE_UI --> BE_ROUTES
-    BE_ROUTES --> BE_MW
-    BE_MW --> BE_CTRL
+    FE_LAYOUT --> FE_COMPONENTS
+    BE_ROUTES --> SH_MW
+    SH_MW --> SH_JWT
+    SH_MW --> BE_CTRL
     BE_CTRL --> BE_SERVICES
     BE_SERVICES --> BE_REPOS
     BE_REPOS --> BE_MODELS
     BE_MODELS --> DB
 
     BE_SERVICES --> CACHE
-    FE_HOOKS --> BE_ROUTES
-
-    FE_UTILS --> SHARED_TYPES
-    BE_CTRL --> SHARED_TYPES
 ```
 
 ## :rocket: AI-First Development
@@ -89,41 +91,46 @@ This starter kit is uniquely designed to maximize the effectiveness of AI-assist
 - **Strongly-Typed Foundation**: End-to-end TypeScript usage creates a clear contract between the frontend, backend, and
   API layers. This reduces ambiguity and allows AI to understand data structures and function signatures, leading to
   fewer errors.
-- **Modular and Opinionated Architecture**: The clear separation of concerns (controllers, services, repositories) makes
-  it easy for an AI to locate, understand, and modify specific parts of the codebase with precision.
+- **Modular, Domain-Driven Architecture**: Each domain is self-contained under `app/modules/<domain>/`, so an AI (or a
+  human) can locate, understand, and modify a feature end to end without spelunking across unrelated layers.
 - **Focus on Business Logic**: With boilerplate for authentication, permissions, and file storage already handled, AI
   can be directed to solve higher-level business problems from day one.
 
 ## 🌟 Key Features
 
-- **🔐 Multi-Guard Authentication**: Ready-to-use JWT-based authentication.
-- **👥 Advanced Role-Based Access Control (RBAC)**: Manage user permissions with roles and fine-grained rules.
-- **📁 File Management**: Pre-configured file upload service with support for local and S3 drivers.
+- **🔐 Multi-Guard Authentication**: Four guards out of the box — JWT (default, cookie + header), API access tokens,
+  session, and basic auth.
+- **👥 Advanced Role-Based Access Control (RBAC)**: Roles, permissions, direct user permissions, role inheritance, and
+  cached permission checks.
+- **🏢 Multi-Tenancy (N:N)**: Users belong to many tenants via a `user_tenants` pivot (with `owner`/`admin`/`member`
+  roles). The active tenant is carried in the JWT and switchable through both API and web endpoints.
+- **📁 File Management**: Pre-configured file upload service with support for local, S3, Spaces, R2, and GCS drivers.
 - **⚡️ Full-Stack Reactivity**: The power of React combined with the simplicity of a traditional server-rendered app,
   thanks to Inertia.js.
-- **🎨 UI Components**: A set of beautiful, reusable UI components built with `shadcn/ui`, Tailwind CSS, and
-  `lucide-react`.
-- **✅ Type-Safe API**: Auto-completion and type checking for API calls and props.
+- **🎨 UI Component Library**: ~78 Metronic (shadcn-style) components built on Radix UI, Tailwind CSS v4, and
+  `lucide-react`, plus an admin shell with sidebar, tenant switcher, and theme toggle.
+- **✅ Type-Safe Stack**: End-to-end TypeScript with type checking across backend and frontend.
 - **🏥 Health Checks**: Integrated health check endpoint for monitoring.
 
 ## :computer: Technologies
 
-- **[AdonisJS v6](https://adonisjs.com/)**: A robust Node.js framework for the backend.
+- **[AdonisJS v7](https://adonisjs.com/)**: A robust Node.js framework for the backend (runs TypeScript directly via `@poppinss/ts-exec`).
+- **[Node.js 24 LTS](https://nodejs.org/)**: The runtime (`.nvmrc` → `v24.13.0`).
 - **[React 19](https://react.dev/)**: A powerful library for building user interfaces.
 - **[Inertia.js](https://inertiajs.com/)**: The glue that connects the modern frontend with the backend.
 - **[TypeScript](https://www.typescriptlang.org/)**: For type safety across the entire stack.
-- **[PostgreSQL](https://www.postgresql.org/)**: A reliable and powerful relational database.
-- **[Redis](https://redis.io/)**: Used for caching and session management.
+- **[PostgreSQL](https://www.postgresql.org/)**: A reliable and powerful relational database (SQLite available for tests).
+- **[Redis](https://redis.io/)**: Used for caching, sessions, and the Bull queue.
 - **[Vite](https://vitejs.dev/)**: For a lightning-fast frontend development experience.
-- **[Tailwind CSS](https://tailwindcss.com/)**: A utility-first CSS framework for rapid UI development.
+- **[Tailwind CSS v4](https://tailwindcss.com/)**: A utility-first CSS framework powering the Metronic component library.
 
 ## :package: Installation
 
 ### ✔️ Prerequisites
 
-- **Node.js** (v18 or higher)
-- **pnpm** (or npm/yarn)
-- **Docker** (for running PostgreSQL and Redis)
+- **Node.js 24 LTS** (`.nvmrc` → `v24.13.0`)
+- **pnpm**
+- **PostgreSQL** and **Redis** (both required for dev and tests — easiest via Docker)
 
 ### 🚀 Getting Started
 
@@ -148,10 +155,11 @@ This starter kit is uniquely designed to maximize the effectiveness of AI-assist
 
    _Open the `.env` file and configure your database credentials and other settings._
 
-4. **Run database migrations:**
+4. **Run database migrations (and seed):**
 
    ```sh
-   node ace migration:run
+   pnpm ace migration:run
+   pnpm ace db:seed
    ```
 
 5. **Start the development server:**
@@ -165,8 +173,11 @@ This starter kit is uniquely designed to maximize the effectiveness of AI-assist
 - `pnpm dev`: Starts the development server with HMR.
 - `pnpm build`: Compiles the application for production.
 - `pnpm start`: Runs the production-ready server.
-- `pnpm test`: Executes unit tests.
-- `pnpm test:e2e`: Executes end-to-end tests.
+- `pnpm ace <cmd>`: Runs any AdonisJS ace command (e.g. `pnpm ace migration:run`).
+- `pnpm test`: Executes backend unit tests (Japa).
+- `pnpm test:e2e`: Executes all backend suites (unit + functional + browser).
+- `pnpm test:ui`: Executes frontend tests (Vitest).
+- `pnpm typecheck`: Type-checks both backend and frontend.
 - `pnpm lint`: Lints the codebase.
 - `pnpm format`: Formats the code with Prettier.
 

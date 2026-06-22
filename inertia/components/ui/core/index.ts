@@ -1,16 +1,12 @@
 // Existing components
-export * from './alert'
 export * from './badge'
 export * from './button'
 export * from './card'
 export * from './data_table'
-export * from './dialog'
 export * from './dropdown_menu'
-export * from './form_input'
 export * from './input'
 export * from './label'
 export * from './select'
-export * from './tooltip'
 
 // New components
 export * from './drawer'

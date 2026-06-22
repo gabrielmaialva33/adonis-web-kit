@@ -2,294 +2,273 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## ⚠️ CRITICAL RULE: ALWAYS USE ADONISJS COMMANDS
+## ⚠️ CRITICAL RULE: KEEP THE MODULAR STRUCTURE
 
-**NEVER manually create files in this project.** Always use AdonisJS Ace commands:
+This project does **NOT** use the default AdonisJS layout (`app/controllers`, `app/models`, …).
+It uses a **modular, domain-driven** layout under `app/modules/<domain>/` plus cross-cutting
+code in `app/shared/`. Two things follow from that:
 
-- `node ace make:controller` for controllers
-- `node ace make:model` for models
-- `node ace make:migration` for migrations
-- `node ace make:service` for services
-- See "AdonisJS Commands Reference" section below for complete list
+1. **`node ace make:*` generates files in the DEFAULT location** (`app/controllers/...`,
+   `#controllers/...` aliases) which is **wrong** for this repo. So when you scaffold:
+   - Generate with ace if you want the boilerplate, then **MOVE** the file into the right
+     module (`app/modules/<domain>/{controllers,services,...}/`) and **fix the imports** to
+     `#modules/*` / `#shared/*`, **OR**
+   - Create the file directly following the existing module pattern (look at a sibling module
+     like `app/modules/users/` and copy its shape).
+2. **Never use the removed legacy aliases** (`#controllers`, `#models`, `#services`,
+   `#repositories`, `#middleware`, `#validators`, `#interfaces`, `#routes`). They no longer
+   exist. Use `#modules/*`, `#shared/*`, `#exceptions/*` (see "Import Aliases").
 
-This ensures proper file structure, naming conventions, and boilerplate code.
+The spirit of the old rule still holds: **stay consistent with the existing structure** — just
+don't trust the default ace output paths.
+
+> **Runtime note:** this is **AdonisJS v7** running TypeScript directly via `@poppinss/ts-exec`.
+> There is **no `node ace`** anymore. Use `pnpm ace <cmd>` (or
+> `node --import=@poppinss/ts-exec ace.js <cmd>`).
 
 ## Common Development Commands
 
+Package manager is **pnpm** (there is a `pnpm-workspace.yaml` with `allowBuilds` /
+`verifyDepsBeforeRun`). Node **24 LTS** (`.nvmrc` → `v24.13.0`).
+
 ### Development
 
-- `pnpm run dev` - Start development server with hot reload
-- `pnpm run build` - Build application for production
-- `pnpm start` - Start production server
+- `pnpm dev` - Start development server with HMR
+- `pnpm build` - Build application for production
+- `pnpm start` - Start production server (`node bin/server.js`)
+- `pnpm ace <cmd>` - Run any ace command (wraps `node --import=@poppinss/ts-exec ace.js`)
 
 ### Testing
 
-- `pnpm test` - Run unit tests only
-- `pnpm run test:e2e` - Run all tests (functional and e2e)
+- `pnpm test` - Run unit tests only (Japa, `--force-exit`)
+- `pnpm test:e2e` - Run ALL backend suites: unit + functional + browser (Japa)
+- `pnpm test:ui` - Run frontend tests (Vitest, one-shot)
+- `pnpm test:ui:watch` - Frontend tests in watch mode
 
 ### Code Quality
 
-- `pnpm run lint` - Run ESLint
-- `pnpm run lint:fix` - Fix linting issues automatically
-- `pnpm run format` - Format code with Prettier
-- `pnpm run typecheck` - Run TypeScript type checking
+- `pnpm lint` - Run ESLint
+- `pnpm lint:fix` - Fix linting issues automatically
+- `pnpm format` - Format code with Prettier
+- `pnpm typecheck` - Type-check **both** sides: backend `tsc --noEmit` **and** frontend
+  `tsc --noEmit -p inertia/tsconfig.json`
 
 ### Database
 
-- `node ace migration:run` - Run pending migrations
-- `node ace db:seed` - Run database seeders
-- `node ace migration:rollback` - Rollback last migration
+- `pnpm ace migration:run` - Run pending migrations
+- `pnpm ace migration:fresh` - Drop all tables and re-migrate
+- `pnpm ace db:seed` - Run database seeders
+- `pnpm ace migration:rollback` - Rollback last migration
 
 ### Docker
 
-- `pnpm run docker` - Run migrations, seeders, and start server
+- `pnpm docker` - Run migrations, seeders, then start the production server
+
+> **Infra requirement:** PostgreSQL **and** Redis must be running for both dev and tests.
 
 ## Architecture Overview
 
-This is an AdonisJS v6 application with React frontend using Inertia.js. The project follows a modular structure with
-clear separation of concerns.
+This is an **AdonisJS v7** application with a **React 19 + Inertia.js** frontend. The codebase is
+organized **by domain (modular)**, not by technical layer.
 
 ### Key Technologies
 
-- **Backend**: AdonisJS v6 (Node.js framework)
-- **Frontend**: React 19 with Inertia.js for SPA-like experience
-- **Database**: PostgreSQL (production), SQLite (testing)
+- **Backend**: AdonisJS v7 (runs TS directly via `@poppinss/ts-exec`)
+- **Runtime**: Node.js 24 LTS
+- **Frontend**: React 19 with Inertia.js for an SPA-like experience
+- **Database**: PostgreSQL (dev/prod); SQLite (`better-sqlite3`) available for tests
 - **Styling**: TailwindCSS v4
-- **Authentication**: Multiple guards - JWT (default), API tokens, session, basic auth
+- **Authentication**: Multiple guards — JWT (default, cookie + header), API tokens, session, basic
+- **Multi-tenancy**: N:N (users ↔ tenants via `user_tenants` pivot), JWT-carried active tenant
 - **Validation**: VineJS
-- **Testing**: Japa framework
-- **Queue**: Bull Queue with Redis
+- **Testing**: Japa (backend) + Vitest (frontend)
+- **Queue**: Bull Queue (`@rlanz/bull-queue`) with Redis
+- **Cache**: `@adonisjs/cache` backed by Redis
 
 ### Project Structure
 
 #### Backend Architecture (`app/`)
 
-- **controllers/**: HTTP request handlers organized by domain (user, role, permission, file, health)
-- **models/**: Lucid ORM models with relationships and hooks
-- **services/**: Business logic layer organized by domain with specific use cases
-- **repositories/**: Data access layer abstraction
-- **middleware/**: HTTP middleware for auth, ACL, ownership checks
-- **validators/**: Request validation schemas
-- **events/**: Domain events and listeners
-- **exceptions/**: Custom exception classes
+Three top-level areas:
+
+```
+app/
+├── modules/        # domain modules — the heart of the app
+│   ├── auth/         controllers/ services/ events/ routes.ts
+│   ├── users/        controllers/ services/ repositories/ models/ validators/ interfaces/ routes.ts
+│   ├── roles/        controllers/ services/ repositories/ models/ validators/ interfaces/ routes.ts
+│   ├── permissions/  controllers/ services/ repositories/ models/ validators/ interfaces/ routes.ts
+│   ├── files/        controllers/ services/ models/ routes.ts
+│   ├── audits/       services/ models/
+│   ├── tenants/      controllers/ models/ routes.ts
+│   ├── health/       controllers/ routes.ts
+│   └── web/          controllers/ services/ routes.ts   # Inertia pages (login, dashboard, users, files, tenant switch)
+├── shared/         # cross-cutting concerns
+│   ├── middleware/   auth, guest, acl, permission, ownership, tenant, locale, inertia, …
+│   ├── services/     ownership_service
+│   ├── jwt/          custom JWT guard (define_config, jwt, jwt_service, types)
+│   ├── lucid/        base repository + interface (lucid_repository)
+│   ├── models/       tenant_base_model (tenant-scoped + soft delete base)
+│   ├── extensions/   logged_user_extension
+│   └── interfaces/   ownership_interface
+└── exceptions/     # typed exceptions at the root
+    ├── base_exception.ts
+    ├── bad_request_exception.ts
+    ├── forbidden_exception.ts
+    ├── not_found_exception.ts
+    ├── unauthorized_exception.ts
+    ├── validation_exception.ts
+    └── handler.ts
+```
+
+Each module owns its slice end to end. A module typically wires
+**controller → service → repository → model**, registers its own `routes.ts` (imported from
+`start/routes.ts`), and keeps its validators/interfaces alongside.
 
 #### Frontend (`inertia/`)
 
-- **app/**: React application entry points
-- **pages/**: React page components
-- **css/**: Stylesheets
+- **app/**: React entry points
+- **pages/**: page components (auth/login, auth/register, dashboard, users/{index,create,edit}, files, errors, home, ui_demo)
+- **layouts/**: admin shell — `main_layout` (sidebar + header with tenant switcher, user menu, theme toggle) and `auth/auth_split_layout`
+- **components/ui/**: ~78 Metronic (shadcn-style) components, kebab-case (button, card, data-grid, form, dialog, drawer, command, calendar, chart, …)
+- **components/ui/core/**: legacy components, in transition out
+- **hooks/ lib/ providers/ services/ utils/ types/**: client-side support code
+- **css/**: stylesheets (Tailwind v4)
 
 #### Configuration (`config/`)
 
-- **auth.ts**: Multi-guard authentication (JWT default, API tokens, session, basic auth)
-- **database.ts**: PostgreSQL/SQLite configuration
-- **drive.ts**: File storage (local, S3, GCS)
+- **auth.ts**: 4 guards — `jwt` (default, cookie-based custom guard from `#shared/jwt`), `api` (access tokens), `web` (session), `basicAuth`
+- **database.ts**: `DB_CONNECTION` selects `postgres` (default) or `sqlite`
+- **drive.ts**: file storage (`DRIVE_DISK`: fs / s3 / spaces / r2 / gcs)
+- **mail.ts**, **redis.ts**, **cache.ts**, **limiter.ts**, **queue.ts**, **inertia.ts**, etc.
+
+### Multi-Tenancy
+
+The app is multi-tenant with an **N:N** relationship:
+
+- **`Tenant`** model (`tenants` table) and a **`user_tenants`** pivot carrying a `role` column
+  (`owner` / `admin` / `member`, defaults to `member`). `User` `manyToMany` `Tenant`.
+- The **active tenant rides in the JWT** as a `tenantId` claim (minted on sign-in and on tenant
+  switch). Tenant-scoped entities can extend `#shared/models/tenant_base_model` (gives
+  `tenant_id`, soft-delete `deletedAt`, and `notDeleted` / `withTenant(id)` scopes).
+- **`#shared/middleware/tenant_middleware`** resolves `ctx.tenant` in this order:
+  1. `x-tenant-id` request header
+  2. `tenantId` claim from the JWT (bearer header or `token` cookie)
+  3. fallback: the user's first tenant (via `user_tenants`)
+
+  It **always enforces membership** — resolving a tenant the user doesn't belong to throws
+  `ForbiddenException`. If nothing resolves, the request continues without `ctx.tenant`.
+- **Endpoints:**
+  - API: `GET /api/v1/tenants/me` (lists tenants + the user's role in each),
+    `POST /api/v1/tenants/switch` (validates membership, mints fresh tokens with the new `tenantId`)
+  - Web (Inertia): `POST /tenant/switch` (re-mints the JWT **cookie** with the new `tenantId`)
+- **Global (NOT tenant-scoped):** `roles`, `permissions`, and `audit_logs` are global.
 
 ### Authentication & Authorization
 
-The application uses a comprehensive RBAC (Role-Based Access Control) system:
+RBAC on top of the multi-guard auth:
 
-- **Multiple Auth Guards**: JWT (default), API tokens, session, basic auth
-- **Role-Permission System**: Users have roles, roles have permissions, users can have direct permissions
-- **Permission Inheritance**: Roles can inherit permissions from other roles
-- **Permission Caching**: Optimized permission checking with caching
-- **Ownership-based Access**: Middleware for resource ownership validation
+- **Guards**: `jwt` (default — custom guard in `#shared/jwt`, cookie + `Authorization` header),
+  `api` (access tokens), `web` (session), `basicAuth`.
+- **Role–Permission system**: users have roles, roles have permissions, users can also have
+  direct permissions. Roles can **inherit** permissions from other roles. Permission checks are
+  **cached**.
+- **Named middleware** (`start/kernel.ts`): `auth`, `guest`, `acl`, `permission`, `ownership`,
+  `tenant` — all resolve from `#shared/middleware/*`.
+- **Ownership-based access**: `ownership` middleware + `ownership_service` validate that a user
+  owns the resource being accessed.
 
-### Key Features
+### Frontend (UI components)
 
-- **User Management**: CRUD operations with email verification
-- **Role Management**: Dynamic role creation and permission assignment
-- **File Upload**: Multi-provider file storage (local, S3, GCS)
-- **Audit Logging**: Track user actions and changes
-- **Rate Limiting**: API throttling
-- **Internationalization**: Multi-language support (en/pt)
-- **Health Checks**: System health monitoring
-
-### Import Aliases
-
-The project uses extensive import aliases defined in `package.json`:
-
-- `#controllers/*` → `./app/controllers/*.js`
-- `#models/*` → `./app/models/*.js`
-- `#services/*` → `./app/services/*.js`
-- `#repositories/*` → `./app/repositories/*.js`
-- `#middleware/*` → `./app/middleware/*.js`
-- `#validators/*` → `./app/validators/*.js`
-- `#config/*` → `./config/*.js`
-- And many more...
+The UI is built on a **Metronic (shadcn-style) component library** under
+`inertia/components/ui/` (~78 components, kebab-case filenames). It leans on Radix UI primitives,
+`class-variance-authority`, `tailwind-merge`, and `lucide-react`. The admin shell
+(`inertia/layouts/main_layout.tsx`) provides a sidebar + header with a **tenant switcher**, user
+menu, and theme toggle (`next-themes`). Legacy components live in `inertia/components/ui/core/`
+and are being phased out — prefer the top-level `ui/` components for new work.
 
 ### Database
 
 - **ORM**: Lucid with snake_case naming strategy
-- **Migrations**: Located in `database/migrations/`
-- **Soft Deletes**: Implemented in User model
-- **Relationships**: Extensive use of many-to-many relationships for RBAC
+- **Migrations**: `database/migrations/` (includes `create_tenants_table`, `create_user_tenants_table`)
+- **Soft Deletes**: via `tenant_base_model` for tenant-scoped entities (and on `User`)
+- **Relationships**: heavy use of many-to-many (RBAC roles/permissions, user↔tenant)
 
 ### Testing
 
-Two test suites configured in `adonisrc.ts`:
+Three Japa suites are configured in `adonisrc.ts`:
 
-- **Unit tests**: `tests/unit/**/*.spec.ts` (2s timeout)
-- **Functional tests**: `tests/functional/**/*.spec.ts` (30s timeout)
+- **unit**: `tests/unit/**/*.spec.ts` (2s timeout)
+- **functional**: `tests/functional/**/*.spec.ts` (30s timeout)
+- **browser**: `tests/browser/**/*.spec.ts` (60s timeout, Playwright via `@japa/browser-client`)
 
-Uses Japa testing framework with API client and OpenAPI assertion support.
+Frontend tests run under **Vitest** (`pnpm test:ui`) with Testing Library + jsdom + MSW.
+Japa is wired with the API client and OpenAPI assertion support. Tests need Postgres + Redis.
 
-### File Organization
+### Import Aliases
 
-Services are organized by domain with specific use cases:
+Defined in `package.json` `imports` (and mirrored in tsconfig):
 
-- `app/services/users/` - User-related operations
-- `app/services/permissions/` - Permission management
-- `app/services/roles/` - Role management
-- `app/services/audits/` - Audit logging
-- `app/services/upload/` - File upload handling
+- `#modules/*` → `./app/modules/*.js`
+- `#shared/*` → `./app/shared/*.js`
+- `#exceptions/*` → `./app/exceptions/*.js`
+- `#providers/*` → `./providers/*.js`
+- `#database/*` → `./database/*.js`
+- `#tests/*` → `./tests/*.js`
+- `#start/*` → `./start/*.js`
+- `#config/*` → `./config/*.js`
 
-This structure promotes maintainability and clear separation of business logic.
+> The old per-layer aliases (`#controllers`, `#models`, `#services`, `#repositories`,
+> `#middleware`, `#validators`, `#interfaces`, `#routes`) were **removed**. Do not use them.
 
-## AdonisJS Commands Reference (MUST USE)
+## AdonisJS Commands Reference
+
+> **Important:** ace runs via `pnpm ace <cmd>` (not `node ace`). The `make:*` generators emit
+> files into the **default** AdonisJS layout (`app/controllers`, `app/models`, …) and reference
+> the default aliases. This repo is **modular** — after generating, **move the file into the
+> correct `app/modules/<domain>/` (or `app/shared/`) folder and fix imports to `#modules/*` /
+> `#shared/*`**. When in doubt, copy the shape of an existing module instead of scaffolding.
 
 ### File Generation Commands
 
-#### Controllers
-
 ```bash
-node ace make:controller User
-# Creates: app/controllers/users_controller.ts
-
-node ace make:controller Post --resource
-# Creates controller with all RESTful methods
-```
-
-#### Models
-
-```bash
-node ace make:model User
-# Creates: app/models/user.ts
-
-node ace make:model Post -m
-# Creates model with migration
-```
-
-#### Migrations
-
-```bash
-node ace make:migration users
-# Creates: database/migrations/[timestamp]_create_users_table.ts
-
-node ace make:migration add_email_to_users --alter
-# Creates migration for altering existing table
-```
-
-#### Services
-
-```bash
-node ace make:service users/CreateUser
-# Creates: app/services/users/create_user.ts
-
-node ace make:service auth/VerifyEmail
-# Creates: app/services/auth/verify_email.ts
-```
-
-#### Middleware
-
-```bash
-node ace make:middleware Auth
-# Creates: app/middleware/auth_middleware.ts
-
-node ace make:middleware RateLimit --stack=router
-# Creates middleware for router stack
-```
-
-#### Validators
-
-```bash
-node ace make:validator CreateUser
-# Creates: app/validators/create_user.ts
-
-node ace make:validator users/UpdateProfile
-# Creates: app/validators/users/update_profile.ts
-```
-
-#### Tests
-
-```bash
-node ace make:test UserController --suite=functional
-# Creates: tests/functional/user_controller.spec.ts
-
-node ace make:test UserService --suite=unit
-# Creates: tests/unit/user_service.spec.ts
-```
-
-#### Other Resources
-
-```bash
-node ace make:factory User
-# Creates: database/factories/user_factory.ts
-
-node ace make:seeder User
-# Creates: database/seeders/user_seeder.ts
-
-node ace make:event UserRegistered
-# Creates: app/events/user_registered.ts
-
-node ace make:listener SendWelcomeEmail
-# Creates: app/listeners/send_welcome_email.ts
-
-node ace make:mail VerifyEmail
-# Creates: app/mails/verify_email.ts
-
-node ace make:exception ValidationException
-# Creates: app/exceptions/validation_exception.ts
-
-node ace make:provider AppProvider
-# Creates: providers/app_provider.ts
-
-node ace make:command SendEmails
-# Creates: commands/send_emails.ts
-
-node ace make:job ProcessPayment
-# Creates: app/jobs/process_payment.ts
-
-node ace make:preload redis
-# Creates: start/redis.ts
-
-node ace make:view users/index
-# Creates: resources/views/users/index.edge
+pnpm ace make:controller Product            # → move to app/modules/products/controllers/
+pnpm ace make:controller Product --resource # RESTful methods
+pnpm ace make:model Product                 # → move to app/modules/products/models/
+pnpm ace make:model Product -m              # model + migration
+pnpm ace make:migration products            # → database/migrations/ (correct as-is)
+pnpm ace make:migration add_x_to_products --alter
+pnpm ace make:service products/CreateProduct # → move to app/modules/products/services/
+pnpm ace make:middleware RateLimit          # → move to app/shared/middleware/
+pnpm ace make:validator products/Create     # → move to app/modules/products/validators/
+pnpm ace make:test ProductController --suite=functional
+pnpm ace make:factory Product               # → database/factories/ (correct as-is)
+pnpm ace make:seeder Product                # → database/seeders/ (correct as-is)
+pnpm ace make:event ProductCreated          # → move into the owning module
+pnpm ace make:listener SendNotification
+pnpm ace make:mail VerifyEmail
+pnpm ace make:exception SomethingFailed     # → app/exceptions/
+pnpm ace make:provider AppProvider          # → providers/ (correct as-is)
+pnpm ace make:command SendEmails            # → commands/ (correct as-is)
+pnpm ace make:job ProcessPayment
 ```
 
 ### Migration Commands
 
 ```bash
-# Run pending migrations
-node ace migration:run
-
-# Rollback last batch
-node ace migration:rollback
-
-# Rollback all migrations
-node ace migration:reset
-
-# Drop all tables and re-migrate
-node ace migration:fresh
-
-# Rollback and re-run all migrations
-node ace migration:refresh
-
-# Check migration status
-node ace migration:status
-
-# Rollback to specific batch
-node ace migration:rollback --batch=2
+pnpm ace migration:run        # run pending
+pnpm ace migration:rollback   # rollback last batch
+pnpm ace migration:reset      # rollback all
+pnpm ace migration:fresh      # drop all tables and re-migrate
+pnpm ace migration:refresh    # rollback + re-run all
+pnpm ace migration:status     # check status
 ```
 
 ### Package Management
 
 ```bash
-# Install and configure a package
-node ace add @adonisjs/lucid
-
-# Configure already installed package
-node ace configure @adonisjs/lucid
+pnpm ace add @adonisjs/lucid        # install + configure a package
+pnpm ace configure @adonisjs/lucid  # configure an already-installed package
 ```
 
 ## REPL (Read-Eval-Print Loop) Usage
@@ -297,117 +276,70 @@ node ace configure @adonisjs/lucid
 ### Starting REPL
 
 ```bash
-# Start interactive REPL session
-node ace repl
+pnpm ace repl
 ```
 
 ### Common REPL Operations
 
-#### Import Models and Services
-
 ```javascript
-// Import default export
-const User = await importDefault('#models/user')
+// Import a model (use the MODULAR alias)
+const User = await importDefault('#modules/users/models/user')
+const { default: Tenant } = await import('#modules/tenants/models/tenant')
 
-// Alternative import syntax
-const { default: User } = await import('#models/user')
-
-// Import services
-const UserService = await importDefault('#services/users/create_user')
-```
-
-#### Working with Models
-
-```javascript
-// Query users
+// Query
 const users = await User.all()
 const user = await User.find(1)
 
-// Create user
-const newUser = await User.create({
-  email: 'test@example.com',
-  password: 'secret',
-})
+// Create
+const newUser = await User.create({ email: 'test@example.com', password: 'secret' })
 
-// Update user
-user.email = 'newemail@example.com'
-await user.save()
+// Load app services
+await loadApp()     // app service
+await loadRouter()  // router
+await loadConfig()  // config
+await loadHash()    // hash
+await loadHelpers() // helpers
 ```
-
-#### Load Application Services
-
-```javascript
-// Load specific services
-await loadApp() // Access app service
-await loadRouter() // Access router service
-await loadConfig() // Access config service
-await loadHash() // Access hash service
-await loadHelpers() // Access helpers module
-```
-
-### REPL Best Practices
-
-1. **Use for debugging and data exploration**
-   - Test queries before implementing
-   - Inspect data relationships
-   - Debug service methods
-
-2. **Common Use Cases**
-   - Testing model queries
-   - Debugging service logic
-   - Inspecting configuration
-   - Running one-off data migrations
-   - Testing email templates
-   - Verifying queue jobs
 
 ### REPL Tips
 
-- Use `importDefault()` for cleaner imports
-- Access configs via `await loadConfig()`
-- Test services interactively before implementing
-- Use `.ls` to list all available methods
-- Press Tab for auto-completion
-- Use `.exit` or Ctrl+C twice to quit
+- Use modular aliases (`#modules/...`, `#shared/...`) — the legacy ones are gone.
+- `importDefault()` for clean default imports.
+- `.ls` lists available methods, Tab auto-completes, `.exit` (or Ctrl+C twice) quits.
+- Great for testing queries, debugging services, and inspecting config before implementing.
 
 ## Important Instructions for AI Assistants
 
-1. **ALWAYS USE COMMANDS** - Never create files manually
-   - Use `node ace make:controller` not manual file creation
-   - Use `node ace make:migration` not manual database files
-   - Use `node ace make:service` not manual service files
+1. **Respect the modular structure** — code lives in `app/modules/<domain>/` and `app/shared/`.
+   `make:*` output lands in the wrong place; move it and fix imports, or hand-write to match a
+   sibling module.
 
-2. **Follow the Architecture**
-   - Controller → Service → Repository → Model flow
-   - Use dependency injection with `@inject()` decorator
-   - Keep business logic in services, not controllers
+2. **Follow the per-module flow** — Controller → Service → Repository → Model. Use `@inject()`
+   for dependency injection. Keep business logic in services, not controllers.
 
-3. **Use Import Aliases**
-   - Always use `#controllers/*`, `#services/*`, etc.
-   - Never use relative imports like `../../`
+3. **Use the modular import aliases** — `#modules/*`, `#shared/*`, `#exceptions/*`,
+   `#config/*`, etc. Never use relative `../../` imports or the removed legacy aliases.
 
-4. **Test Before Committing**
-   - Run `pnpm lint` - Must pass
-   - Run `pnpm typecheck` - Must pass
-   - Run `pnpm test` - Must pass
+4. **Run ace via pnpm** — `pnpm ace <cmd>`, never `node ace`.
 
-5. **Suggest REPL for Debugging**
-   - When users need to explore data
-   - When testing queries before implementation
-   - When debugging service methods
+5. **Validate before committing**
+   - `pnpm lint` — must pass
+   - `pnpm typecheck` — must pass (checks backend **and** `inertia/`)
+   - `pnpm test` — must pass (and `pnpm test:ui` if you touched the frontend)
 
-6. **Example Workflow**
+6. **Multi-tenancy awareness** — for tenant-scoped data, extend `tenant_base_model` and scope by
+   `ctx.tenant`; remember `roles`, `permissions`, and `audit_logs` are global.
+
+7. **Example workflow** (new "products" feature)
 
    ```bash
-   # User asks: "Create a new product feature"
-
-   # Execute in order:
-   node ace make:model Product -m
-   node ace make:controller Product --resource
-   node ace make:validator CreateProduct
-   node ace make:service products/CreateProduct
-   node ace make:service products/UpdateProduct
-   node ace make:service products/DeleteProduct
-   node ace make:factory Product
-   node ace make:test ProductController --suite=functional
-   node ace migration:run
+   pnpm ace make:model Product -m
+   pnpm ace make:controller Product --resource
+   pnpm ace make:validator products/CreateProduct
+   pnpm ace make:service products/CreateProduct
+   # then MOVE the generated controller/model/validator/service into
+   # app/modules/products/{controllers,models,validators,services}/ and rewrite
+   # their imports to #modules/* / #shared/*, add app/modules/products/routes.ts,
+   # and import it from start/routes.ts
+   pnpm ace migration:run
    ```

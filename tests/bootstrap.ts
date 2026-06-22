@@ -24,7 +24,9 @@ export const plugins: Config['plugins'] = [
   apiClient({
     baseURL: `http://${env.get('HOST')}:${env.get('PORT')}`,
   }),
-  browserClient({}),
+  browserClient({
+    runInSuites: ['browser'],
+  }),
   pluginAdonisJS(app),
   authApiClient(app),
   sessionApiClient(app),

@@ -1,9 +1,9 @@
 import { FormEvent } from 'react'
 import { useForm, Link } from '@inertiajs/react'
-import { Mail, Lock } from 'lucide-react'
+import { Loader2, Mail, Lock } from 'lucide-react'
 
-import { Button } from '../ui/core/button'
-import { FormInput } from '~/components/ui/core/form_input'
+import { Button } from '~/components/ui/button'
+import { Field } from '~/components/forms/field'
 
 export function LoginForm() {
   const { data, setData, post, processing, errors } = useForm({
@@ -18,32 +18,32 @@ export function LoginForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <FormInput
+      <Field
         label="Email or Username"
         id="uid"
         type="text"
         name="uid"
         value={data.uid}
         onChange={(e) => setData('uid', e.target.value)}
-        errorMessage={errors.uid}
+        error={errors.uid}
         placeholder="john@example.com"
         required
         autoComplete="username"
-        leftIcon={<Mail className="h-4 w-4" />}
+        leftIcon={<Mail className="size-4" />}
       />
 
-      <FormInput
+      <Field
         label="Password"
         id="password"
         type="password"
         name="password"
         value={data.password}
         onChange={(e) => setData('password', e.target.value)}
-        errorMessage={errors.password}
+        error={errors.password}
         required
         autoComplete="current-password"
-        leftIcon={<Lock className="h-4 w-4" />}
-        rightAdornment={
+        leftIcon={<Lock className="size-4" />}
+        labelAction={
           <Link href="/forgot-password" className="text-xs text-primary hover:underline">
             Forgot password?
           </Link>
@@ -53,11 +53,12 @@ export function LoginForm() {
       <div className="space-y-4">
         <Button
           type="submit"
-          loading={processing}
+          variant="primary"
           disabled={processing}
           className="w-full"
           size="lg"
         >
+          {processing && <Loader2 className="size-4 animate-spin" />}
           Sign in
         </Button>
 

@@ -92,17 +92,17 @@ export default defineConfig({
   tests: {
     suites: [
       {
-        files: ['tests/unit/**/*.spec(.ts|.js)'],
+        files: ['tests/unit/**/*.spec.ts'],
         name: 'unit',
         timeout: 2000,
       },
       {
-        files: ['tests/functional/**/*.spec(.ts|.js)'],
+        files: ['tests/functional/**/*.spec.ts'],
         name: 'functional',
         timeout: 30000,
       },
       {
-        files: ['tests/browser/**/*.spec(.ts|.js)'],
+        files: ['tests/browser/**/*.spec.ts'],
         name: 'browser',
         timeout: 60000,
       },
@@ -134,8 +134,7 @@ export default defineConfig({
     },
   ],
 
-  assetsBundler: false,
   hooks: {
-    onBuildStarting: [() => import('@adonisjs/vite/build_hook')],
+    buildStarting: [() => import('@adonisjs/vite/build_hook')],
   },
 })

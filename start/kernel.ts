@@ -23,11 +23,11 @@ server.errorHandler(() => import('#exceptions/handler'))
  * the request URL.
  */
 server.use([
-  () => import('#middleware/container_bindings_middleware'),
+  () => import('#shared/middleware/container_bindings_middleware'),
   () => import('@adonisjs/static/static_middleware'),
   () => import('@adonisjs/cors/cors_middleware'),
   () => import('@adonisjs/vite/vite_middleware'),
-  () => import('@adonisjs/inertia/inertia_middleware'),
+  () => import('#shared/middleware/inertia_middleware'),
 ])
 
 /**
@@ -39,7 +39,7 @@ router.use([
   () => import('@adonisjs/session/session_middleware'),
   () => import('@adonisjs/shield/shield_middleware'),
   () => import('@adonisjs/auth/initialize_auth_middleware'),
-  () => import('#middleware/detect_user_locale_middleware'),
+  () => import('#shared/middleware/detect_user_locale_middleware'),
 ])
 
 /**
@@ -47,9 +47,10 @@ router.use([
  * the routes or the routes group.
  */
 export const middleware = router.named({
-  auth: () => import('#middleware/auth_middleware'),
-  guest: () => import('#middleware/guest_middleware'),
-  acl: () => import('#middleware/acl_middleware'),
-  permission: () => import('#middleware/permission_middleware'),
-  ownership: () => import('#middleware/ownership_middleware'),
+  auth: () => import('#shared/middleware/auth_middleware'),
+  guest: () => import('#shared/middleware/guest_middleware'),
+  acl: () => import('#shared/middleware/acl_middleware'),
+  permission: () => import('#shared/middleware/permission_middleware'),
+  ownership: () => import('#shared/middleware/ownership_middleware'),
+  tenant: () => import('#shared/middleware/tenant_middleware'),
 })

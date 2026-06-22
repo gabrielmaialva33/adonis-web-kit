@@ -1,6 +1,6 @@
 import { BaseCommand } from '@adonisjs/core/ace'
 import type { CommandOptions } from '@adonisjs/core/types/ace'
-import AssignDefaultPermissionsService from '#services/permissions/assign_default_permissions_service'
+import AssignDefaultPermissionsService from '#modules/permissions/services/assign_default_permissions_service'
 
 export default class SyncPermissions extends BaseCommand {
   static commandName = 'permission:sync'

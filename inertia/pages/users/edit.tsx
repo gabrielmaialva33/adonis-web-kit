@@ -1,11 +1,11 @@
-import { Head, useForm } from '@inertiajs/react'
+import { Head, Link, useForm } from '@inertiajs/react'
+import { ArrowLeft } from 'lucide-react'
 
 import { MainLayout } from '~/layouts'
-
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/core/card'
-import { Button } from '~/components/ui/core/button'
-import { FormInput } from '~/components/ui/core/form_input'
-
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/ui/card'
+import { Button } from '~/components/ui/button'
+import { Field } from '~/components/forms/field'
+import { PageHeader } from '~/components/page_header'
 import type { User } from '~/types'
 
 interface EditUserPageProps {
@@ -18,56 +18,67 @@ export default function EditUserPage({ user }: EditUserPageProps) {
     email: user.email || '',
   })
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
     put(`/users/${user.id}`)
   }
 
   return (
     <MainLayout>
-      <Head title={`Edit User: ${user.full_name}`} />
+      <Head title={`Edit user: ${user.full_name}`} />
 
       <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">Edit User</h1>
-          <p className="text-muted-foreground mt-1">Update the user's details.</p>
-        </div>
+        <PageHeader
+          title="Edit user"
+          description="Update the user's details."
+          actions={
+            <Link href="/users">
+              <Button variant="outline">
+                <ArrowLeft className="size-4" />
+                Back to users
+              </Button>
+            </Link>
+          }
+        />
 
-        <Card>
-          <CardHeader>
-            <CardTitle>User Details</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <FormInput
-                label="Full Name"
-                id="full_name"
+        <form onSubmit={handleSubmit}>
+          <Card className="max-w-2xl">
+            <CardHeader>
+              <CardTitle>User details</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-5">
+              <Field
+                label="Full name"
+                name="full_name"
                 value={data.full_name}
-                onChange={(e) => setData('full_name', e.target.value)}
+                onChange={(event) => setData('full_name', event.target.value)}
                 error={errors.full_name}
                 autoComplete="name"
                 required
               />
-
-              <FormInput
+              <Field
                 label="Email"
-                id="email"
+                name="email"
                 type="email"
                 value={data.email}
-                onChange={(e) => setData('email', e.target.value)}
+                onChange={(event) => setData('email', event.target.value)}
                 error={errors.email}
                 autoComplete="email"
                 required
               />
-
-              <div className="flex justify-end">
-                <Button type="submit" disabled={processing}>
-                  {processing ? 'Saving...' : 'Save Changes'}
+            </CardContent>
+            <CardFooter className="justify-end gap-2 border-t pt-5">
+              <Link href="/users">
+                <Button variant="outline" type="button">
+                  Cancel
                 </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+              </Link>
+              <Button variant="primary" type="submit" disabled={processing}>
+                {processing ? 'Saving...' : 'Save changes'}
+              </Button>
+            </CardFooter>
+          </Card>
+        </form>
       </div>
     </MainLayout>
   )

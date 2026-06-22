@@ -5,7 +5,8 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { X } from 'lucide-react'
 import { cn } from '~/utils/cn'
 import { Button } from './button'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, type HTMLMotionProps } from 'framer-motion'
+import { Slot as SlotPrimitive } from 'radix-ui'
 
 const drawerVariants = cva('fixed z-50 bg-background shadow-xl transition-transform', {
   variants: {
@@ -50,16 +51,19 @@ const Drawer = ({ open = false, onOpenChange, children }: DrawerProps) => {
   )
 }
 
-interface DrawerTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+interface DrawerTriggerProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  asChild?: boolean
+}
 
 const DrawerTrigger = React.forwardRef<HTMLButtonElement, DrawerTriggerProps>(
-  ({ onClick, ...props }, ref) => {
+  ({ onClick, asChild = false, ...props }, ref) => {
     const { onOpenChange } = useDrawer()
+    const Comp = asChild ? SlotPrimitive.Slot : 'button'
 
     return (
-      <button
+      <Comp
         ref={ref}
-        onClick={(e) => {
+        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
           onClick?.(e)
           onOpenChange(true)
         }}
@@ -71,7 +75,7 @@ const DrawerTrigger = React.forwardRef<HTMLButtonElement, DrawerTriggerProps>(
 DrawerTrigger.displayName = 'DrawerTrigger'
 
 interface DrawerContentProps
-  extends React.HTMLAttributes<HTMLDivElement>,
+  extends Omit<HTMLMotionProps<'div'>, 'ref'>,
     VariantProps<typeof drawerVariants> {
   onInteractOutside?: () => void
 }
