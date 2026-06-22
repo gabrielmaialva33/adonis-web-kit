@@ -3,17 +3,18 @@ import { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 import CreateDefaultPermissionsService from '#modules/permissions/services/create_default_permissions_service'
 import SyncRolePermissionsService from '#modules/permissions/services/sync_role_permissions_service'
-import Role from '#modules/roles/models/role'
-import Permission from '#modules/permissions/models/permission'
+import RolesRepository from '#modules/roles/repositories/roles_repository'
+import PermissionRepository from '#modules/permissions/repositories/permission_repository'
 
 import IRole from '#modules/roles/interfaces/role_interface'
-import IPermission from '#modules/permissions/interfaces/permission_interface'
 
 @inject()
 export default class AssignDefaultPermissionsService {
   constructor(
     private createDefaultPermissionsService: CreateDefaultPermissionsService,
-    private syncRolePermissionsService: SyncRolePermissionsService
+    private syncRolePermissionsService: SyncRolePermissionsService,
+    private rolesRepository: RolesRepository,
+    private permissionRepository: PermissionRepository
   ) {}
 
   async run(trx?: TransactionClientContract): Promise<void> {
@@ -39,78 +40,34 @@ export default class AssignDefaultPermissionsService {
   }
 
   private async assignRootPermissions(trx?: TransactionClientContract): Promise<void> {
-    const rootRole = await Role.findBy('slug', IRole.Slugs.ROOT, { client: trx })
+    const rootRole = await this.rolesRepository.findBy('slug', IRole.Slugs.ROOT, { client: trx })
     if (rootRole) {
-      const allPermissions = await Permission.query({ client: trx }).select('id')
-      await this.syncRolePermissionsService.handle(
-        rootRole.id,
-        allPermissions.map((p) => p.id),
-        trx
-      )
+      const permissionIds = await this.permissionRepository.findAllIds(trx)
+      await this.syncRolePermissionsService.handle(rootRole.id, permissionIds, trx)
     }
   }
 
   private async assignAdminPermissions(trx?: TransactionClientContract): Promise<void> {
-    const adminRole = await Role.findBy('slug', IRole.Slugs.ADMIN, { client: trx })
+    const adminRole = await this.rolesRepository.findBy('slug', IRole.Slugs.ADMIN, { client: trx })
     if (adminRole) {
-      const adminPermissions = await Permission.query({ client: trx })
-        .whereNot('resource', IPermission.Resources.PERMISSIONS)
-        .orWhere((query) => {
-          query
-            .where('resource', IPermission.Resources.PERMISSIONS)
-            .whereIn('action', [IPermission.Actions.READ, IPermission.Actions.LIST])
-        })
-        .select('id')
-
-      await this.syncRolePermissionsService.handle(
-        adminRole.id,
-        adminPermissions.map((p) => p.id),
-        trx
-      )
+      const permissionIds = await this.permissionRepository.findAdminPermissionIds(trx)
+      await this.syncRolePermissionsService.handle(adminRole.id, permissionIds, trx)
     }
   }
 
   private async assignUserPermissions(trx?: TransactionClientContract): Promise<void> {
-    const userRole = await Role.findBy('slug', IRole.Slugs.USER, { client: trx })
+    const userRole = await this.rolesRepository.findBy('slug', IRole.Slugs.USER, { client: trx })
     if (userRole) {
-      const userPermissions = await Permission.query({ client: trx })
-        .where((query) => {
-          query
-            .where('resource', IPermission.Resources.USERS)
-            .whereIn('action', [IPermission.Actions.READ, IPermission.Actions.UPDATE])
-        })
-        .orWhere((query) => {
-          query
-            .where('resource', IPermission.Resources.FILES)
-            .whereIn('action', [
-              IPermission.Actions.CREATE,
-              IPermission.Actions.READ,
-              IPermission.Actions.LIST,
-            ])
-        })
-        .select('id')
-
-      await this.syncRolePermissionsService.handle(
-        userRole.id,
-        userPermissions.map((p) => p.id),
-        trx
-      )
+      const permissionIds = await this.permissionRepository.findUserPermissionIds(trx)
+      await this.syncRolePermissionsService.handle(userRole.id, permissionIds, trx)
     }
   }
 
   private async assignGuestPermissions(trx?: TransactionClientContract): Promise<void> {
-    const guestRole = await Role.findBy('slug', IRole.Slugs.GUEST, { client: trx })
+    const guestRole = await this.rolesRepository.findBy('slug', IRole.Slugs.GUEST, { client: trx })
     if (guestRole) {
-      const guestPermissions = await Permission.query({ client: trx })
-        .whereIn('action', [IPermission.Actions.READ, IPermission.Actions.LIST])
-        .whereNotIn('resource', [IPermission.Resources.PERMISSIONS, IPermission.Resources.AUDIT])
-        .select('id')
-
-      await this.syncRolePermissionsService.handle(
-        guestRole.id,
-        guestPermissions.map((p) => p.id),
-        trx
-      )
+      const permissionIds = await this.permissionRepository.findGuestPermissionIds(trx)
+      await this.syncRolePermissionsService.handle(guestRole.id, permissionIds, trx)
     }
   }
 }

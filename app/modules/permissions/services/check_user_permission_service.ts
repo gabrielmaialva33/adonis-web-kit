@@ -1,21 +1,17 @@
 import { inject } from '@adonisjs/core'
 import { DateTime } from 'luxon'
-import User from '#modules/users/models/user'
+import UsersRepository from '#modules/users/repositories/users_repository'
 
 @inject()
 export default class CheckUserPermissionService {
+  constructor(private usersRepository: UsersRepository) {}
+
   async handle(
     userId: number,
     permissionNames: string | string[],
     requireAll: boolean = false
   ): Promise<boolean> {
-    const user = await User.query()
-      .where('id', userId)
-      .preload('roles', (query) => {
-        query.preload('permissions')
-      })
-      .preload('permissions')
-      .firstOrFail()
+    const user = await this.usersRepository.findByIdWithPermissionsAndRolesOrFail(userId)
 
     const permissionsToCheck = Array.isArray(permissionNames) ? permissionNames : [permissionNames]
 
@@ -51,13 +47,7 @@ export default class CheckUserPermissionService {
   }
 
   async getUserPermissions(userId: number): Promise<string[]> {
-    const user = await User.query()
-      .where('id', userId)
-      .preload('roles', (query) => {
-        query.preload('permissions')
-      })
-      .preload('permissions')
-      .firstOrFail()
+    const user = await this.usersRepository.findByIdWithPermissionsAndRolesOrFail(userId)
 
     const userPermissions = new Set<string>()
 

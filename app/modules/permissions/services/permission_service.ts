@@ -4,7 +4,7 @@ import PermissionCacheService from '#modules/permissions/services/permission_cac
 import PermissionInheritanceService from '#modules/permissions/services/permission_inheritance_service'
 
 import Permission from '#modules/permissions/models/permission'
-import User from '#modules/users/models/user'
+import UsersRepository from '#modules/users/repositories/users_repository'
 
 import IPermission from '#modules/permissions/interfaces/permission_interface'
 
@@ -12,7 +12,8 @@ import IPermission from '#modules/permissions/interfaces/permission_interface'
 export default class PermissionService {
   constructor(
     private cacheService: PermissionCacheService,
-    private inheritanceService: PermissionInheritanceService
+    private inheritanceService: PermissionInheritanceService,
+    private usersRepository: UsersRepository
   ) {}
 
   /**
@@ -87,13 +88,7 @@ export default class PermissionService {
     effectivePermissions: Permission[]
     roles: string[]
   }> {
-    const user = await User.query()
-      .where('id', userId)
-      .preload('permissions')
-      .preload('roles', (query) => {
-        query.preload('permissions')
-      })
-      .first()
+    const user = await this.usersRepository.findByIdWithPermissionsAndRoles(userId)
 
     if (!user) {
       return {
@@ -200,18 +195,7 @@ export default class PermissionService {
    * Load user permissions with optimized queries
    */
   private async loadUserPermissionsOptimized(userId: number): Promise<Permission[]> {
-    const user = await User.query()
-      .where('id', userId)
-      .preload('permissions', (query) => {
-        query.where('granted', true)
-        query.where((subQuery) => {
-          subQuery.whereNull('expires_at').orWhere('expires_at', '>', new Date())
-        })
-      })
-      .preload('roles', (query) => {
-        query.preload('permissions')
-      })
-      .first()
+    const user = await this.usersRepository.findByIdWithActivePermissions(userId)
 
     if (!user) {
       return []

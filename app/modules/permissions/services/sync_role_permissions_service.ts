@@ -1,12 +1,14 @@
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 
-import Role from '#modules/roles/models/role'
+import RolesRepository from '#modules/roles/repositories/roles_repository'
 import NotFoundException from '#exceptions/not_found_exception'
 import { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 @inject()
 export default class SyncRolePermissionsService {
+  constructor(private rolesRepository: RolesRepository) {}
+
   async handle(
     roleId: number,
     permissionIds: number[],
@@ -14,7 +16,7 @@ export default class SyncRolePermissionsService {
   ): Promise<void> {
     try {
       const { i18n } = HttpContext.getOrFail()
-      const role = await Role.find(roleId, { client: trx })
+      const role = await this.rolesRepository.findBy('id', roleId, { client: trx })
       if (!role) {
         throw new NotFoundException(
           i18n.t('errors.not_found', {
@@ -24,14 +26,14 @@ export default class SyncRolePermissionsService {
       }
 
       // Sync permissions (this removes old permissions and adds new ones)
-      await role.related('permissions').sync(permissionIds, undefined, trx)
+      await this.rolesRepository.syncPermissions(role, permissionIds, trx)
     } catch (error) {
       // If HttpContext is not available (e.g., in migrations), fallback logic
-      const role = await Role.find(roleId, { client: trx })
+      const role = await this.rolesRepository.findBy('id', roleId, { client: trx })
       if (!role) {
         throw new NotFoundException('Role not found')
       }
-      await role.related('permissions').sync(permissionIds, undefined, trx)
+      await this.rolesRepository.syncPermissions(role, permissionIds, trx)
     }
   }
 
@@ -42,7 +44,7 @@ export default class SyncRolePermissionsService {
   ): Promise<void> {
     try {
       const { i18n } = HttpContext.getOrFail()
-      const role = await Role.find(roleId, { client: trx })
+      const role = await this.rolesRepository.findBy('id', roleId, { client: trx })
       if (!role) {
         throw new NotFoundException(
           i18n.t('errors.not_found', {
@@ -52,14 +54,14 @@ export default class SyncRolePermissionsService {
       }
 
       // Attach only adds new permissions without removing existing ones
-      await role.related('permissions').attach(permissionIds, trx)
+      await this.rolesRepository.attachPermissions(role, permissionIds, trx)
     } catch (error) {
       // If HttpContext is not available (e.g., in migrations), fallback logic
-      const role = await Role.find(roleId, { client: trx })
+      const role = await this.rolesRepository.findBy('id', roleId, { client: trx })
       if (!role) {
         throw new NotFoundException('Role not found')
       }
-      await role.related('permissions').attach(permissionIds, trx)
+      await this.rolesRepository.attachPermissions(role, permissionIds, trx)
     }
   }
 
@@ -70,7 +72,7 @@ export default class SyncRolePermissionsService {
   ): Promise<void> {
     try {
       const { i18n } = HttpContext.getOrFail()
-      const role = await Role.find(roleId, { client: trx })
+      const role = await this.rolesRepository.findBy('id', roleId, { client: trx })
       if (!role) {
         throw new NotFoundException(
           i18n.t('errors.not_found', {
@@ -80,14 +82,14 @@ export default class SyncRolePermissionsService {
       }
 
       // Detach removes only the specified permissions
-      await role.related('permissions').detach(permissionIds, trx)
+      await this.rolesRepository.detachPermissions(role, permissionIds, trx)
     } catch (error) {
       // If HttpContext is not available (e.g., in migrations), fallback logic
-      const role = await Role.find(roleId, { client: trx })
+      const role = await this.rolesRepository.findBy('id', roleId, { client: trx })
       if (!role) {
         throw new NotFoundException('Role not found')
       }
-      await role.related('permissions').detach(permissionIds, trx)
+      await this.rolesRepository.detachPermissions(role, permissionIds, trx)
     }
   }
 }

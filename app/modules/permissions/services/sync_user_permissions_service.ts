@@ -2,7 +2,8 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import NotFoundException from '#exceptions/not_found_exception'
-import User from '#modules/users/models/user'
+import UsersRepository from '#modules/users/repositories/users_repository'
+import type IUser from '#modules/users/interfaces/user_interface'
 
 interface UserPermissionData {
   permission_id: number
@@ -12,9 +13,11 @@ interface UserPermissionData {
 
 @inject()
 export default class SyncUserPermissionsService {
+  constructor(private usersRepository: UsersRepository) {}
+
   async handle(userId: number, permissions: UserPermissionData[]): Promise<void> {
     const { i18n } = HttpContext.getOrFail()
-    const user = await User.find(userId)
+    const user = await this.usersRepository.findBy('id', userId)
     if (!user) {
       throw new NotFoundException(
         i18n.t('errors.not_found', {
@@ -24,7 +27,7 @@ export default class SyncUserPermissionsService {
     }
 
     // Prepare data for sync
-    const syncData: Record<number, any> = {}
+    const syncData: IUser.PermissionPivotMap = {}
 
     permissions.forEach((perm) => {
       syncData[perm.permission_id] = {
@@ -34,7 +37,7 @@ export default class SyncUserPermissionsService {
     })
 
     // Sync permissions (this removes old permissions and adds new ones)
-    await user.related('permissions').sync(syncData)
+    await this.usersRepository.syncPermissions(user, syncData)
   }
 
   async attachPermission(
@@ -44,7 +47,7 @@ export default class SyncUserPermissionsService {
     expiresAt?: string | null
   ): Promise<void> {
     const { i18n } = HttpContext.getOrFail()
-    const user = await User.find(userId)
+    const user = await this.usersRepository.findBy('id', userId)
     if (!user) {
       throw new NotFoundException(
         i18n.t('errors.not_found', {
@@ -53,34 +56,24 @@ export default class SyncUserPermissionsService {
       )
     }
 
-    const pivotData = {
+    const pivotData: IUser.PermissionPivotData = {
       granted,
       expires_at: expiresAt ? DateTime.fromISO(expiresAt).toSQL() : null,
     }
 
     // Attach or update if already exists
-    const existing = await user
-      .related('permissions')
-      .pivotQuery()
-      .where('permission_id', permissionId)
-      .first()
+    const existing = await this.usersRepository.findPermissionPivot(user, permissionId)
 
     if (existing) {
-      await user
-        .related('permissions')
-        .pivotQuery()
-        .where('permission_id', permissionId)
-        .update(pivotData)
+      await this.usersRepository.updatePermissionPivot(user, permissionId, pivotData)
     } else {
-      await user.related('permissions').attach({
-        [permissionId]: pivotData,
-      })
+      await this.usersRepository.attachPermission(user, permissionId, pivotData)
     }
   }
 
   async revokePermission(userId: number, permissionId: number): Promise<void> {
     const { i18n } = HttpContext.getOrFail()
-    const user = await User.find(userId)
+    const user = await this.usersRepository.findBy('id', userId)
     if (!user) {
       throw new NotFoundException(
         i18n.t('errors.not_found', {
@@ -89,6 +82,6 @@ export default class SyncUserPermissionsService {
       )
     }
 
-    await user.related('permissions').detach([permissionId])
+    await this.usersRepository.detachPermissions(user, [permissionId])
   }
 }

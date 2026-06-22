@@ -2,13 +2,15 @@ import { inject } from '@adonisjs/core'
 import redis from '@adonisjs/redis/services/main'
 import Permission from '#modules/permissions/models/permission'
 import Role from '#modules/roles/models/role'
-import User from '#modules/users/models/user'
+import UsersRepository from '#modules/users/repositories/users_repository'
 
 @inject()
 export default class PermissionCacheService {
   private readonly CACHE_PREFIX = 'acl:permissions'
   private readonly DEFAULT_TTL = 3600 // 1 hour in seconds
   private readonly ROLE_TTL = 7200 // 2 hours in seconds
+
+  constructor(private usersRepository: UsersRepository) {}
 
   /**
    * Cache user permissions
@@ -226,13 +228,7 @@ export default class PermissionCacheService {
    * Warm up cache for a user
    */
   async warmUpUserCache(userId: number): Promise<void> {
-    const user = await User.query()
-      .where('id', userId)
-      .preload('roles', (query) => {
-        query.preload('permissions')
-      })
-      .preload('permissions')
-      .first()
+    const user = await this.usersRepository.findByIdWithPermissionsAndRoles(userId)
 
     if (!user) {
       return

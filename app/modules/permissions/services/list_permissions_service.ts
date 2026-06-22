@@ -1,19 +1,12 @@
 import { inject } from '@adonisjs/core'
-import Permission from '#modules/permissions/models/permission'
+
+import PermissionRepository from '#modules/permissions/repositories/permission_repository'
 
 @inject()
 export default class ListPermissionsService {
+  constructor(private permissionRepository: PermissionRepository) {}
+
   async handle(page: number = 1, perPage: number = 10, resource?: string, action?: string) {
-    const query = Permission.query()
-
-    if (resource) {
-      query.where('resource', resource)
-    }
-
-    if (action) {
-      query.where('action', action)
-    }
-
-    return await query.orderBy('resource', 'asc').orderBy('action', 'asc').paginate(page, perPage)
+    return this.permissionRepository.paginateFiltered(page, perPage, resource, action)
   }
 }

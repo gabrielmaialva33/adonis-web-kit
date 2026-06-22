@@ -1,10 +1,16 @@
 import { inject } from '@adonisjs/core'
-import Role from '#modules/roles/models/role'
+import RolesRepository from '#modules/roles/repositories/roles_repository'
+import PermissionRepository from '#modules/permissions/repositories/permission_repository'
 import Permission from '#modules/permissions/models/permission'
 import IRole from '#modules/roles/interfaces/role_interface'
 
 @inject()
 export default class PermissionInheritanceService {
+  constructor(
+    private rolesRepository: RolesRepository,
+    private permissionRepository: PermissionRepository
+  ) {}
+
   /**
    * Get all inherited permissions for a role based on hierarchy
    */
@@ -14,20 +20,14 @@ export default class PermissionInheritanceService {
       return []
     }
 
-    const permissions = await Permission.query()
-      .whereHas('roles', (query) => {
-        query.whereIn('slug', childRoles)
-      })
-      .distinct()
-
-    return permissions
+    return this.permissionRepository.findByRoleSlugs(childRoles)
   }
 
   /**
    * Get all effective permissions for a role (direct + inherited)
    */
   async getEffectivePermissions(roleSlug: string): Promise<Permission[]> {
-    const role = await Role.query().where('slug', roleSlug).preload('permissions').first()
+    const role = await this.rolesRepository.findBySlugWithPermissions(roleSlug)
 
     if (!role) {
       return []
@@ -80,7 +80,7 @@ export default class PermissionInheritanceService {
    * This method ensures role hierarchy is maintained
    */
   async syncInheritedPermissions(roleSlug: string): Promise<void> {
-    const role = await Role.query().where('slug', roleSlug).first()
+    const role = await this.rolesRepository.findBySlug(roleSlug)
     if (!role) {
       return
     }
@@ -88,7 +88,7 @@ export default class PermissionInheritanceService {
     const effectivePermissions = await this.getEffectivePermissions(roleSlug)
     const permissionIds = effectivePermissions.map((p) => p.id)
 
-    await role.related('permissions').sync(permissionIds)
+    await this.rolesRepository.syncPermissions(role, permissionIds)
   }
 
   /**

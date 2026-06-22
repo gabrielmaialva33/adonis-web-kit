@@ -24,7 +24,44 @@ namespace IUser {
      * @param abilities
      */
     generateRefreshToken(userId: number, abilities?: string[]): Promise<AccessToken>
+
+    findByIdWithPermissionsAndRoles(userId: number): Promise<User | null>
+
+    findByIdWithPermissionsAndRolesOrFail(userId: number): Promise<User>
+
+    findByIdWithActivePermissions(userId: number): Promise<User | null>
+
+    findCreatedSince(startSql: string): Promise<User[]>
+
+    listRecentWithRoles(limit: number): Promise<User[]>
+
+    findByEmailVerificationToken(token: string): Promise<User | null>
+
+    syncPermissions(user: User, syncData: PermissionPivotMap): Promise<void>
+
+    findPermissionPivot(user: User, permissionId: number): Promise<Record<string, unknown> | null>
+
+    updatePermissionPivot(
+      user: User,
+      permissionId: number,
+      pivotData: PermissionPivotData
+    ): Promise<void>
+
+    attachPermission(
+      user: User,
+      permissionId: number,
+      pivotData: PermissionPivotData
+    ): Promise<void>
+
+    detachPermissions(user: User, permissionIds: number[]): Promise<void>
   }
+
+  export interface PermissionPivotData {
+    granted: boolean
+    expires_at: string | null
+  }
+
+  export type PermissionPivotMap = Record<number, PermissionPivotData>
 
   export interface CreatePayload {
     full_name: string
