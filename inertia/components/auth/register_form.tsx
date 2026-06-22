@@ -14,7 +14,11 @@ import {
   FormInput,
 } from '~/components/ui/core'
 
-export function RegisterForm() {
+interface RegisterFormProps {
+  errors?: Record<string, string>
+}
+
+export function RegisterForm({ errors: serverErrors }: RegisterFormProps = {}) {
   const { data, setData, post, processing, errors } = useForm({
     full_name: '',
     email: '',
@@ -22,6 +26,8 @@ export function RegisterForm() {
     password: '',
     password_confirmation: '',
   })
+
+  const generalError = serverErrors?.general
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -37,9 +43,9 @@ export function RegisterForm() {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {errors?.general && (
+          {generalError && (
             <Alert variant="destructive">
-              <AlertDescription>{errors.general}</AlertDescription>
+              <AlertDescription>{generalError}</AlertDescription>
             </Alert>
           )}
 

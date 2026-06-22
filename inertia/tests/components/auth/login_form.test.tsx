@@ -1,20 +1,36 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
-import { LoginForm } from '~/components/auth/LoginForm'
+import { LoginForm } from '~/components/auth/login_form'
 import { render } from '~/tests/test_utils'
 
-// Mock the inertia useForm hook
-vi.mock('@inertiajs/react', () => {
-  const mockPost = vi.fn()
+const { mockPost } = vi.hoisted(() => ({ mockPost: vi.fn() }))
+
+// Mock the inertia useForm hook with real local state so the controlled
+// inputs actually update when the user types (the previous static mock left
+// the inputs empty, which also blocked the required-field form submission).
+vi.mock('@inertiajs/react', async () => {
+  const React = await import('react')
   return {
-    useForm: vi.fn(() => ({
-      data: { uid: '', password: '' },
-      setData: vi.fn((field, value) => {}),
-      post: mockPost,
-      processing: false,
-      errors: {},
-    })),
-    Link: ({ href, children, className }: any) => (
+    useForm: <T extends Record<string, unknown>>(initial: T) => {
+      const [data, setData] = React.useState<T>(initial)
+      return {
+        data,
+        setData: (key: keyof T, value: unknown) =>
+          setData((prev) => ({ ...prev, [key]: value })),
+        post: mockPost,
+        processing: false,
+        errors: {} as Record<string, string>,
+      }
+    },
+    Link: ({
+      href,
+      children,
+      className,
+    }: {
+      href: string
+      children: React.ReactNode
+      className?: string
+    }) => (
       <a href={href} className={className}>
         {children}
       </a>
@@ -24,14 +40,12 @@ vi.mock('@inertiajs/react', () => {
 
 describe('LoginForm', () => {
   beforeEach(() => {
-    // Clear all mocks before each test
     vi.clearAllMocks()
   })
 
   it('renders the login form with all fields', () => {
     render(<LoginForm />)
 
-    // Check if form elements are rendered
     expect(screen.getByLabelText(/Email or Username/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/Password/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Sign in/i })).toBeInTheDocument()
@@ -41,36 +55,29 @@ describe('LoginForm', () => {
   it('allows entering credentials', async () => {
     const { user } = render(<LoginForm />)
 
-    // Get form elements
     const emailInput = screen.getByLabelText(/Email or Username/i)
     const passwordInput = screen.getByLabelText(/Password/i)
 
-    // Type in credentials
     await user.type(emailInput, 'test@example.com')
     await user.type(passwordInput, 'password123')
 
-    // Check if inputs have the entered values
     expect(emailInput).toHaveValue('test@example.com')
     expect(passwordInput).toHaveValue('password123')
   })
 
   it('submits the form when the sign in button is clicked', async () => {
-    // Get the mocked post function
-    const mockPost = vi.mocked(vi.mocked(vi.importMock('@inertiajs/react')).useForm().post)
-
     const { user } = render(<LoginForm />)
 
-    // Click the submit button
+    await user.type(screen.getByLabelText(/Email or Username/i), 'test@example.com')
+    await user.type(screen.getByLabelText(/Password/i), 'password123')
     await user.click(screen.getByRole('button', { name: /Sign in/i }))
 
-    // Check if the form was submitted
     expect(mockPost).toHaveBeenCalledWith('/login')
   })
 
-  it('shows the forgot password link', async () => {
+  it('shows the forgot password link', () => {
     render(<LoginForm />)
 
-    // Check if the forgot password link is rendered and has the correct href
     const forgotPasswordLink = screen.getByText(/Forgot password\?/i)
     expect(forgotPasswordLink).toBeInTheDocument()
     expect(forgotPasswordLink.closest('a')).toHaveAttribute('href', '/forgot-password')

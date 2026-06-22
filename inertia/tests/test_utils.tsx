@@ -11,9 +11,7 @@ export const queryClient = new QueryClient({
 
 export function render(
   ui: ReactElement,
-  { route, ...options }: Omit<Parameters<typeof rtlRender>[1], 'wrapper'> & { route?: string } = {
-    reactStrictMode: true,
-  }
+  { route, ...options }: Omit<Parameters<typeof rtlRender>[1], 'wrapper'> & { route?: string } = {}
 ) {
   // No need for window.history.pushState with Inertia
   // Inertia manages all routing server-side

@@ -8,7 +8,6 @@ import {
   Calendar,
   CheckCircle,
   Clock,
-  AlertCircle,
 } from 'lucide-react'
 import { MainLayout } from '~/layouts'
 import { AnimatedPage } from '~/components/animated_page'

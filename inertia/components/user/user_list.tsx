@@ -4,9 +4,9 @@ import { Button } from '../ui/core/button'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/core/card'
 
 import type { PaginatedResponse, User } from '~/types'
-import { formatDate } from '~/utils/api'
+import { formatDate } from '~/utils/formatters'
 
-interface UserListProps {
+export interface UserListProps {
   users: PaginatedResponse<User>
 }
 

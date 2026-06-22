@@ -40,7 +40,7 @@ export default function CreateUserPage() {
                 id="full_name"
                 value={data.full_name}
                 onChange={(e) => setData('full_name', e.target.value)}
-                error={errors.full_name}
+                errorMessage={errors.full_name}
                 autoComplete="name"
                 required
               />
@@ -51,7 +51,7 @@ export default function CreateUserPage() {
                 type="email"
                 value={data.email}
                 onChange={(e) => setData('email', e.target.value)}
-                error={errors.email}
+                errorMessage={errors.email}
                 autoComplete="email"
                 required
               />
@@ -62,7 +62,7 @@ export default function CreateUserPage() {
                 type="password"
                 value={data.password}
                 onChange={(e) => setData('password', e.target.value)}
-                error={errors.password}
+                errorMessage={errors.password}
                 autoComplete="new-password"
                 required
               />
@@ -73,7 +73,7 @@ export default function CreateUserPage() {
                 type="password"
                 value={data.password_confirmation}
                 onChange={(e) => setData('password_confirmation', e.target.value)}
-                error={errors.password_confirmation}
+                errorMessage={errors.password_confirmation}
                 autoComplete="new-password"
                 required
               />

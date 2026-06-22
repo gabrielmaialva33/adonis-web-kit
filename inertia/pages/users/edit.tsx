@@ -44,7 +44,7 @@ export default function EditUserPage({ user }: EditUserPageProps) {
                 id="full_name"
                 value={data.full_name}
                 onChange={(e) => setData('full_name', e.target.value)}
-                error={errors.full_name}
+                errorMessage={errors.full_name}
                 autoComplete="name"
                 required
               />
@@ -55,7 +55,7 @@ export default function EditUserPage({ user }: EditUserPageProps) {
                 type="email"
                 value={data.email}
                 onChange={(e) => setData('email', e.target.value)}
-                error={errors.email}
+                errorMessage={errors.email}
                 autoComplete="email"
                 required
               />
