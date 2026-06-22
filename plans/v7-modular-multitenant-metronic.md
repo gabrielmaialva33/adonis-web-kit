@@ -100,6 +100,10 @@ app/exceptions/
 5. `validators/index.ts` por módulo.
 6. Validar.
 
+## ✅ FASE 4 — Multi-tenancy N:N — CONCLUÍDA
+> tenant + pivot user_tenants (role). JWT tenant ativo + tenant_middleware (membership).
+> File tenant-scoped. modules/tenants (me/switch). 99/99 testes. roles/perms globais.
+
 ## FASE 4 — Multi-tenancy genérico  [commit: `feat: generic multi-tenancy`]
 1. `app/shared/models/tenant_base_model.ts` (tenantId + soft delete).
 2. Modelo `Tenant`/`Organization` + migration.

@@ -10,8 +10,13 @@ import File from '#modules/files/models/file'
 @inject()
 export default class UploadFileService {
   async run(file: MultipartFile) {
-    const { auth } = HttpContext.getOrFail()
+    const ctx = HttpContext.getOrFail()
+    const { auth } = ctx
     const user = auth.use('jwt').user!
+
+    // Active tenant resolved by the tenant middleware. Nullable: a user without
+    // a tenant uploads files with tenant_id = null.
+    const tenantId = ctx.tenant?.id ?? null
 
     const key = `uploads/${randomUUID()}.${file.extname}`
     await file.moveToDisk(key)
@@ -84,6 +89,7 @@ export default class UploadFileService {
     // Create file record in database
     await File.create({
       owner_id: user.id,
+      tenant_id: tenantId,
       client_name: file.clientName?.replace(`.${file.extname}`, '') || '',
       file_name: key,
       file_size: file.size || 0,

@@ -19,6 +19,7 @@ import * as model from '@adonisjs/lucid/types/model'
 import type { ManyToMany } from '@adonisjs/lucid/types/relations'
 import Role from '#modules/roles/models/role'
 import Permission from '#modules/permissions/models/permission'
+import Tenant from '#modules/tenants/models/tenant'
 import IRole from '#modules/roles/interfaces/role_interface'
 
 const AuthFinder = withAuthFinder(() => hash.use('argon'), {
@@ -97,6 +98,13 @@ export default class User extends compose(BaseModel, AuthFinder) {
     pivotColumns: ['granted', 'expires_at'],
   })
   declare permissions: ManyToMany<typeof Permission>
+
+  @manyToMany(() => Tenant, {
+    pivotTable: 'user_tenants',
+    pivotColumns: ['role'],
+    pivotTimestamps: true,
+  })
+  declare tenants: ManyToMany<typeof Tenant>
 
   /**
    * ------------------------------------------------------

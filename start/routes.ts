@@ -18,6 +18,7 @@ import '#modules/users/routes'
 import '#modules/roles/routes'
 import '#modules/permissions/routes'
 import '#modules/files/routes'
+import '#modules/tenants/routes'
 import '#modules/health/routes'
 
 import '#modules/web/routes'

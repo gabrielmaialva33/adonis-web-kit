@@ -11,6 +11,7 @@ import User from '#modules/users/models/user'
 import Role from '#modules/roles/models/role'
 import Permission from '#modules/permissions/models/permission'
 import File from '#modules/files/models/file'
+import Tenant from '#modules/tenants/models/tenant'
 
 import IPermission from '#modules/permissions/interfaces/permission_interface'
 import IRole from '#modules/roles/interfaces/role_interface'
@@ -430,6 +431,93 @@ test.group('Files upload', (group) => {
 
     const uploadedFiles = await File.query().where('owner_id', user.id)
     assert.lengthOf(uploadedFiles, testFiles.length)
+  })
+
+  test('should scope uploaded file to the active tenant', async ({ client, assert }) => {
+    const userRole = await Role.firstOrCreate(
+      { slug: IRole.Slugs.USER },
+      {
+        name: 'User',
+        slug: IRole.Slugs.USER,
+        description: 'Regular user role',
+      }
+    )
+
+    const user = await User.create({
+      full_name: 'John Doe',
+      email: 'john@example.com',
+      username: 'johndoe',
+      password: 'password123',
+    })
+
+    await db.table('user_roles').insert({
+      user_id: user.id,
+      role_id: userRole.id,
+    })
+
+    await assignPermissions(userRole, [IPermission.Actions.CREATE])
+
+    // Member of a tenant -> middleware fallback resolves it as the active tenant.
+    const tenant = await Tenant.create({ name: 'Acme', slug: 'acme', is_active: true })
+    await user.related('tenants').attach({ [tenant.id]: { role: 'owner' } })
+
+    const testFilePath = join(app.tmpPath(), `scoped-${randomUUID()}.txt`)
+    await import('node:fs').then((fs) => fs.promises.writeFile(testFilePath, 'scoped content'))
+
+    const response = await client
+      .post('/api/v1/files/upload')
+      .file('file', testFilePath)
+      .loginAs(user)
+
+    response.assertStatus(201)
+
+    const uploadedFile = await File.findBy('owner_id', user.id)
+    assert.isNotNull(uploadedFile)
+    assert.equal(uploadedFile!.tenant_id, tenant.id)
+
+    await import('node:fs').then((fs) => fs.promises.unlink(testFilePath))
+  })
+
+  test('should reject access to a tenant the user does not belong to', async ({ client }) => {
+    const userRole = await Role.firstOrCreate(
+      { slug: IRole.Slugs.USER },
+      {
+        name: 'User',
+        slug: IRole.Slugs.USER,
+        description: 'Regular user role',
+      }
+    )
+
+    const user = await User.create({
+      full_name: 'Jane Doe',
+      email: 'jane@example.com',
+      username: 'janedoe',
+      password: 'password123',
+    })
+
+    await db.table('user_roles').insert({
+      user_id: user.id,
+      role_id: userRole.id,
+    })
+
+    await assignPermissions(userRole, [IPermission.Actions.CREATE])
+
+    // A tenant the user is NOT a member of.
+    const foreignTenant = await Tenant.create({ name: 'Foreign', slug: 'foreign', is_active: true })
+
+    const testFilePath = join(app.tmpPath(), `forbidden-${randomUUID()}.txt`)
+    await import('node:fs').then((fs) => fs.promises.writeFile(testFilePath, 'content'))
+
+    const response = await client
+      .post('/api/v1/files/upload')
+      .header('x-tenant-id', String(foreignTenant.id))
+      .header('Accept', 'application/json')
+      .file('file', testFilePath)
+      .loginAs(user)
+
+    response.assertStatus(403)
+
+    await import('node:fs').then((fs) => fs.promises.unlink(testFilePath))
   })
 
   test('should require authentication for file upload', async ({ client }) => {

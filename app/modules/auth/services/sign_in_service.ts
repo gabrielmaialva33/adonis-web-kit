@@ -32,7 +32,11 @@ export default class SignInService {
       const user = await this.usersRepository.verifyCredentials(uid, password)
       await user.load('roles')
 
-      const auth = await this.jwtAuthTokensService.run({ userId: user.id })
+      // Active tenant = the user's first tenant (N:N via user_tenants). May be
+      // undefined when the user belongs to no tenant; that is acceptable.
+      const tenant = await user.related('tenants').query().first()
+
+      const auth = await this.jwtAuthTokensService.run({ userId: user.id, tenantId: tenant?.id })
       const userJson = user.toJSON()
 
       // Check if the user is admin

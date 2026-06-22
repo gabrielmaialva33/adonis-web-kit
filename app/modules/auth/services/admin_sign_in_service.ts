@@ -42,7 +42,10 @@ export default class AdminSignInService {
         throw new NotFoundException(i18n.t('errors.permission_denied'))
       }
 
-      const auth = await this.jwtAuthTokensService.run({ userId: user.id })
+      // Active tenant = the user's first tenant (N:N via user_tenants).
+      const tenant = await user.related('tenants').query().first()
+
+      const auth = await this.jwtAuthTokensService.run({ userId: user.id, tenantId: tenant?.id })
       const userJson = user.toJSON()
 
       // Emit login succeeded event

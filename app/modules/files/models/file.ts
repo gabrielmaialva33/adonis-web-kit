@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import { BaseModel, belongsTo, column, SnakeCaseNamingStrategy } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import User from '#modules/users/models/user'
+import Tenant from '#modules/tenants/models/tenant'
 
 export default class File extends BaseModel {
   static table = 'files'
@@ -12,6 +13,9 @@ export default class File extends BaseModel {
 
   @column()
   declare owner_id: number
+
+  @column()
+  declare tenant_id: number | null
 
   @column()
   declare client_name: string
@@ -46,4 +50,9 @@ export default class File extends BaseModel {
     foreignKey: 'owner_id',
   })
   declare owner: BelongsTo<typeof User>
+
+  @belongsTo(() => Tenant, {
+    foreignKey: 'tenant_id',
+  })
+  declare tenant: BelongsTo<typeof Tenant>
 }
