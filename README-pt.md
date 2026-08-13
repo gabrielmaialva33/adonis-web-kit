@@ -25,6 +25,7 @@
   <a href="#rocket-desenvolvimento-ai-first">Desenvolvimento AI-First</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
   <a href="#computer-tecnologias">Tecnologias</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
   <a href="#package-instalação">Instalação</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+  <a href="#whale-docker">Docker</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
   <a href="#memo-licença">Licença</a>
 </p>
 
@@ -230,6 +231,44 @@ Este _starter kit_ foi projetado de forma única para maximizar a eficácia da c
 
 > **Nota:** não existe mais `node ace` — o AdonisJS v7 roda TypeScript diretamente, então todo
 > comando ace passa por `pnpm ace <cmd>`.
+
+## :whale: Docker
+
+O projeto já vem com um `Dockerfile` (multi-stage, com target `production`) e um
+`docker-compose.yml`.
+
+**Só os datastores** — o cenário mais comum, com a aplicação rodando na máquina via `pnpm dev`:
+
+```sh
+docker compose up -d postgres redis
+```
+
+**Stack completa** — aplicação, PostgreSQL e Redis todos em containers:
+
+```sh
+docker compose up --build
+```
+
+O container da aplicação espera os healthchecks dos dois serviços, roda migrations e seeders e só
+então sobe o servidor em `http://localhost:3333`. O compose traz um `APP_KEY` de placeholder; gere
+uma chave real e exporte antes de rodar a stack completa em qualquer coisa além de um ambiente
+descartável:
+
+```sh
+export APP_KEY=$(pnpm ace generate:key --show | cut -d' ' -f3)
+```
+
+_O `--show` imprime `APP_KEY = <chave>` em vez de escrever no `.env` — daí o `cut`._
+
+> A porta 3333 precisa estar livre — se você já tem um `pnpm dev` rodando na máquina, o container da
+> aplicação não vai conseguir fazer o bind.
+
+## :test_tube: Integração Contínua
+
+Todo push para `master`/`develop` e todo PR para `master` dispara o
+[workflow de CI](.github/workflows/ci-cd.yml): lint, checagem de tipos (backend + frontend), a suíte
+completa do backend (unit + functional + browser no Playwright Chromium), os testes do frontend e um
+build de produção — contra containers reais de PostgreSQL e Redis.
 
 ## :memo: Licença
 

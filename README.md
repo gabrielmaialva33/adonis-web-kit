@@ -25,6 +25,7 @@
   <a href="#rocket-ai-first-development">AI-First Development</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
   <a href="#computer-technologies">Technologies</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
   <a href="#package-installation">Installation</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+  <a href="#whale-docker">Docker</a>&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
   <a href="#memo-license">License</a>
 </p>
 
@@ -228,6 +229,43 @@ This starter kit is uniquely designed to maximize the effectiveness of AI-assist
 
 > **Note:** there is no `node ace` anymore — AdonisJS v7 runs TypeScript directly, so every ace
 > command goes through `pnpm ace <cmd>`.
+
+## :whale: Docker
+
+A `Dockerfile` (multi-stage, with a `production` target) and a `docker-compose.yml` ship with the
+project.
+
+**Datastores only** — the common setup, with the app running on the host via `pnpm dev`:
+
+```sh
+docker compose up -d postgres redis
+```
+
+**Full stack** — app, PostgreSQL, and Redis all containerized:
+
+```sh
+docker compose up --build
+```
+
+The app container waits for both healthchecks, then runs migrations and seeders before starting the
+server on `http://localhost:3333`. Compose ships a placeholder `APP_KEY`; generate a real one and
+export it before running the full stack in anything but a scratch environment:
+
+```sh
+export APP_KEY=$(pnpm ace generate:key --show | cut -d' ' -f3)
+```
+
+_`--show` prints `APP_KEY = <key>` instead of writing it into `.env`, hence the `cut`._
+
+> Port 3333 must be free — if you already have `pnpm dev` running on the host, the app container
+> will fail to bind.
+
+## :test_tube: Continuous Integration
+
+Every push to `master`/`develop` and every PR against `master` runs the
+[CI workflow](.github/workflows/ci-cd.yml): lint, type check (backend + frontend), the full backend
+suite (unit + functional + browser on Playwright Chromium), the frontend tests, and a production
+build — against real PostgreSQL and Redis service containers.
 
 ## :memo: License
 
