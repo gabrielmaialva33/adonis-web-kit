@@ -1,9 +1,11 @@
 import { createContext, ReactNode, useContext } from 'react'
 import { cn } from '~/lib/utils'
-import { ColumnFiltersState, RowData, SortingState, Table } from '@tanstack/react-table'
+import { ColumnFiltersState, RowData, SortingState, TableFeatures } from '@tanstack/react-table'
+import type { DataGridTable } from './data-grid-features'
 
 declare module '@tanstack/react-table' {
-  interface ColumnMeta<TData extends RowData, TValue> {
+  // v9 threads TFeatures through every core type, including column meta.
+  interface ColumnMeta<TFeatures extends TableFeatures, TData extends RowData, TValue> {
     headerTitle?: string
     headerClassName?: string
     cellClassName?: string
@@ -31,7 +33,7 @@ export type DataGridApiResponse<T> = {
 
 export interface DataGridContextProps<TData extends object> {
   props: DataGridProps<TData>
-  table: Table<TData>
+  table: DataGridTable<TData>
   recordCount: number
   isLoading: boolean
 }
@@ -45,7 +47,7 @@ export type DataGridRequestParams = {
 
 export interface DataGridProps<TData extends object> {
   className?: string
-  table?: Table<TData>
+  table?: DataGridTable<TData>
   recordCount: number
   children?: ReactNode
   onRowClick?: (row: TData) => void
@@ -96,15 +98,22 @@ function DataGridProvider<TData extends object>({
   children,
   table,
   ...props
-}: DataGridProps<TData> & { table: Table<TData> }) {
+}: DataGridProps<TData> & { table: DataGridTable<TData> }) {
   return (
     <DataGridContext.Provider
-      value={{
-        props,
-        table,
-        recordCount: props.recordCount,
-        isLoading: props.isLoading || false,
-      }}
+      /**
+       * The context deliberately erases `TData` so any grid can publish into
+       * it; v9's row types are invariant in `TData`, so the widening has to
+       * be spelled out.
+       */
+      value={
+        {
+          props,
+          table,
+          recordCount: props.recordCount,
+          isLoading: props.isLoading || false,
+        } as DataGridContextProps<any>
+      }
     >
       {children}
     </DataGridContext.Provider>

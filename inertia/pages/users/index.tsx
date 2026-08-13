@@ -2,9 +2,7 @@ import { Head, Link, router } from '@inertiajs/react'
 import { useMemo, useState } from 'react'
 import {
   createColumnHelper,
-  getCoreRowModel,
-  getPaginationRowModel,
-  useReactTable,
+  useTable,
   type OnChangeFn,
   type PaginationState,
   type SortingState,
@@ -25,6 +23,7 @@ import { Input } from '~/components/ui/input'
 import { Badge } from '~/components/ui/badge'
 import { Avatar, AvatarFallback } from '~/components/ui/avatar'
 import { DataGrid, DataGridContainer } from '~/components/ui/data-grid'
+import { dataGridFeatures, type DataGridFeatures } from '~/components/ui/data-grid-features'
 import { DataGridTable } from '~/components/ui/data-grid-table'
 import { DataGridPagination } from '~/components/ui/data-grid-pagination'
 import { DataGridColumnHeader } from '~/components/ui/data-grid-column-header'
@@ -72,7 +71,7 @@ interface UsersPageProps {
   direction: 'asc' | 'desc'
 }
 
-const columnHelper = createColumnHelper<UserRow>()
+const columnHelper = createColumnHelper<DataGridFeatures, UserRow>()
 
 function initialsOf(name: string) {
   return name
@@ -137,106 +136,110 @@ export default function UsersPage({ users, search, sortBy, direction }: UsersPag
   }
 
   const columns = useMemo(
-    () => [
-      columnHelper.accessor('full_name', {
-        id: 'full_name',
-        header: ({ column }) => <DataGridColumnHeader column={column} title="Name" />,
-        cell: ({ row }) => (
-          <div className="flex items-center gap-3">
-            <Avatar className="size-8">
-              <AvatarFallback className="bg-primary/10 text-xs text-primary">
-                {initialsOf(row.original.full_name)}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-medium">{row.original.full_name}</p>
-              <p className="truncate text-xs text-muted-foreground">{row.original.email}</p>
+    () =>
+      // `columns()` keeps each column's TValue intact across the array — v9
+      // otherwise widens them to `unknown` and the defs stop matching.
+      columnHelper.columns([
+        columnHelper.accessor('full_name', {
+          id: 'full_name',
+          header: ({ column }) => <DataGridColumnHeader column={column} title="Name" />,
+          cell: ({ row }) => (
+            <div className="flex items-center gap-3">
+              <Avatar className="size-8">
+                <AvatarFallback className="bg-primary/10 text-xs text-primary">
+                  {initialsOf(row.original.full_name)}
+                </AvatarFallback>
+              </Avatar>
+              <div className="min-w-0">
+                <p className="truncate text-sm font-medium">{row.original.full_name}</p>
+                <p className="truncate text-xs text-muted-foreground">{row.original.email}</p>
+              </div>
             </div>
-          </div>
-        ),
-        enableSorting: true,
-      }),
-      columnHelper.accessor('roles', {
-        id: 'roles',
-        header: 'Roles',
-        cell: ({ row }) => {
-          const roles = row.original.roles ?? []
-          if (roles.length === 0) {
-            return <span className="text-xs text-muted-foreground">—</span>
-          }
-          return (
-            <div className="flex flex-wrap gap-1">
-              {roles.map((role) => (
-                <Badge key={role.id} variant="secondary" appearance="light" size="sm">
-                  {role.display_name ?? role.name}
-                </Badge>
-              ))}
-            </div>
-          )
-        },
-        enableSorting: false,
-      }),
-      columnHelper.accessor('email_verified_at', {
-        id: 'email_verified_at',
-        header: 'Status',
-        cell: ({ row }) =>
-          row.original.email_verified_at ? (
-            <Badge variant="success" appearance="light" size="sm">
-              Verified
-            </Badge>
-          ) : (
-            <Badge variant="warning" appearance="light" size="sm">
-              Unverified
-            </Badge>
           ),
-        enableSorting: false,
-      }),
-      columnHelper.accessor('created_at', {
-        id: 'created_at',
-        header: ({ column }) => <DataGridColumnHeader column={column} title="Created" />,
-        cell: ({ row }) => (
-          <span className="text-sm text-muted-foreground">
-            {formatDate(row.original.created_at)}
-          </span>
-        ),
-        enableSorting: true,
-      }),
-      columnHelper.display({
-        id: 'actions',
-        header: '',
-        cell: ({ row }) => (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" mode="icon" size="sm">
-                <MoreVertical className="size-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href={`/users/${row.original.id}/edit`}>
-                  <Edit className="size-4" />
-                  Edit user
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                variant="destructive"
-                onSelect={() => setUserToDelete(row.original)}
-              >
-                <Trash2 className="size-4" />
-                Delete user
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ),
-      }),
-    ],
+          enableSorting: true,
+        }),
+        columnHelper.accessor('roles', {
+          id: 'roles',
+          header: 'Roles',
+          cell: ({ row }) => {
+            const roles = row.original.roles ?? []
+            if (roles.length === 0) {
+              return <span className="text-xs text-muted-foreground">—</span>
+            }
+            return (
+              <div className="flex flex-wrap gap-1">
+                {roles.map((role) => (
+                  <Badge key={role.id} variant="secondary" appearance="light" size="sm">
+                    {role.display_name ?? role.name}
+                  </Badge>
+                ))}
+              </div>
+            )
+          },
+          enableSorting: false,
+        }),
+        columnHelper.accessor('email_verified_at', {
+          id: 'email_verified_at',
+          header: 'Status',
+          cell: ({ row }) =>
+            row.original.email_verified_at ? (
+              <Badge variant="success" appearance="light" size="sm">
+                Verified
+              </Badge>
+            ) : (
+              <Badge variant="warning" appearance="light" size="sm">
+                Unverified
+              </Badge>
+            ),
+          enableSorting: false,
+        }),
+        columnHelper.accessor('created_at', {
+          id: 'created_at',
+          header: ({ column }) => <DataGridColumnHeader column={column} title="Created" />,
+          cell: ({ row }) => (
+            <span className="text-sm text-muted-foreground">
+              {formatDate(row.original.created_at)}
+            </span>
+          ),
+          enableSorting: true,
+        }),
+        columnHelper.display({
+          id: 'actions',
+          header: '',
+          cell: ({ row }) => (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" mode="icon" size="sm">
+                  <MoreVertical className="size-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild>
+                  <Link href={`/users/${row.original.id}/edit`}>
+                    <Edit className="size-4" />
+                    Edit user
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  variant="destructive"
+                  onSelect={() => setUserToDelete(row.original)}
+                >
+                  <Trash2 className="size-4" />
+                  Delete user
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ),
+        }),
+      ]),
     []
   )
 
-  const table = useReactTable({
+  const table = useTable({
+    features: dataGridFeatures,
     data: users.data,
     columns,
     state: { sorting, pagination },
@@ -246,8 +249,6 @@ export default function UsersPage({ users, search, sortBy, direction }: UsersPag
     manualPagination: true,
     rowCount: total,
     getRowId: (row) => String(row.id),
-    getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
   })
 
   const confirmDelete = () => {

@@ -6,13 +6,14 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
-import { Table } from '@tanstack/react-table'
+import { RowData } from '@tanstack/react-table'
+import type { DataGridTable } from './data-grid-features'
 
-function DataGridColumnVisibility<TData>({
+function DataGridColumnVisibility<TData extends RowData>({
   table,
   trigger,
 }: {
-  table: Table<TData>
+  table: DataGridTable<TData>
   trigger: ReactNode
 }) {
   return (

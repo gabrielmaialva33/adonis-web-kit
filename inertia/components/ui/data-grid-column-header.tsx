@@ -15,7 +15,8 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
-import { Column } from '@tanstack/react-table'
+import { Column, RowData } from '@tanstack/react-table'
+import type { DataGridFeatures } from './data-grid-features'
 import {
   ArrowDown,
   ArrowLeft,
@@ -29,8 +30,11 @@ import {
   Settings2,
 } from 'lucide-react'
 
-interface DataGridColumnHeaderProps<TData, TValue> extends HTMLAttributes<HTMLDivElement> {
-  column: Column<TData, TValue>
+interface DataGridColumnHeaderProps<
+  TData extends RowData,
+  TValue,
+> extends HTMLAttributes<HTMLDivElement> {
+  column: Column<DataGridFeatures, TData, TValue>
   title?: string
   icon?: ReactNode
   pinnable?: boolean
@@ -38,7 +42,7 @@ interface DataGridColumnHeaderProps<TData, TValue> extends HTMLAttributes<HTMLDi
   visibility?: boolean
 }
 
-function DataGridColumnHeader<TData, TValue>({
+function DataGridColumnHeader<TData extends RowData, TValue>({
   column,
   title = '',
   icon,
@@ -49,7 +53,7 @@ function DataGridColumnHeader<TData, TValue>({
   const { isLoading, table, props, recordCount } = useDataGrid()
 
   const moveColumn = (direction: 'left' | 'right') => {
-    const currentOrder = [...table.getState().columnOrder] // Get current column order
+    const currentOrder = [...table.state.columnOrder] // Get current column order
     const currentIndex = currentOrder.indexOf(column.id) // Get current index of the column
 
     if (direction === 'left' && currentIndex > 0) {
@@ -70,7 +74,7 @@ function DataGridColumnHeader<TData, TValue>({
   }
 
   const canMove = (direction: 'left' | 'right'): boolean => {
-    const currentOrder = table.getState().columnOrder
+    const currentOrder = table.state.columnOrder
     const currentIndex = currentOrder.indexOf(column.id)
     if (direction === 'left') {
       return currentIndex > 0
@@ -201,20 +205,20 @@ function DataGridColumnHeader<TData, TValue>({
             {props.tableLayout?.columnsPinnable && column.getCanPin() && (
               <>
                 <DropdownMenuItem
-                  onClick={() => column.pin(column.getIsPinned() === 'left' ? false : 'left')}
+                  onClick={() => column.pin(column.getIsPinned() === 'start' ? false : 'start')}
                 >
                   <ArrowLeftToLine className="size-3.5!" aria-hidden="true" />
                   <span className="grow">Pin to left</span>
-                  {column.getIsPinned() === 'left' && (
+                  {column.getIsPinned() === 'start' && (
                     <Check className="size-4 opacity-100! text-primary" />
                   )}
                 </DropdownMenuItem>
                 <DropdownMenuItem
-                  onClick={() => column.pin(column.getIsPinned() === 'right' ? false : 'right')}
+                  onClick={() => column.pin(column.getIsPinned() === 'end' ? false : 'end')}
                 >
                   <ArrowRightToLine className="size-3.5!" aria-hidden="true" />
                   <span className="grow">Pin to right</span>
-                  {column.getIsPinned() === 'right' && (
+                  {column.getIsPinned() === 'end' && (
                     <Check className="size-4 opacity-100! text-primary" />
                   )}
                 </DropdownMenuItem>
