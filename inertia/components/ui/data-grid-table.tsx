@@ -31,6 +31,17 @@ const bodyCellSpacingVariants = cva('', {
   },
 })
 
+/**
+ * v9 reports the pinned side as the logical `'start'`/`'end'`, while the grid's
+ * Tailwind selectors are written against the physical `data-pinned=left|right`.
+ * Map back at the DOM boundary so the CSS contract stays untouched.
+ */
+function pinnedSideAttr(isPinned: 'start' | 'end' | false) {
+  if (isPinned === 'start') return 'left'
+  if (isPinned === 'end') return 'right'
+  return undefined
+}
+
 function getPinningStyles<TData extends RowData>(
   column: Column<DataGridFeatures, TData, unknown>
 ): CSSProperties {
@@ -136,7 +147,7 @@ function DataGridTableHeadRowCell<TData extends RowData>({
         ...(props.tableLayout?.columnsPinnable && column.getCanPin() && getPinningStyles(column)),
         ...(dndStyle ? dndStyle : null),
       }}
-      data-pinned={isPinned || undefined}
+      data-pinned={pinnedSideAttr(isPinned)}
       data-last-col={isLastLeftPinned ? 'left' : isFirstRightPinned ? 'right' : undefined}
       className={cn(
         'relative h-10 text-left rtl:text-right align-middle font-normal text-accent-foreground [&:has([role=checkbox])]:pe-0',
@@ -339,7 +350,7 @@ function DataGridTableBodyRowCell<TData extends RowData>({
         ...(props.tableLayout?.columnsPinnable && column.getCanPin() && getPinningStyles(column)),
         ...(dndStyle ? dndStyle : null),
       }}
-      data-pinned={isPinned || undefined}
+      data-pinned={pinnedSideAttr(isPinned)}
       data-last-col={isLastLeftPinned ? 'left' : isFirstRightPinned ? 'right' : undefined}
       className={cn(
         'align-middle',
