@@ -163,7 +163,8 @@ Este _starter kit_ foi projetado de forma única para maximizar a eficácia da c
 
 - **Node.js 24 LTS** (`.nvmrc` → `v24.13.0`)
 - **pnpm**
-- **PostgreSQL** e **Redis** (ambos obrigatórios para dev e testes — mais fácil via Docker)
+- **PostgreSQL** e **Redis** — ambos obrigatórios para dev _e_ testes. O jeito mais rápido de subir
+  os dois é `docker compose up -d postgres redis` (veja [Docker](#whale-docker)).
 
 ### 🚀 Começando
 
@@ -188,14 +189,22 @@ Este _starter kit_ foi projetado de forma única para maximizar a eficácia da c
 
    _Abra o arquivo `.env` e configure suas credenciais de banco de dados e outras configurações._
 
-4. **Execute as migrações do banco de dados (e o seed):**
+4. **Suba o PostgreSQL e o Redis:**
+
+   ```sh
+   docker compose up -d postgres redis
+   ```
+
+   _Pule este passo se você já roda os dois serviços localmente._
+
+5. **Execute as migrações do banco de dados (e o seed):**
 
    ```sh
    pnpm ace migration:run
    pnpm ace db:seed
    ```
 
-5. **Inicie o servidor de desenvolvimento:**
+6. **Inicie o servidor de desenvolvimento:**
    ```sh
    pnpm dev
    ```
@@ -203,16 +212,24 @@ Este _starter kit_ foi projetado de forma única para maximizar a eficácia da c
 
 ### 📜 Scripts Disponíveis
 
-- `pnpm dev`: Inicia o servidor de desenvolvimento com HMR.
-- `pnpm build`: Compila a aplicação para produção.
-- `pnpm start`: Executa o servidor pronto para produção.
-- `pnpm ace <cmd>`: Roda qualquer comando ace do AdonisJS (ex.: `pnpm ace migration:run`).
-- `pnpm test`: Executa os testes unitários do backend (Japa).
-- `pnpm test:e2e`: Executa todas as suítes do backend (unit + functional + browser).
-- `pnpm test:ui`: Executa os testes do frontend (Vitest).
-- `pnpm typecheck`: Verifica os tipos no backend e no frontend.
-- `pnpm lint`: Verifica o código com o linter.
-- `pnpm format`: Formata o código com o Prettier.
+| Script               | O que faz                                                               |
+| -------------------- | ----------------------------------------------------------------------- |
+| `pnpm dev`           | Inicia o servidor de desenvolvimento com HMR.                           |
+| `pnpm build`         | Compila a aplicação para produção.                                      |
+| `pnpm start`         | Executa o servidor pronto para produção (`node bin/server.js`).         |
+| `pnpm ace <cmd>`     | Roda qualquer comando ace do AdonisJS (ex.: `pnpm ace migration:run`).  |
+| `pnpm test`          | Executa os testes unitários do backend (Japa).                          |
+| `pnpm test:e2e`      | Executa todas as suítes do backend (unit + functional + browser).       |
+| `pnpm test:ui`       | Executa os testes do frontend (Vitest).                                 |
+| `pnpm test:ui:watch` | Testes do frontend em modo watch.                                       |
+| `pnpm typecheck`     | Verifica os tipos no backend e no frontend.                             |
+| `pnpm lint`          | Verifica o código com o linter.                                         |
+| `pnpm lint:fix`      | Verifica e corrige automaticamente os fontes do backend.                |
+| `pnpm format`        | Formata o código com o Prettier.                                        |
+| `pnpm docker`        | Roda migrations, seeds e sobe o servidor (usado como CMD do container). |
+
+> **Nota:** não existe mais `node ace` — o AdonisJS v7 roda TypeScript diretamente, então todo
+> comando ace passa por `pnpm ace <cmd>`.
 
 ## :memo: Licença
 

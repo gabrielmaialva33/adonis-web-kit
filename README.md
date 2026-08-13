@@ -161,7 +161,8 @@ This starter kit is uniquely designed to maximize the effectiveness of AI-assist
 
 - **Node.js 24 LTS** (`.nvmrc` → `v24.13.0`)
 - **pnpm**
-- **PostgreSQL** and **Redis** (both required for dev and tests — easiest via Docker)
+- **PostgreSQL** and **Redis** — both are required for dev _and_ tests. The quickest way to get them
+  is `docker compose up -d postgres redis` (see [Docker](#whale-docker)).
 
 ### 🚀 Getting Started
 
@@ -186,14 +187,22 @@ This starter kit is uniquely designed to maximize the effectiveness of AI-assist
 
    _Open the `.env` file and configure your database credentials and other settings._
 
-4. **Run database migrations (and seed):**
+4. **Start PostgreSQL and Redis:**
+
+   ```sh
+   docker compose up -d postgres redis
+   ```
+
+   _Skip this if you already run both services locally._
+
+5. **Run database migrations (and seed):**
 
    ```sh
    pnpm ace migration:run
    pnpm ace db:seed
    ```
 
-5. **Start the development server:**
+6. **Start the development server:**
    ```sh
    pnpm dev
    ```
@@ -201,16 +210,24 @@ This starter kit is uniquely designed to maximize the effectiveness of AI-assist
 
 ### 📜 Available Scripts
 
-- `pnpm dev`: Starts the development server with HMR.
-- `pnpm build`: Compiles the application for production.
-- `pnpm start`: Runs the production-ready server.
-- `pnpm ace <cmd>`: Runs any AdonisJS ace command (e.g. `pnpm ace migration:run`).
-- `pnpm test`: Executes backend unit tests (Japa).
-- `pnpm test:e2e`: Executes all backend suites (unit + functional + browser).
-- `pnpm test:ui`: Executes frontend tests (Vitest).
-- `pnpm typecheck`: Type-checks both backend and frontend.
-- `pnpm lint`: Lints the codebase.
-- `pnpm format`: Formats the code with Prettier.
+| Script               | What it does                                                        |
+| -------------------- | ------------------------------------------------------------------- |
+| `pnpm dev`           | Starts the development server with HMR.                             |
+| `pnpm build`         | Compiles the application for production.                            |
+| `pnpm start`         | Runs the production-ready server (`node bin/server.js`).            |
+| `pnpm ace <cmd>`     | Runs any AdonisJS ace command (e.g. `pnpm ace migration:run`).      |
+| `pnpm test`          | Executes backend unit tests (Japa).                                 |
+| `pnpm test:e2e`      | Executes all backend suites (unit + functional + browser).          |
+| `pnpm test:ui`       | Executes frontend tests (Vitest).                                   |
+| `pnpm test:ui:watch` | Frontend tests in watch mode.                                       |
+| `pnpm typecheck`     | Type-checks both backend and frontend.                              |
+| `pnpm lint`          | Lints the codebase.                                                 |
+| `pnpm lint:fix`      | Lints and auto-fixes the backend sources.                           |
+| `pnpm format`        | Formats the code with Prettier.                                     |
+| `pnpm docker`        | Migrates, seeds, then boots the server (used as the container CMD). |
+
+> **Note:** there is no `node ace` anymore — AdonisJS v7 runs TypeScript directly, so every ace
+> command goes through `pnpm ace <cmd>`.
 
 ## :memo: License
 
