@@ -75,8 +75,7 @@ const DrawerTrigger = React.forwardRef<HTMLButtonElement, DrawerTriggerProps>(
 DrawerTrigger.displayName = 'DrawerTrigger'
 
 interface DrawerContentProps
-  extends Omit<HTMLMotionProps<'div'>, 'ref'>,
-    VariantProps<typeof drawerVariants> {
+  extends Omit<HTMLMotionProps<'div'>, 'ref'>, VariantProps<typeof drawerVariants> {
   onInteractOutside?: () => void
 }
 

@@ -195,15 +195,13 @@ const alertVariants = cva('flex items-stretch w-full gap-2 group-[.toaster]:w-(-
 })
 
 interface AlertProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof alertVariants> {
+  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof alertVariants> {
   close?: boolean
   onClose?: () => void
 }
 
 interface AlertIconProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof alertVariants> {}
+  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof alertVariants> {}
 
 function Alert({
   className,

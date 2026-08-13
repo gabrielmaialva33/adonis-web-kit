@@ -4,16 +4,14 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { Slot as SlotPrimitive } from 'radix-ui'
 
 export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {
+  extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeVariants> {
   asChild?: boolean
   dotClassName?: string
   disabled?: boolean
 }
 
 export interface BadgeButtonProps
-  extends React.ButtonHTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeButtonVariants> {
+  extends React.ButtonHTMLAttributes<HTMLDivElement>, VariantProps<typeof badgeButtonVariants> {
   asChild?: boolean
 }
 

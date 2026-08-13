@@ -7,8 +7,7 @@ import { Check, Copy } from 'lucide-react'
 import { Slot as SlotPrimitive } from 'radix-ui'
 
 export interface CodeProps
-  extends React.HTMLAttributes<HTMLElement>,
-    VariantProps<typeof codeVariants> {
+  extends React.HTMLAttributes<HTMLElement>, VariantProps<typeof codeVariants> {
   asChild?: boolean
   showCopyButton?: boolean
   copyText?: string

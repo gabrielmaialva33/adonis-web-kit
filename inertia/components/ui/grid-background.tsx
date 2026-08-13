@@ -3,16 +3,7 @@ import { HTMLMotionProps, motion } from 'motion/react'
 import { cn } from '~/lib/utils'
 
 type GridSize =
-  | '4:4'
-  | '5:5'
-  | '6:6'
-  | '6:8'
-  | '8:8'
-  | '8:12'
-  | '10:10'
-  | '12:12'
-  | '12:16'
-  | '16:16'
+  '4:4' | '5:5' | '6:6' | '6:8' | '8:8' | '8:12' | '10:10' | '12:12' | '12:16' | '16:16'
 
 type GridBackgroundProps = HTMLMotionProps<'div'> & {
   children?: React.ReactNode

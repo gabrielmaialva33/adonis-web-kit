@@ -27,8 +27,7 @@ const githubButtonVariants = cva(
 )
 
 interface GithubButtonProps
-  extends React.ComponentProps<'button'>,
-    VariantProps<typeof githubButtonVariants> {
+  extends React.ComponentProps<'button'>, VariantProps<typeof githubButtonVariants> {
   /** Whether to round stars */
   roundStars?: boolean
   /** Whether to show Github icon */
