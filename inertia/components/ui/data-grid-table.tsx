@@ -144,8 +144,14 @@ function DataGridTableHeadRowCell<TData extends RowData>({
         ...(props.tableLayout?.width === 'fixed' && {
           width: `${header.getSize()}px`,
         }),
-        ...(props.tableLayout?.columnsPinnable && column.getCanPin() && getPinningStyles(column)),
+        /**
+         * The drag style has to be merged before the pinning one: it hardcodes
+         * `position: relative`, which would otherwise clobber the `sticky` a
+         * pinned column needs. Merging it first keeps the drag transform and
+         * opacity while letting pinning win on positioning.
+         */
         ...(dndStyle ? dndStyle : null),
+        ...(props.tableLayout?.columnsPinnable && column.getCanPin() && getPinningStyles(column)),
       }}
       data-pinned={pinnedSideAttr(isPinned)}
       data-last-col={isLastLeftPinned ? 'left' : isFirstRightPinned ? 'right' : undefined}
@@ -347,8 +353,9 @@ function DataGridTableBodyRowCell<TData extends RowData>({
       ref={dndRef}
       {...(props.tableLayout?.columnsDraggable && !isPinned ? { cell } : {})}
       style={{
-        ...(props.tableLayout?.columnsPinnable && column.getCanPin() && getPinningStyles(column)),
+        // See the head cell: pinning has to be merged after the drag style.
         ...(dndStyle ? dndStyle : null),
+        ...(props.tableLayout?.columnsPinnable && column.getCanPin() && getPinningStyles(column)),
       }}
       data-pinned={pinnedSideAttr(isPinned)}
       data-last-col={isLastLeftPinned ? 'left' : isFirstRightPinned ? 'right' : undefined}
