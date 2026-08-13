@@ -117,15 +117,43 @@ This starter kit is uniquely designed to maximize the effectiveness of AI-assist
 
 ## :computer: Technologies
 
+### Core
+
 - **[AdonisJS v7](https://adonisjs.com/)**: A robust Node.js framework for the backend (runs TypeScript directly via `@poppinss/ts-exec`).
 - **[Node.js 24 LTS](https://nodejs.org/)**: The runtime (`.nvmrc` → `v24.13.0`).
 - **[React 19](https://react.dev/)**: A powerful library for building user interfaces.
-- **[Inertia.js](https://inertiajs.com/)**: The glue that connects the modern frontend with the backend.
+- **[Inertia.js v3](https://inertiajs.com/)**: The glue that connects the modern frontend with the backend.
 - **[TypeScript](https://www.typescriptlang.org/)**: For type safety across the entire stack.
 - **[PostgreSQL](https://www.postgresql.org/)**: A reliable and powerful relational database (SQLite available for tests).
 - **[Redis](https://redis.io/)**: Used for caching, sessions, and the Bull queue.
 - **[Vite](https://vitejs.dev/)**: For a lightning-fast frontend development experience.
 - **[Tailwind CSS v4](https://tailwindcss.com/)**: A utility-first CSS framework powering the Metronic component library.
+
+### Frontend libraries
+
+- **[TanStack Table v9](https://tanstack.com/table)**: Headless data grids (the `DataGrid` components under `inertia/components/ui/`).
+- **[TanStack Query](https://tanstack.com/query)**: Server-state caching for client-side fetches.
+- **[React Hook Form](https://react-hook-form.com/)** + **[Zod](https://zod.dev/)**: Form state and schema validation.
+- **[Radix UI](https://www.radix-ui.com/)** + **[lucide-react](https://lucide.dev/)**: Primitives and icons behind the component library.
+- **[Recharts](https://recharts.org/)**, **[dnd-kit](https://dndkit.com/)**, **[Motion](https://motion.dev/)**: Charts, drag-and-drop, and animation.
+
+### Backend libraries
+
+- **[Lucid ORM](https://lucid.adonisjs.com/)**: Models, migrations, and query building with a snake_case naming strategy.
+- **[VineJS](https://vinejs.dev/)**: Request validation at the edge.
+- **[Bull Queue](https://github.com/RomainLanz/adonis-bull-queue)**: Background jobs on top of Redis.
+
+### Testing
+
+- **[Japa](https://japa.dev/)**: Backend unit, functional, and browser suites (browser via Playwright).
+- **[Vitest](https://vitest.dev/)** + **[Testing Library](https://testing-library.com/)** + **[MSW](https://mswjs.io/)**: Frontend tests.
+
+> **Note on TypeScript.** The `typescript` dependency is aliased to
+> `@typescript/typescript6` while TS 7 ships as `typescript-native`. `typescript-eslint` does not
+> support the TS 7 API yet ([#10940](https://github.com/typescript-eslint/typescript-eslint/issues/10940))
+> and resolves TypeScript through a peer dependency, so the two run side by side: ESLint gets the
+> TS 6 API, while `pnpm typecheck` and `pnpm build` use the TS 7 `tsc`. Collapse them back into a
+> single `typescript` entry once typescript-eslint catches up.
 
 ## :package: Installation
 

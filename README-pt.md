@@ -119,15 +119,43 @@ Este _starter kit_ foi projetado de forma única para maximizar a eficácia da c
 
 ## :computer: Tecnologias
 
+### Núcleo
+
 - **[AdonisJS v7](https://adonisjs.com/)**: Um framework Node.js robusto para o backend (roda TypeScript direto via `@poppinss/ts-exec`).
 - **[Node.js 24 LTS](https://nodejs.org/)**: O runtime (`.nvmrc` → `v24.13.0`).
 - **[React 19](https://react.dev/)**: Uma poderosa biblioteca para construir interfaces de usuário.
-- **[Inertia.js](https://inertiajs.com/)**: A cola que conecta o frontend moderno com o backend.
+- **[Inertia.js v3](https://inertiajs.com/)**: A cola que conecta o frontend moderno com o backend.
 - **[TypeScript](https://www.typescriptlang.org/)**: Para segurança de tipos em toda a stack.
 - **[PostgreSQL](https://www.postgresql.org/)**: Um banco de dados relacional confiável e poderoso (SQLite disponível para testes).
 - **[Redis](https://redis.io/)**: Usado para cache, sessões e a fila Bull.
 - **[Vite](https://vitejs.dev/)**: Para uma experiência de desenvolvimento frontend ultrarrápida.
 - **[Tailwind CSS v4](https://tailwindcss.com/)**: Framework CSS utility-first que sustenta a biblioteca de componentes Metronic.
+
+### Bibliotecas de frontend
+
+- **[TanStack Table v9](https://tanstack.com/table)**: Data grids headless (os componentes `DataGrid` em `inertia/components/ui/`).
+- **[TanStack Query](https://tanstack.com/query)**: Cache de estado de servidor para requisições no cliente.
+- **[React Hook Form](https://react-hook-form.com/)** + **[Zod](https://zod.dev/)**: Estado de formulários e validação por schema.
+- **[Radix UI](https://www.radix-ui.com/)** + **[lucide-react](https://lucide.dev/)**: Primitivos e ícones por trás da biblioteca de componentes.
+- **[Recharts](https://recharts.org/)**, **[dnd-kit](https://dndkit.com/)**, **[Motion](https://motion.dev/)**: Gráficos, drag-and-drop e animação.
+
+### Bibliotecas de backend
+
+- **[Lucid ORM](https://lucid.adonisjs.com/)**: Models, migrations e query builder com estratégia de nomes em snake_case.
+- **[VineJS](https://vinejs.dev/)**: Validação de requisições na borda do sistema.
+- **[Bull Queue](https://github.com/RomainLanz/adonis-bull-queue)**: Jobs em background sobre o Redis.
+
+### Testes
+
+- **[Japa](https://japa.dev/)**: Suítes de backend unit, functional e browser (browser via Playwright).
+- **[Vitest](https://vitest.dev/)** + **[Testing Library](https://testing-library.com/)** + **[MSW](https://mswjs.io/)**: Testes do frontend.
+
+> **Nota sobre o TypeScript.** A dependência `typescript` está apontada para
+> `@typescript/typescript6`, enquanto o TS 7 entra como `typescript-native`. O `typescript-eslint`
+> ainda não suporta a API do TS 7 ([#10940](https://github.com/typescript-eslint/typescript-eslint/issues/10940))
+> e resolve o TypeScript via peer dependency, então os dois rodam lado a lado: o ESLint usa a API do
+> TS 6 e o `pnpm typecheck`/`pnpm build` usam o `tsc` do TS 7. Volte a ter uma única entrada
+> `typescript` assim que o typescript-eslint acompanhar.
 
 ## :package: Instalação
 
