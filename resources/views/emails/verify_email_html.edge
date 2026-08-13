@@ -3,9 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>
-      Verify your email address
-    </title>
+    <title>Verify your email address</title>
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -15,18 +13,18 @@
         margin: 0 auto;
         padding: 20px;
       }
-      
+
       .container {
         background-color: #f4f4f4;
         padding: 30px;
         border-radius: 10px;
       }
-      
+
       .header {
         text-align: center;
         margin-bottom: 30px;
       }
-      
+
       .button {
         display: inline-block;
         padding: 12px 30px;
@@ -36,7 +34,7 @@
         border-radius: 5px;
         margin: 20px 0;
       }
-      
+
       .footer {
         margin-top: 30px;
         font-size: 12px;
@@ -47,14 +45,10 @@
   <body>
     <div class="container">
       <div class="header">
-        <h1>
-          Welcome to {{ appName }}!
-        </h1>
+        <h1>Welcome to {{ appName }}!</h1>
       </div>
 
-      <p>
-        Hi {{ user.full_name }},
-      </p>
+      <p>Hi {{ user.full_name }},</p>
 
       <p>
         Thank you for registering! Please verify your email address by clicking the button below:
@@ -64,24 +58,21 @@
         <a href="{{ verificationUrl }}" class="button">Verify Email Address</a>
       </div>
 
-      <p>
-        Or copy and paste this link into your browser:
-      </p>
-      <p style="word-break: break-all; color: #007bff;">
-        {{ verificationUrl }}
-      </p>
+      <p>Or copy and paste this link into your browser:</p>
+      <p style="word-break: break-all; color: #007bff;">{{ verificationUrl }}</p>
 
-      <p>
-        This link will expire in 24 hours.
-      </p>
+      <p>This link will expire in 24 hours.</p>
 
-      <p>
-        If you didn't create an account, you can safely ignore this email.
-      </p>
+      <p>If you didn't create an account, you can safely ignore this email.</p>
 
       <div class="footer">
         <p>
-          Best regards,<br />{{ appName }} Team
+          
+          Best regards,
+          <br />
+          {{ appName }}
+           Team
+
         </p>
       </div>
     </div>
