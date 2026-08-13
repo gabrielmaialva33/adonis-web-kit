@@ -174,7 +174,9 @@ function ChartTooltipContent({
 
           return (
             <div
-              key={key}
+              // `key` above can be the shared `nameKey` prop, which is identical
+              // for every item — the per-series `dataKey` is what's unique.
+              key={item.dataKey !== undefined ? String(item.dataKey) : `${key}-${index}`}
               className={cn(
                 '[&>svg]:text-muted-foreground flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5',
                 indicator === 'dot' && 'items-center'
