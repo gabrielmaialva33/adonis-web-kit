@@ -31,6 +31,16 @@ don't trust the default ace output paths.
 Package manager is **pnpm** (there is a `pnpm-workspace.yaml` with `allowBuilds` /
 `verifyDepsBeforeRun`). Node **24 LTS** (`.nvmrc` → `v24.13.0`).
 
+> **TypeScript runs side by side.** `typescript` is aliased to
+> `@typescript/typescript6` (TS 6, binary `tsc6`) because `typescript-eslint`
+> throws on the TS 7 API ([typescript-eslint#10940]) and resolves TS through its
+> peer dependency — pnpm `overrides` cannot redirect a peer, so the alias has to
+> live at the root. TS 7 comes in as `typescript-native` and owns the plain `tsc`
+> binary, which is what `pnpm typecheck` and `pnpm build` use. Collapse both back
+> into a single `typescript` entry once typescript-eslint supports TS 7.
+>
+> [typescript-eslint#10940]: https://github.com/typescript-eslint/typescript-eslint/issues/10940
+
 ### Development
 
 - `pnpm dev` - Start development server with HMR
