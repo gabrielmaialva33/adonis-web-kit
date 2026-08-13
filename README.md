@@ -3,10 +3,13 @@
 </h1>
 
 <p align="center">
+  <a href="https://github.com/gabrielmaialva33/adonis-web-kit/actions/workflows/ci-cd.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/gabrielmaialva33/adonis-web-kit/ci-cd.yml?branch=master&style=flat-square" alt="CI status" >
+  </a>
   <img src="https://img.shields.io/github/license/gabrielmaialva33/adonis-web-kit?color=00b8d3&style=flat-square" alt="License" />
   <img src="https://img.shields.io/github/languages/top/gabrielmaialva33/adonis-web-kit?style=flat-square" alt="GitHub top language" >
   <img src="https://img.shields.io/github/repo-size/gabrielmaialva33/adonis-web-kit?style=flat-square" alt="Repository size" >
-  <a href="https://github.com/gabrielmaialva33/adonis-web-kit/commits/main">
+  <a href="https://github.com/gabrielmaialva33/adonis-web-kit/commits/master">
     <img src="https://img.shields.io/github/last-commit/gabrielmaialva33/adonis-web-kit?style=flat-square" alt="GitHub last commit" >
   </a>
 </p>
