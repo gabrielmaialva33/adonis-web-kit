@@ -2,7 +2,7 @@
 
 import '../css/app.css'
 import { hydrateRoot } from 'react-dom/client'
-import { createInertiaApp } from '@inertiajs/react'
+import { createInertiaApp, type ResolvedComponent } from '@inertiajs/react'
 import { resolvePageComponent } from '@adonisjs/inertia/helpers'
 import { ThemeProvider } from '~/providers/theme_provider'
 import { QueryProvider } from '~/providers/query_provider'
@@ -14,8 +14,17 @@ createInertiaApp({
 
   title: (title) => `${title} - ${appName}`,
 
-  resolve: (name) => {
-    return resolvePageComponent(`../pages/${name}.tsx`, import.meta.glob('../pages/**/*.tsx'))
+  resolve: async (name) => {
+    /**
+     * `resolvePageComponent` resolves to the page *module*; Inertia v3's
+     * resolver contract wants the component itself.
+     */
+    const moduloPagina = await resolvePageComponent<{ default: ResolvedComponent }>(
+      `../pages/${name}.tsx`,
+      import.meta.glob<{ default: ResolvedComponent }>('../pages/**/*.tsx')
+    )
+
+    return moduloPagina.default
   },
 
   setup({ el, App, props }) {

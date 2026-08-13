@@ -1,5 +1,3 @@
-import type { SharedProps as InertiaSharedProps } from '@adonisjs/inertia/types'
-
 export * from './api'
 
 /**
@@ -30,9 +28,9 @@ export interface AuthSharedProps {
   activeTenantId: number | null
 }
 
-// Extend shared props with our app-specific props
+// Extend shared props with our app-specific props (declaration merging)
 declare module '@adonisjs/inertia/types' {
-  export interface SharedProps extends InertiaSharedProps {
+  export interface SharedProps {
     auth?: AuthSharedProps
     flash?: {
       success?: string
