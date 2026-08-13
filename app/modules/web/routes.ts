@@ -62,6 +62,13 @@ router
       })
       .as('ui-demo')
 
+    // Data grid demo — exercises pinning, resizing and drag-and-drop
+    router
+      .get('/data-grid-demo', async ({ inertia }) => {
+        return inertia.render('data_grid_demo', {})
+      })
+      .as('data-grid-demo')
+
     // Users - with permission check
     router
       .group(() => {
