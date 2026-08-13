@@ -1,4 +1,5 @@
 import { type symbols } from '@adonisjs/auth'
+import type { SignOptions } from 'jsonwebtoken'
 
 /**
  * The bridge between the User provider and the
@@ -51,7 +52,7 @@ export type BaseJwtContent = {
 
 export type JwtGuardOptions<RealUser extends any = unknown> = {
   secret: string
-  expiresIn?: number | string
+  expiresIn?: SignOptions['expiresIn']
   useCookies?: boolean
   content?: (user: JwtGuardUser<RealUser>) => Record<string, any>
 }

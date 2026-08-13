@@ -4,9 +4,9 @@ import type { HttpContext } from '@adonisjs/core/http'
 import jwt from 'jsonwebtoken'
 import { type JwtGuardOptions, type JwtUserProviderContract } from './types.js'
 
-export class JwtGuard<UserProvider extends JwtUserProviderContract<unknown>>
-  implements GuardContract<UserProvider[typeof symbols.PROVIDER_REAL_USER]>
-{
+export class JwtGuard<
+  UserProvider extends JwtUserProviderContract<unknown>,
+> implements GuardContract<UserProvider[typeof symbols.PROVIDER_REAL_USER]> {
   /**
    * A list of events and their types emitted by
    * the guard.
@@ -50,7 +50,6 @@ export class JwtGuard<UserProvider extends JwtUserProviderContract<unknown>>
    */
   async generate(user: UserProvider[typeof symbols.PROVIDER_REAL_USER]) {
     const providerUser = await this.#userProvider.createUserForGuard(user)
-    // @ts-ignore
     const token = jwt.sign(
       this.#options.content!(providerUser),
       this.#options.secret,
@@ -199,7 +198,6 @@ export class JwtGuard<UserProvider extends JwtUserProviderContract<unknown>>
     user: UserProvider[typeof symbols.PROVIDER_REAL_USER]
   ): Promise<AuthClientResponse> {
     const providerUser = await this.#userProvider.createUserForGuard(user)
-    // @ts-ignore
     const token = jwt.sign(
       this.#options.content!(providerUser),
       this.#options.secret,
