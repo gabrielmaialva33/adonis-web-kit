@@ -133,8 +133,6 @@ function DataGridTableDnd<TData extends RowData>({
             {table
               .getHeaderGroups()
               .map((headerGroup: HeaderGroup<DataGridFeatures, TData>, index) => {
-                console.log('table.state.columnOrder:', table.state.columnOrder)
-
                 return (
                   <DataGridTableHeadRow headerGroup={headerGroup} key={index}>
                     <SortableContext
