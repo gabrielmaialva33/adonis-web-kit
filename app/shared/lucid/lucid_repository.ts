@@ -14,9 +14,9 @@ import {
 } from '#shared/lucid/lucid_repository_interface'
 import type LucidRepositoryInterface from '#shared/lucid/lucid_repository_interface'
 
-export default class LucidRepository<T extends typeof BaseModel>
-  implements LucidRepositoryInterface<T>
-{
+export default class LucidRepository<
+  T extends typeof BaseModel,
+> implements LucidRepositoryInterface<T> {
   static ORDER_ASC = 'asc' as const
   static ORDER_DESC = 'desc' as const
   protected DEFAULT_PAGE = 1
