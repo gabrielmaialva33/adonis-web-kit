@@ -3,7 +3,7 @@ import { cn } from '~/lib/utils'
 import * as RechartsPrimitive from 'recharts'
 
 // recharts v3 does not re-export these value/name primitives from its barrel.
-type TooltipValueType = number | string | Array<number | string>
+type TooltipValueType = number | string | ReadonlyArray<number | string>
 type TooltipNameType = number | string
 type ChartTooltipItem = RechartsPrimitive.TooltipContentProps<
   TooltipValueType,
@@ -174,7 +174,7 @@ function ChartTooltipContent({
 
           return (
             <div
-              key={item.dataKey}
+              key={key}
               className={cn(
                 '[&>svg]:text-muted-foreground flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5',
                 indicator === 'dot' && 'items-center'
