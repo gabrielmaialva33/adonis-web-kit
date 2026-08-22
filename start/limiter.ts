@@ -47,6 +47,32 @@ export const authThrottle = limiter.define('auth', (ctx) => {
     })
 })
 
+export const passwordResetRequestThrottle = limiter.define('password-reset-request', (ctx) => {
+  const email = String(ctx.request.input('email') ?? 'unknown')
+    .trim()
+    .toLowerCase()
+
+  return limiter
+    .allowRequests(5)
+    .every('15 minutes')
+    .blockFor('30 minutes')
+    .usingKey(`password_reset_request_${ctx.request.ip()}_${email}`)
+    .limitExceeded((error) => {
+      error.setMessage('Too many password reset requests. Please try again later.')
+    })
+})
+
+export const passwordResetThrottle = limiter.define('password-reset', (ctx) => {
+  return limiter
+    .allowRequests(10)
+    .every('15 minutes')
+    .blockFor('30 minutes')
+    .usingKey(`password_reset_${ctx.request.ip()}`)
+    .limitExceeded((error) => {
+      error.setMessage('Too many password reset attempts. Please try again later.')
+    })
+})
+
 /**
  * API throttle for protected API endpoints
  * - 100 requests per minute for authenticated users
