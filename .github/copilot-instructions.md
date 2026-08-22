@@ -87,19 +87,19 @@ Essential aliases defined in `package.json`:
 
 ## File Organization
 
-**Domain-Driven Services**: `/app/services/users/`, `/app/services/permissions/` with specific use cases like `CreateUserService`, `VerifyEmailService`.
+**Domain Modules**: `app/modules/<domain>/` owns its controllers, services, repositories, models, validators, interfaces, and routes.
 
-**Interface Contracts**: TypeScript interfaces in `/app/interfaces/` define service contracts and data structures.
+**Shared Infrastructure**: Cross-cutting middleware, JWT support, Lucid repository helpers, and ownership checks live under `app/shared/`.
 
-**Event-Driven**: Authentication events in `/app/events/auth_events.ts` with listeners in `/providers/auth_events_provider.ts`.
+**Event-Driven**: Authentication events live in `app/modules/auth/events/auth_events.ts` with listeners registered by `providers/auth_events_provider.ts`.
 
 ## Development Commands
 
 **Essential Commands**:
 
 - `pnpm dev` - Development with HMR
-- `node ace migration:run` - Run migrations
-- `node ace db:seed` - Seed database
+- `pnpm ace migration:run` - Run migrations
+- `pnpm ace db:seed` - Seed the development database
 - `pnpm test` - Unit tests only
 - `pnpm test:e2e` - All tests
 

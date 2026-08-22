@@ -16,9 +16,11 @@
 @baseUrl = http://localhost:3333
 @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1MjE5MDY4NywiZXhwIjoxNzUyMTkxNTg3fQ.mN5_LyaxP1nZ46wWjRFVVB26E-0FD9vXJ7J5JlkE8AE
 @refreshToken = sample-opaque-refresh-token
+@passwordResetToken = sample-opaque-password-reset-token
 @tenantId = 1
 @userId = 3
 @roleId = 3
+@fileId = 1
 
 ###############################################################################
 ### HEALTH ENDPOINTS
@@ -79,6 +81,25 @@ Content-Type: application/json
   "password_confirmation": "password123"
 }
 
+### Request Password Reset
+# Always returns the same accepted response, even when the email does not exist.
+POST {{baseUrl}}/api/v1/sessions/forgot-password
+Content-Type: application/json
+
+{
+  "email": "john@example.com"
+}
+
+### Reset Password
+POST {{baseUrl}}/api/v1/sessions/reset-password
+Content-Type: application/json
+
+{
+  "token": "{{passwordResetToken}}",
+  "password": "newpassword123",
+  "password_confirmation": "newpassword123"
+}
+
 ### Rotate Refresh Token
 POST {{baseUrl}}/api/v1/sessions/refresh
 Content-Type: application/json
@@ -114,9 +135,30 @@ GET {{baseUrl}}/api/v1/me/roles
 Authorization: Bearer {{token}}
 Accept: application/json
 
+### Delete My Account
+# Anonymizes the account and revokes active credentials.
+DELETE {{baseUrl}}/api/v1/me
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "current_password": "password123",
+  "confirmation": "DELETE"
+}
+
 ###############################################################################
 ### TENANT ENDPOINTS (Requires Authentication)
 ###############################################################################
+
+### Create Workspace
+# Requires tenants.create and returns a fresh tenant-scoped token pair.
+POST {{baseUrl}}/api/v1/tenants
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "name": "Acme Workspace"
+}
 
 ### List My Tenant Memberships
 GET {{baseUrl}}/api/v1/tenants/me
@@ -346,12 +388,19 @@ Content-Type: application/json
 ### FILE MANAGEMENT ENDPOINTS (Requires Authentication)
 ###############################################################################
 
+### List Workspace Files
+GET {{baseUrl}}/api/v1/files?page=1&per_page=20
+Authorization: Bearer {{token}}
+x-tenant-id: {{tenantId}}
+Accept: application/json
+
 ### Upload File
-# Maximum size: 5MB
+# Maximum size: 10MB
 # Allowed extensions: jpeg, jpg, png, pdf, doc, docx, txt, csv, xls, xlsx, mp3, mp4, zip
 # File is automatically categorized: image, document, video, audio, file
 POST {{baseUrl}}/api/v1/files/upload
 Authorization: Bearer {{token}}
+x-tenant-id: {{tenantId}}
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -364,6 +413,7 @@ Content-Type: application/pdf
 ### Upload Image
 POST {{baseUrl}}/api/v1/files/upload
 Authorization: Bearer {{token}}
+x-tenant-id: {{tenantId}}
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
 ------WebKitFormBoundary7MA4YWxkTrZu0gW
@@ -372,6 +422,12 @@ Content-Type: image/jpeg
 
 < ./photo.jpg
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Delete Workspace File
+# files.delete deletes any workspace file; files.delete.own only deletes the uploader's file.
+DELETE {{baseUrl}}/api/v1/files/{{fileId}}
+Authorization: Bearer {{token}}
+x-tenant-id: {{tenantId}}
 
 ###############################################################################
 ### EXAMPLE RESPONSES

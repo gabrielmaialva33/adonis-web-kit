@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: Adonis Web Kit API
-  version: 0.1.0
+  version: 0.9.0
   description: |
     ## Welcome to the Adonis Web Kit API
 
@@ -12,8 +12,9 @@ info:
     - **Access JWTs**: Short-lived signed bearer tokens for API requests
     - **Opaque Refresh Tokens**: Rotated on every use and persisted only as HMAC hashes
     - **Global RBAC**: Roles, direct permissions, inheritance, and cache invalidation
-    - **Tenant Workspaces**: Verified active-tenant context for tenant-scoped resources
-    - **File Management**: Tenant-scoped uploads with multiple storage drivers
+    - **Tenant Workspaces**: Verified active-tenant context, personal workspace onboarding, and workspace creation
+    - **File Management**: Tenant-scoped upload, listing, and owner-aware deletion across multiple storage drivers
+    - **Account Lifecycle**: Email verification, single-use password reset, and anonymized self-deletion
     - **Health Monitoring**: Public readiness and dependency checks
 
     ## Authentication
@@ -159,6 +160,9 @@ components:
             $ref: '#/components/schemas/Role'
         auth:
           $ref: '#/components/schemas/AuthTokens'
+        email_verification_sent:
+          type: boolean
+          description: Present on sign-up responses; false means the account was created but email delivery failed.
 
     AuthTokens:
       type: object
@@ -181,6 +185,70 @@ components:
           type: string
           minLength: 32
           description: Opaque refresh token returned by sign-in, sign-up, tenant switch, or refresh.
+
+    PasswordResetRequest:
+      type: object
+      required: [token, password, password_confirmation]
+      properties:
+        token:
+          type: string
+          minLength: 32
+          description: Opaque single-use password reset token delivered by email.
+        password:
+          type: string
+          format: password
+          minLength: 8
+        password_confirmation:
+          type: string
+          format: password
+          minLength: 8
+
+    Tenant:
+      type: object
+      required: [id, name, slug, role]
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        slug:
+          type: string
+        is_active:
+          type: boolean
+        role:
+          type: string
+          enum: [owner, admin, member]
+
+    FileListItem:
+      type: object
+      required: [id, client_name, file_name, file_size, file_type, file_category, url, owner]
+      properties:
+        id:
+          type: integer
+        client_name:
+          type: string
+        file_name:
+          type: string
+        file_size:
+          type: integer
+        file_type:
+          type: string
+        file_category:
+          type: string
+          enum: [image, document, video, audio, file]
+        url:
+          type: string
+        owner:
+          type: object
+          required: [id, full_name]
+          properties:
+            id:
+              type: integer
+            full_name:
+              type: string
+        created_at:
+          type: [string, 'null']
+          format: date-time
 
     Error:
       type: object
@@ -309,6 +377,15 @@ components:
         type: string
       description: Search term for filtering results
 
+    tenantHeader:
+      name: x-tenant-id
+      in: header
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+      description: Optional active workspace override. Membership and active status are always validated.
+
   responses:
     UnauthorizedError:
       description: Authentication required
@@ -390,7 +467,7 @@ paths:
                     example: 'Full-stack AdonisJS 7 and React starter kit'
                   version:
                     type: string
-                    example: '0.0.0'
+                    example: '0.9.0'
                   author:
                     type: string
                     example: 'Gabriel Maia'
@@ -498,6 +575,64 @@ paths:
         '422':
           $ref: '#/components/responses/ValidationError'
 
+  /api/v1/sessions/forgot-password:
+    post:
+      operationId: requestPasswordReset
+      summary: Request a password reset link
+      description: Returns the same accepted response whether or not the email exists. Any issued token is opaque, single-use, and stored only as an HMAC.
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [email]
+              properties:
+                email:
+                  type: string
+                  format: email
+      responses:
+        '202':
+          description: Request accepted without revealing account existence
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          description: Too many password reset requests
+
+  /api/v1/sessions/reset-password:
+    post:
+      operationId: resetPassword
+      summary: Reset an account password
+      description: Consumes a valid reset token, changes the password, invalidates other reset links, and revokes active API refresh tokens.
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+      responses:
+        '200':
+          description: Password reset successfully
+        '400':
+          description: Invalid or expired token
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '429':
+          description: Too many password reset attempts
+
   /api/v1/sessions/refresh:
     post:
       operationId: refreshSession
@@ -564,6 +699,36 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
+    delete:
+      operationId: deleteOwnAccount
+      summary: Delete the authenticated account
+      description: Requires the current password and the literal confirmation DELETE. The user is anonymized and active API credentials are revoked while historical references remain intact.
+      tags:
+        - Profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [current_password, confirmation]
+              properties:
+                current_password:
+                  type: string
+                  format: password
+                confirmation:
+                  type: string
+                  const: DELETE
+      responses:
+        '204':
+          description: Account anonymized and credentials revoked
+        '400':
+          description: Incorrect password or confirmation
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
   /api/v1/me/permissions:
     get:
       operationId: getMyPermissions
@@ -613,7 +778,7 @@ paths:
     post:
       operationId: signUp
       summary: User registration
-      description: Create a new user account
+      description: Creates a user, assigns the default role, optionally creates a personal workspace according to `REGISTRATION_WORKSPACE_MODE`, and returns tenant-scoped API tokens. Email delivery failure does not roll back the account.
       tags:
         - Authentication
       security: []
@@ -692,6 +857,47 @@ paths:
           description: Verification email sent successfully
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '503':
+          description: Verification email could not be delivered
+
+  /api/v1/tenants:
+    post:
+      operationId: createTenant
+      summary: Create a workspace
+      description: Creates an active workspace, adds the authenticated user as owner, and returns a token pair carrying the new tenant id. Requires `tenants.create`.
+      tags:
+        - Tenants
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name]
+              properties:
+                name:
+                  type: string
+                  minLength: 2
+                  maxLength: 120
+                  example: Acme Workspace
+      responses:
+        '201':
+          description: Workspace created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tenant:
+                    $ref: '#/components/schemas/Tenant'
+                  auth:
+                    $ref: '#/components/schemas/AuthTokens'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
 
   /api/v1/tenants/me:
     get:
@@ -1225,6 +1431,59 @@ paths:
         '422':
           $ref: '#/components/responses/ValidationError'
 
+  /api/v1/files:
+    get:
+      operationId: listFiles
+      summary: List files in the active workspace
+      description: Returns a paginated tenant-scoped file list. Requires `files.list` and an active workspace.
+      tags:
+        - Files
+      parameters:
+        - $ref: '#/components/parameters/tenantHeader'
+        - $ref: '#/components/parameters/pageParam'
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+      responses:
+        '200':
+          description: Workspace file list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      total:
+                        type: integer
+                      perPage:
+                        type: integer
+                      currentPage:
+                        type: integer
+                      lastPage:
+                        type: integer
+                      firstPage:
+                        type: integer
+                      nextPageUrl:
+                        type: [string, 'null']
+                      previousPageUrl:
+                        type: [string, 'null']
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/FileListItem'
+        '400':
+          description: An active workspace is required or the tenant header is malformed
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/v1/files/upload:
     post:
       operationId: uploadFile
@@ -1233,7 +1492,7 @@ paths:
         Upload a file to the server. Files are automatically categorized based on their type.
 
         **File constraints:**
-        - Maximum size: 5MB
+        - Maximum size: 10MB
         - Allowed extensions: jpeg, jpg, png, pdf, doc, docx, txt, csv, xls, xlsx, mp3, mp4, zip
 
         **Categories:**
@@ -1244,6 +1503,8 @@ paths:
         - `file`: csv, xls, xlsx, zip, and others
       tags:
         - Files
+      parameters:
+        - $ref: '#/components/parameters/tenantHeader'
       requestBody:
         required: true
         content:
@@ -1274,6 +1535,28 @@ paths:
                 $ref: '#/components/schemas/Error'
               example:
                 errors:
-                  - message: 'File size should be less than 5MB'
+                  - message: 'File size should be less than 10MB'
                     field: 'file'
                     rule: 'size'
+
+  /api/v1/files/{id}:
+    delete:
+      operationId: deleteFile
+      summary: Delete a workspace file
+      description: Deletes a file from storage and the database. `files.delete` may delete any workspace file; `files.delete.own` is restricted to the uploader.
+      tags:
+        - Files
+      parameters:
+        - $ref: '#/components/parameters/pathId'
+        - $ref: '#/components/parameters/tenantHeader'
+      responses:
+        '204':
+          description: File deleted successfully
+        '400':
+          description: An active workspace is required or the tenant header is malformed
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'

@@ -103,14 +103,14 @@ Este _starter kit_ foi projetado de forma única para maximizar a eficácia da c
 
 ## 🌟 Principais Funcionalidades
 
-- **🔐 Autenticação Multi-Guard**: JWTs de acesso curtos (cookie HTTP-only ou bearer header), refresh tokens opacos com
-  rotação e armazenamento apenas do hash, API access tokens, sessão e basic auth.
-- **👥 RBAC Global Avançado**: Papéis, permissões diretas no usuário, herança, cache e navegação Inertia orientada por
-  permissões. Os papéis de associação ao tenant são metadados do workspace, não concessões de RBAC.
-- **🏢 Multi-Tenancy (N:N)**: Usuários pertencem a vários tenants via pivot `user_tenants` (com papéis de associação
-  `owner`/`admin`/`member`). O JWT de acesso verificado carrega o tenant ativo e o middleware isola os dados do workspace.
-- **📁 Gerenciamento de Arquivos**: Serviço de upload pré-configurado com suporte para drivers local, S3, Spaces, R2 e
-  GCS.
+- **🔐 Ciclo de Conta Completo**: JWTs de acesso curtos, refresh tokens opacos com rotação, verificação de e-mail,
+  recuperação de senha sem enumeração, cookies web, API access tokens e exclusão autenticada da própria conta.
+- **👥 RBAC Global Avançado**: Papéis, permissões diretas, herança, ownership contextual, cache e navegação Inertia
+  orientada por autorização. Papéis de associação ao tenant continuam sendo metadados do workspace.
+- **🏢 Multi-Tenancy (N:N)**: Usuários pertencem a vários workspaces via `user_tenants`. O cadastro público pode criar um
+  workspace pessoal, usuários autenticados podem criar outros e o JWT verificado carrega o tenant ativo.
+- **📁 Gerenciamento de Arquivos**: Upload, paginação, abertura e exclusão orientada por ownership, com escopo de tenant e
+  drivers local, S3, Spaces, R2 e GCS.
 - **⚡️ Reatividade Full-Stack**: O poder do React combinado com a simplicidade de uma aplicação tradicional renderizada
   no servidor, graças ao Inertia.js.
 - **🎨 Biblioteca de Componentes de UI**: ~78 componentes Metronic (estilo shadcn) sobre Radix UI, Tailwind CSS v4 e
@@ -163,9 +163,9 @@ Este _starter kit_ foi projetado de forma única para maximizar a eficácia da c
 ### ✔️ Pré-requisitos
 
 - **Node.js 24 LTS** (`.nvmrc` → `v24.13.0`)
-- **pnpm**
-- **PostgreSQL** e **Redis** — ambos obrigatórios para dev _e_ testes. O jeito mais rápido de subir
-  os dois é `docker compose up -d postgres redis` (veja [Docker](#whale-docker)).
+- **pnpm 11** (o campo `packageManager` fixa a versão testada)
+- **PostgreSQL** e **Redis** — ambos obrigatórios para desenvolvimento e testes
+- **Docker Compose** é recomendado para PostgreSQL, Redis e a caixa de entrada Mailpit incluída
 
 ### 🚀 Começando
 
@@ -182,23 +182,26 @@ Este _starter kit_ foi projetado de forma única para maximizar a eficácia da c
    pnpm install
    ```
 
-3. **Configure as variáveis de ambiente:**
+3. **Crie o arquivo de ambiente e a chave da aplicação:**
 
    ```sh
    cp .env.example .env
+   pnpm ace generate:key
    ```
 
-   _Abra o arquivo `.env` e configure suas credenciais de banco de dados e outras configurações._
+   Revise `APP_NAME`, `APP_URL`, credenciais do banco, segredos, e-mail e
+   `REGISTRATION_WORKSPACE_MODE` antes de continuar.
 
-4. **Suba o PostgreSQL e o Redis:**
+4. **Suba PostgreSQL, Redis e Mailpit:**
 
    ```sh
-   docker compose up -d postgres redis
+   docker compose up -d postgres redis mailpit
    ```
 
-   _Pule este passo se você já roda os dois serviços localmente._
+   O Mailpit recebe e-mails de desenvolvimento na porta SMTP `1025`; a caixa de entrada fica em
+   `http://localhost:8025`. Pule serviços que já executa localmente e ajuste o `.env`.
 
-5. **Execute as migrações do banco de dados (e o seed):**
+5. **Execute as migrations e os seeders de desenvolvimento:**
 
    ```sh
    pnpm ace migration:run
@@ -214,23 +217,39 @@ Este _starter kit_ foi projetado de forma única para maximizar a eficácia da c
    ```
    _Sua aplicação estará disponível em `http://localhost:3333`._
 
+### ⚙️ Configuração do produto
+
+A identidade e as decisões reutilizáveis de onboarding ficam em variáveis de ambiente:
+
+| Variável                                             | Finalidade                                                                         |
+| ---------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `APP_NAME`, `APP_URL`, `APP_SOURCE_URL`              | Marca, links gerados e link opcional para o código-fonte                           |
+| `ACCESS_TOKEN_SECRET`, `REFRESH_TOKEN_SECRET`        | Segredos independentes dos tokens da API                                           |
+| `EMAIL_VERIFICATION_SECRET`, `PASSWORD_RESET_SECRET` | HMAC dos links de conta de uso único                                               |
+| `JWT_ISSUER`, `JWT_AUDIENCE`, `JWT_COOKIE_NAME`      | Identidade JWT e cookie web                                                        |
+| `REGISTRATION_WORKSPACE_MODE`                        | `personal` cria um workspace no cadastro; `none` deixa o onboarding para o produto |
+| `DEMO_PAGES_ENABLED`                                 | Habilita páginas de referência dos componentes e Data Grid                         |
+| `DRIVE_DISK`                                         | Seleciona storage `fs`, `s3`, `spaces`, `r2` ou `gcs`                              |
+
+Não reutilize os fallbacks de desenvolvimento em produção. Gere segredos longos e independentes e mantenha-os fora do Git.
+
 ### 📜 Scripts Disponíveis
 
-| Script               | O que faz                                                               |
-| -------------------- | ----------------------------------------------------------------------- |
-| `pnpm dev`           | Inicia o servidor de desenvolvimento com HMR.                           |
-| `pnpm build`         | Compila a aplicação para produção.                                      |
-| `pnpm start`         | Executa o servidor pronto para produção (`node bin/server.js`).         |
-| `pnpm ace <cmd>`     | Roda qualquer comando ace do AdonisJS (ex.: `pnpm ace migration:run`).  |
-| `pnpm test`          | Executa os testes unitários do backend (Japa).                          |
-| `pnpm test:e2e`      | Executa todas as suítes do backend (unit + functional + browser).       |
-| `pnpm test:ui`       | Executa os testes do frontend (Vitest).                                 |
-| `pnpm test:ui:watch` | Testes do frontend em modo watch.                                       |
-| `pnpm typecheck`     | Verifica os tipos no backend e no frontend.                             |
-| `pnpm lint`          | Verifica o código com o linter.                                         |
-| `pnpm lint:fix`      | Verifica e corrige automaticamente os fontes do backend.                |
-| `pnpm format`        | Formata o código com o Prettier.                                        |
-| `pnpm docker`        | Roda migrations, seeds e sobe o servidor (usado como CMD do container). |
+| Script               | O que faz                                                                |
+| -------------------- | ------------------------------------------------------------------------ |
+| `pnpm dev`           | Inicia o servidor de desenvolvimento com HMR.                            |
+| `pnpm build`         | Compila a aplicação para produção.                                       |
+| `pnpm start`         | Executa o servidor pronto para produção (`node bin/server.js`).          |
+| `pnpm ace <cmd>`     | Roda qualquer comando ace do AdonisJS (ex.: `pnpm ace migration:run`).   |
+| `pnpm test`          | Executa os testes unitários do backend (Japa).                           |
+| `pnpm test:e2e`      | Executa todas as suítes do backend (unit + functional + browser).        |
+| `pnpm test:ui`       | Executa os testes do frontend (Vitest).                                  |
+| `pnpm test:ui:watch` | Testes do frontend em modo watch.                                        |
+| `pnpm typecheck`     | Verifica os tipos no backend e no frontend.                              |
+| `pnpm lint`          | Verifica o código com o linter.                                          |
+| `pnpm lint:fix`      | Verifica e corrige automaticamente os fontes do backend.                 |
+| `pnpm format`        | Formata o código com o Prettier.                                         |
+| `pnpm docker`        | Roda migrations, seeds e sobe o servidor em um fluxo local de container. |
 
 > **Nota:** não existe mais `node ace` — o AdonisJS v7 roda TypeScript diretamente, então todo
 > comando ace passa por `pnpm ace <cmd>`.
@@ -240,22 +259,21 @@ Este _starter kit_ foi projetado de forma única para maximizar a eficácia da c
 O projeto já vem com um `Dockerfile` (multi-stage, com target `production`) e um
 `docker-compose.yml`.
 
-**Só os datastores** — o cenário mais comum, com a aplicação rodando na máquina via `pnpm dev`:
+**Infraestrutura local** — o cenário mais comum, com a aplicação rodando na máquina via `pnpm dev`:
 
 ```sh
-docker compose up -d postgres redis
+docker compose up -d postgres redis mailpit
 ```
 
-**Stack completa** — aplicação, PostgreSQL e Redis todos em containers:
+**Stack completa** — aplicação, PostgreSQL, Redis e Mailpit em containers:
 
 ```sh
 docker compose up --build
 ```
 
-O container da aplicação espera os healthchecks dos dois serviços, roda migrations e seeders e só
-então sobe o servidor em `http://localhost:3333`. O compose traz um `APP_KEY` de placeholder; gere
-uma chave real e exporte antes de rodar a stack completa em qualquer coisa além de um ambiente
-descartável:
+O container da aplicação espera as dependências, executa as migrations pendentes e sobe o servidor
+em `http://localhost:3333`. O Mailpit fica em `http://localhost:8025`. O Compose inclui segredos de
+placeholder; gere um `APP_KEY` real e forneça segredos independentes antes de usar a stack fora de um ambiente descartável:
 
 ```sh
 export APP_KEY=$(pnpm ace generate:key --show | cut -d' ' -f3)
