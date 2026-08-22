@@ -2,12 +2,49 @@ import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 import jwt from 'jsonwebtoken'
 
-import User from '#modules/users/models/user'
+import IRole from '#modules/roles/interfaces/role_interface'
+import Role from '#modules/roles/models/role'
 import Tenant from '#modules/tenants/models/tenant'
+import User from '#modules/users/models/user'
 import env from '#start/env'
 
 test.group('Tenants', (group) => {
   group.each.setup(() => testUtils.db().withGlobalTransaction())
+
+  test('POST / creates an owned workspace and returns tenant-scoped tokens', async ({
+    client,
+    assert,
+  }) => {
+    const user = await User.create({
+      full_name: 'Workspace Creator',
+      email: 'workspace-creator@example.com',
+      username: 'workspace-creator',
+      password: 'password123',
+    })
+    const userRole = await Role.findByOrFail('slug', IRole.Slugs.USER)
+    await user.related('roles').attach([userRole.id])
+
+    const response = await client
+      .post('/api/v1/tenants')
+      .json({ name: 'Creator Workspace' })
+      .loginAs(user)
+
+    response.assertStatus(201)
+    assert.equal(response.body().tenant.name, 'Creator Workspace')
+    assert.equal(response.body().tenant.role, 'owner')
+
+    const tenant = await Tenant.findOrFail(response.body().tenant.id)
+    const members = await tenant.related('users').query()
+    assert.lengthOf(members, 1)
+    assert.equal(members[0].id, user.id)
+    assert.equal(members[0].$extras.pivot_role, 'owner')
+
+    const payload = jwt.verify(
+      response.body().auth.access_token,
+      env.get('ACCESS_TOKEN_SECRET', env.get('APP_KEY'))
+    ) as { tenantId?: number }
+    assert.equal(payload.tenantId, tenant.id)
+  })
 
   test('GET /me lists tenants the user belongs to with pivot role', async ({ client, assert }) => {
     const user = await User.create({
