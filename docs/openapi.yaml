@@ -1,40 +1,42 @@
 openapi: 3.1.0
 info:
-  title: Base ACL API
-  version: 1.0.0
+  title: Adonis Web Kit API
+  version: 0.1.0
   description: |
-    ## Welcome to Base ACL API
+    ## Welcome to the Adonis Web Kit API
 
-    A robust authentication and access control API built with AdonisJS v6. This API provides comprehensive user management, role-based access control, and file management capabilities.
+    An AdonisJS 7 starter API with global RBAC, N:N tenant workspaces, file management, health checks, and a React/Inertia web application.
 
     ### Key Features
 
-    - **JWT Authentication**: Secure token-based authentication with refresh tokens
-    - **Role-Based Access Control**: Fine-grained permissions with multiple user roles
-    - **User Management**: Complete CRUD operations for user accounts
-    - **File Management**: Secure file upload with automatic categorization
-    - **Health Monitoring**: Built-in health check endpoints
+    - **Access JWTs**: Short-lived signed bearer tokens for API requests
+    - **Opaque Refresh Tokens**: Rotated on every use and persisted only as HMAC hashes
+    - **Global RBAC**: Roles, direct permissions, inheritance, and cache invalidation
+    - **Tenant Workspaces**: Verified active-tenant context for tenant-scoped resources
+    - **File Management**: Tenant-scoped uploads with multiple storage drivers
+    - **Health Monitoring**: Public readiness and dependency checks
 
     ## Authentication
 
-    The API uses JWT Bearer authentication. To access protected endpoints:
-
     1. **Login**: POST to `/api/v1/sessions/sign-in` with your credentials
-    2. **Get Token**: Extract the `access_token` from the response
-    3. **Use Token**: Include `Authorization: Bearer <token>` in all requests
+    2. **Get Tokens**: Extract `access_token` and `refresh_token` from `auth`
+    3. **Use Access Token**: Include `Authorization: Bearer <access_token>`
+    4. **Rotate Tokens**: POST the opaque refresh token to `/api/v1/sessions/refresh`
 
     ### Token Management
 
-    - **Access Token Lifetime**: 1 hour
+    - **API Access Token Lifetime**: 15 minutes
+    - **Web Cookie Lifetime**: 1 hour
     - **Refresh Token Lifetime**: 3 days
-    - **Token Format**: JWT Bearer token
+    - **Access Token Format**: JWT with `token_use=access`
+    - **Refresh Token Format**: Opaque random value; it is not a JWT
 
     ## API Conventions
 
     ### Request Format
     - **Content-Type**: `application/json` for all requests (except file uploads)
-    - **Pagination**: Use `?page=1&perPage=10` query parameters
-    - **Sorting**: Use `?sortBy=field&order=asc` or `?sortBy=field&order=desc`
+    - **Pagination**: Use `?page=1&per_page=10` query parameters
+    - **Sorting**: Use `?sort_by=field&order=asc` or `?sort_by=field&order=desc`
     - **Searching**: Use `?search=term` for text search
 
     ### Response Format
@@ -72,7 +74,7 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: JWT authentication token
+      description: Short-lived access JWT. Opaque refresh tokens are never accepted here.
 
   schemas:
     User:
@@ -89,8 +91,14 @@ components:
           format: email
           example: 'john@example.com'
         username:
-          type: string
+          type: [string, 'null']
           example: 'johndoe'
+        email_verified:
+          type: boolean
+          example: true
+        email_verified_at:
+          type: [string, 'null']
+          format: date-time
         created_at:
           type: string
           format: date-time
@@ -118,7 +126,7 @@ components:
           example: 'Regular user role'
         slug:
           type: string
-          enum: [root, admin, user, guest]
+          enum: [root, admin, user, guest, editor]
           example: 'user'
         created_at:
           type: string
@@ -150,14 +158,29 @@ components:
           items:
             $ref: '#/components/schemas/Role'
         auth:
-          type: object
-          properties:
-            access_token:
-              type: string
-              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
-            refresh_token:
-              type: string
-              example: 'refresh_token_string'
+          $ref: '#/components/schemas/AuthTokens'
+
+    AuthTokens:
+      type: object
+      required: [access_token, refresh_token]
+      properties:
+        access_token:
+          type: string
+          description: Short-lived JWT accepted by bearer-authenticated endpoints.
+          example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+        refresh_token:
+          type: string
+          description: Opaque one-time refresh credential rotated after every successful refresh.
+          example: 'D4m6j6pTW1u3Jf_Z0Q4K7rJch7Jv8k9xQ4Q6xk2MsGv...'
+
+    RefreshTokenRequest:
+      type: object
+      required: [refresh_token]
+      properties:
+        refresh_token:
+          type: string
+          minLength: 32
+          description: Opaque refresh token returned by sign-in, sign-up, tenant switch, or refresh.
 
     Error:
       type: object
@@ -253,7 +276,7 @@ components:
       description: Page number for pagination
 
     perPageParam:
-      name: perPage
+      name: per_page
       in: query
       schema:
         type: integer
@@ -263,7 +286,7 @@ components:
       description: Number of items per page
 
     sortByParam:
-      name: sortBy
+      name: sort_by
       in: query
       schema:
         type: string
@@ -431,7 +454,7 @@ paths:
     post:
       operationId: signIn
       summary: User login
-      description: Authenticate a user and receive JWT tokens
+      description: Authenticate a user and receive a short-lived access JWT plus an opaque rotating refresh token.
       tags:
         - Authentication
       security: []
@@ -452,7 +475,7 @@ paths:
                 password:
                   type: string
                   format: password
-                  minLength: 6
+                  minLength: 8
                   example: 'password123'
       responses:
         '200':
@@ -461,7 +484,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
-        '401':
+        '400':
           description: Invalid credentials
           content:
             application/json:
@@ -470,6 +493,55 @@ paths:
               example:
                 errors:
                   - message: 'Invalid credentials'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/v1/sessions/refresh:
+    post:
+      operationId: refreshSession
+      summary: Rotate a refresh token
+      description: Atomically revokes the submitted opaque refresh token and returns a new access/refresh pair.
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Token pair rotated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  auth:
+                    $ref: '#/components/schemas/AuthTokens'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+
+  /api/v1/sessions/logout:
+    post:
+      operationId: revokeSession
+      summary: Revoke an API refresh token
+      description: Revokes the submitted refresh token. Repeating the request is idempotent.
+      tags:
+        - Authentication
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '204':
+          description: Refresh token revoked
         '422':
           $ref: '#/components/responses/ValidationError'
 
@@ -569,7 +641,7 @@ paths:
                 password:
                   type: string
                   format: password
-                  minLength: 6
+                  minLength: 8
                   example: 'password123'
                 password_confirmation:
                   type: string
@@ -619,6 +691,74 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
+  /api/v1/tenants/me:
+    get:
+      operationId: listMyTenants
+      summary: List the authenticated user's tenant memberships
+      tags:
+        - Tenants
+      responses:
+        '200':
+          description: Tenant memberships retrieved
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        slug:
+                          type: string
+                        is_active:
+                          type: boolean
+                        role:
+                          type: string
+                          enum: [owner, admin, member]
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/v1/tenants/switch:
+    post:
+      operationId: switchTenant
+      summary: Switch the active API tenant
+      description: Validates active membership and issues a fresh access/refresh pair carrying the selected tenant.
+      tags:
+        - Tenants
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [tenant_id]
+              properties:
+                tenant_id:
+                  type: integer
+                  minimum: 1
+      responses:
+        '200':
+          description: Active tenant switched
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  tenant:
+                    type: object
+                  auth:
+                    $ref: '#/components/schemas/AuthTokens'
+        '400':
+          description: Invalid tenant id
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+
   /api/v1/users:
     get:
       operationId: listUsers
@@ -652,7 +792,7 @@ paths:
     post:
       operationId: createUser
       summary: Create user
-      description: Create a new user account (requires USER role)
+      description: Create a new user account (requires the global `users.create` permission)
       tags:
         - Users
       requestBody:
@@ -677,7 +817,7 @@ paths:
                 password:
                   type: string
                   format: password
-                  minLength: 6
+                  minLength: 8
                 password_confirmation:
                   type: string
                   format: password
@@ -734,7 +874,7 @@ paths:
                 password:
                   type: string
                   format: password
-                  minLength: 6
+                  minLength: 8
                 password_confirmation:
                   type: string
                   format: password

@@ -1,4 +1,4 @@
-### Base ACL API HTTP Requests
+### Adonis Web Kit API HTTP Requests
 ### Base URL: http://localhost:3333
 ###
 ### Authentication: Most endpoints require JWT Bearer token
@@ -8,13 +8,15 @@
 ### - Content-Type: application/json (except file uploads)
 ### - Timestamps: ISO 8601 format
 ### - Database fields: snake_case naming
-### - Pagination: ?page=1&perPage=10
-### - Sorting: ?sortBy=field&order=asc|desc
+### - Pagination: ?page=1&per_page=10
+### - Sorting: ?sort_by=field&order=asc|desc
 ### - Search: ?search=term
 
 ### Variables (replace with actual values)
 @baseUrl = http://localhost:3333
 @token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsImlhdCI6MTc1MjE5MDY4NywiZXhwIjoxNzUyMTkxNTg3fQ.mN5_LyaxP1nZ46wWjRFVVB26E-0FD9vXJ7J5JlkE8AE
+@refreshToken = sample-opaque-refresh-token
+@tenantId = 1
 @userId = 3
 @roleId = 3
 
@@ -23,7 +25,7 @@
 ###############################################################################
 
 ### Get API Information
-GET {{baseUrl}}/
+GET {{baseUrl}}/version
 Accept: application/json
 
 ### Health Check
@@ -77,6 +79,22 @@ Content-Type: application/json
   "password_confirmation": "password123"
 }
 
+### Rotate Refresh Token
+POST {{baseUrl}}/api/v1/sessions/refresh
+Content-Type: application/json
+
+{
+  "refresh_token": "{{refreshToken}}"
+}
+
+### Revoke Refresh Token
+POST {{baseUrl}}/api/v1/sessions/logout
+Content-Type: application/json
+
+{
+  "refresh_token": "{{refreshToken}}"
+}
+
 ###############################################################################
 ### PROFILE ENDPOINTS (Requires Authentication)
 ###############################################################################
@@ -95,6 +113,24 @@ Accept: application/json
 GET {{baseUrl}}/api/v1/me/roles
 Authorization: Bearer {{token}}
 Accept: application/json
+
+###############################################################################
+### TENANT ENDPOINTS (Requires Authentication)
+###############################################################################
+
+### List My Tenant Memberships
+GET {{baseUrl}}/api/v1/tenants/me
+Authorization: Bearer {{token}}
+Accept: application/json
+
+### Switch Active Tenant and Receive a Fresh Token Pair
+POST {{baseUrl}}/api/v1/tenants/switch
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "tenant_id": {{tenantId}}
+}
 
 ###############################################################################
 ### EMAIL VERIFICATION ENDPOINTS
@@ -121,12 +157,12 @@ Authorization: Bearer {{token}}
 Accept: application/json
 
 ### List Users with Pagination
-GET {{baseUrl}}/api/v1/users?page=1&perPage=20
+GET {{baseUrl}}/api/v1/users?page=1&per_page=20
 Authorization: Bearer {{token}}
 Accept: application/json
 
 ### List Users with Sorting
-GET {{baseUrl}}/api/v1/users?sortBy=created_at&order=desc
+GET {{baseUrl}}/api/v1/users?sort_by=created_at&order=desc
 Authorization: Bearer {{token}}
 Accept: application/json
 
@@ -140,7 +176,7 @@ GET {{baseUrl}}/api/v1/users/{{userId}}
 Authorization: Bearer {{token}}
 Accept: application/json
 
-### Create User (Requires USER role)
+### Create User (Requires users.create permission)
 POST {{baseUrl}}/api/v1/users
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -187,7 +223,7 @@ Authorization: Bearer {{token}}
 Accept: application/json
 
 ### List Roles with Pagination
-GET {{baseUrl}}/api/v1/admin/roles?page=1&perPage=10
+GET {{baseUrl}}/api/v1/admin/roles?page=1&per_page=10
 Authorization: Bearer {{token}}
 Accept: application/json
 
@@ -372,7 +408,7 @@ Content-Type: image/jpeg
 #   "roles": [...],
 #   "auth": {
 #     "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-#     "refresh_token": "refresh_token_string"
+#     "refresh_token": "opaque_random_refresh_token"
 #   }
 # }
 

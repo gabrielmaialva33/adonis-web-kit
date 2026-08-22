@@ -132,6 +132,10 @@ export default defineConfig({
       pattern: 'resources/lang/**/*.{json,yaml,yml}',
       reloadServer: false,
     },
+    {
+      pattern: 'docs/*.{html,yaml}',
+      reloadServer: false,
+    },
   ],
 
   hooks: {
