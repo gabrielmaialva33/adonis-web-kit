@@ -1,8 +1,8 @@
 # Local containerized environment for the AdonisJS web kit.
-# - `docker compose up postgres redis`  -> just the datastores (run the app on the host)
-# - `docker compose up --build`          -> full stack (app + datastores) in containers
+# - `docker compose up postgres redis mailpit` -> local infrastructure, app on the host
+# - `docker compose up --build`                -> full stack in containers
 #
-# Generate a real APP_KEY once:  node ace generate:key  (then export APP_KEY=...).
+# Generate a real APP_KEY once: `pnpm ace generate:key` (then export APP_KEY=...).
 name: adonis-web-kit
 
 services:
@@ -37,6 +37,13 @@ services:
       timeout: 5s
       retries: 5
 
+  mailpit:
+    image: axllent/mailpit:v1.30.4
+    restart: unless-stopped
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+
   app:
     build:
       context: .
@@ -47,6 +54,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      mailpit:
+        condition: service_started
     ports:
       - '3333:3333'
     environment:
@@ -55,14 +64,26 @@ services:
       PORT: 3333
       HOST: 0.0.0.0
       LOG_LEVEL: info
-      # Dev placeholder — override with `export APP_KEY=...` (node ace generate:key).
+      APP_NAME: ${APP_NAME:-Adonis Web Kit}
+      APP_URL: ${APP_URL:-http://localhost:3333}
+      APP_SOURCE_URL: ${APP_SOURCE_URL:-https://github.com/gabrielmaialva33/adonis-web-kit}
+      # Development placeholders only. Override every secret outside disposable environments.
       APP_KEY: ${APP_KEY:-dev_app_key_change_me_32_chars_min}
       ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET:-dev_access_token_secret_change_me}
       REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET:-dev_refresh_token_secret_change_me}
       EMAIL_VERIFICATION_SECRET: ${EMAIL_VERIFICATION_SECRET:-dev_email_verification_secret_change_me}
+      PASSWORD_RESET_SECRET: ${PASSWORD_RESET_SECRET:-dev_password_reset_secret_change_me}
+      PASSWORD_RESET_TTL_MINUTES: ${PASSWORD_RESET_TTL_MINUTES:-60}
+      JWT_ISSUER: ${JWT_ISSUER:-adonis-web-kit}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-adonis-web-kit}
+      JWT_COOKIE_NAME: ${JWT_COOKIE_NAME:-token}
+      SESSION_COOKIE_NAME: ${SESSION_COOKIE_NAME:-adonis-web-kit-session}
+      REGISTRATION_WORKSPACE_MODE: ${REGISTRATION_WORKSPACE_MODE:-personal}
+      DEMO_PAGES_ENABLED: 'false'
       SESSION_DRIVER: cookie
       LIMITER_STORE: redis
       DRIVE_DISK: fs
+      DB_CONNECTION: postgres
       DB_HOST: postgres
       DB_PORT: 5432
       DB_USER: postgres
@@ -76,7 +97,9 @@ services:
       QUEUE_REDIS_PORT: 6379
       QUEUE_REDIS_PASSWORD: redis
       MAIL_MAILER: smtp
-      SMTP_HOST: localhost
+      MAIL_FROM_ADDRESS: ${MAIL_FROM_ADDRESS:-noreply@example.com}
+      MAIL_FROM_NAME: ${MAIL_FROM_NAME:-Adonis Web Kit}
+      SMTP_HOST: mailpit
       SMTP_PORT: 1025
 
 volumes:

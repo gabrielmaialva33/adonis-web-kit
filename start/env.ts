@@ -14,12 +14,24 @@ import { Env } from '@adonisjs/core/env'
 export default await Env.create(new URL('../', import.meta.url), {
   NODE_ENV: Env.schema.enum(['development', 'production', 'test'] as const),
   PORT: Env.schema.number(),
+  HOST: Env.schema.string({ format: 'host' }),
+  LOG_LEVEL: Env.schema.string(),
+
+  APP_NAME: Env.schema.string.optional(),
+  APP_URL: Env.schema.string.optional(),
+  APP_SOURCE_URL: Env.schema.string.optional(),
   APP_KEY: Env.schema.string(),
   ACCESS_TOKEN_SECRET: Env.schema.string.optional(),
   REFRESH_TOKEN_SECRET: Env.schema.string.optional(),
   EMAIL_VERIFICATION_SECRET: Env.schema.string.optional(),
-  HOST: Env.schema.string({ format: 'host' }),
-  LOG_LEVEL: Env.schema.string(),
+  PASSWORD_RESET_SECRET: Env.schema.string.optional(),
+  PASSWORD_RESET_TTL_MINUTES: Env.schema.number.optional(),
+  JWT_ISSUER: Env.schema.string.optional(),
+  JWT_AUDIENCE: Env.schema.string.optional(),
+  JWT_COOKIE_NAME: Env.schema.string.optional(),
+  SESSION_COOKIE_NAME: Env.schema.string.optional(),
+  REGISTRATION_WORKSPACE_MODE: Env.schema.enum.optional(['none', 'personal'] as const),
+  DEMO_PAGES_ENABLED: Env.schema.boolean.optional(),
 
   /*
   |----------------------------------------------------------
@@ -47,6 +59,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   | Variables for configuring database connection
   |----------------------------------------------------------
   */
+  DB_CONNECTION: Env.schema.enum.optional(['postgres', 'sqlite'] as const),
   DB_HOST: Env.schema.string.optional({ format: 'host' }),
   DB_PORT: Env.schema.number.optional(),
   DB_USER: Env.schema.string.optional(),
@@ -124,7 +137,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   | Variables for configuring the mail package
   |----------------------------------------------------------
   */
-  MAIL_MAILER: Env.schema.enum(['smtp', 'mailgun', 'ses', 'sparkpost', 'resend', 'brevo'] as const),
+  MAIL_MAILER: Env.schema.enum(['smtp', 'mailgun'] as const),
   MAIL_FROM_ADDRESS: Env.schema.string.optional(),
   MAIL_FROM_NAME: Env.schema.string.optional(),
 

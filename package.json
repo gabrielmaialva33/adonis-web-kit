@@ -1,9 +1,24 @@
 {
   "name": "adonis-web-kit",
-  "version": "0.0.0",
+  "version": "0.9.0",
+  "description": "Opinionated full-stack starter for SaaS and multi-tenant applications with AdonisJS, React, and Inertia.",
   "private": true,
   "type": "module",
-  "license": "UNLICENSED",
+  "license": "MIT",
+  "author": "Gabriel Maia <gabrielmaialva33@gmail.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gabrielmaialva33/adonis-web-kit.git"
+  },
+  "homepage": "https://github.com/gabrielmaialva33/adonis-web-kit#readme",
+  "bugs": {
+    "url": "https://github.com/gabrielmaialva33/adonis-web-kit/issues"
+  },
+  "packageManager": "pnpm@11.22.0",
+  "engines": {
+    "node": ">=24 <25",
+    "pnpm": ">=11 <12"
+  },
   "scripts": {
     "start": "node bin/server.js",
     "build": "node --import=@poppinss/ts-exec ace.js build",

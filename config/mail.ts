@@ -1,8 +1,11 @@
 import { defineConfig, transports } from '@adonisjs/mail'
 import env from '#start/env'
 
+const smtpUser = env.get('SMTP_USER')
+const smtpPass = env.get('SMTP_PASS')
+
 const mailConfig = defineConfig({
-  default: env.get('MAIL_MAILER', 'mailgun') as 'smtp' | 'mailgun',
+  default: env.get('MAIL_MAILER', 'smtp'),
 
   /**
    * A static address for the "from" property. It will be
@@ -11,7 +14,7 @@ const mailConfig = defineConfig({
    */
   from: {
     address: env.get('MAIL_FROM_ADDRESS', 'noreply@example.com'),
-    name: env.get('MAIL_FROM_NAME', 'Adonis Web Kit'),
+    name: env.get('MAIL_FROM_NAME', env.get('APP_NAME', 'Adonis Web Kit')),
   },
 
   /**
@@ -22,13 +25,17 @@ const mailConfig = defineConfig({
   mailers: {
     smtp: transports.smtp({
       host: env.get('SMTP_HOST', 'localhost'),
-      port: env.get('SMTP_PORT'),
-      secure: env.get('SMTP_PORT') === 465,
-      auth: {
-        type: 'login',
-        user: env.get('SMTP_USER', ''),
-        pass: env.get('SMTP_PASS', ''),
-      },
+      port: env.get('SMTP_PORT', 1025),
+      secure: env.get('SMTP_PORT', 1025) === 465,
+      ...(smtpUser && smtpPass
+        ? {
+            auth: {
+              type: 'login' as const,
+              user: smtpUser,
+              pass: smtpPass,
+            },
+          }
+        : {}),
     }),
 
     mailgun: transports.mailgun({

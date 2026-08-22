@@ -9,7 +9,7 @@ ARG NODE_VERSION=24.13.0
 FROM node:${NODE_VERSION}-slim AS base
 ENV PNPM_HOME=/pnpm
 ENV PATH=/pnpm:$PATH
-RUN corepack enable && corepack prepare pnpm@11.3.0 --activate
+RUN corepack enable && corepack prepare pnpm@11.22.0 --activate
 RUN apt-get update \
   && apt-get install -y --no-install-recommends python3 make g++ \
   && rm -rf /var/lib/apt/lists/*
