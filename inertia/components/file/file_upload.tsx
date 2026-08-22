@@ -1,3 +1,4 @@
+import { router } from '@inertiajs/react'
 import { useCallback, useState } from 'react'
 import { useDropzone, type FileRejection } from 'react-dropzone'
 import { CloudUpload, File as FileIcon, Loader2, X } from 'lucide-react'
@@ -83,6 +84,7 @@ export function FileUpload() {
     if (result) {
       setUploadedFile(result)
       setSelectedFile(null)
+      router.reload({ only: ['files'] })
     }
   }
 

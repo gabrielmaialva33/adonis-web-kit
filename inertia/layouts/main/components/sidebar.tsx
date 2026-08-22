@@ -2,6 +2,7 @@ import { Link, usePage } from '@inertiajs/react'
 import { useState } from 'react'
 import { ChevronDown, FileText, Home, type LucideIcon, Settings, Upload, Users } from 'lucide-react'
 
+import { useApp } from '~/hooks/use_app'
 import { useAuth } from '~/hooks/use_auth'
 import { cn } from '~/lib/utils'
 
@@ -16,6 +17,7 @@ interface MenuItem {
   href?: string
   permission?: string
   icon?: LucideIcon
+  developmentOnly?: boolean
   children?: MenuLink[]
 }
 
@@ -31,7 +33,7 @@ const menuItems: MenuItem[] = [
     ],
   },
   { title: 'Files', href: '/files', icon: Upload, permission: 'files.list' },
-  { title: 'Components', href: '/ui-demo', icon: FileText },
+  { title: 'Components', href: '/ui-demo', icon: FileText, developmentOnly: true },
   { title: 'Settings', href: '/settings', icon: Settings },
 ]
 
@@ -52,6 +54,7 @@ export function SidebarNav({
   onNavigate?: () => void
 }) {
   const url = useCurrentUrl()
+  const application = useApp()
   const { can } = useAuth()
 
   const visibleItems = menuItems
@@ -60,6 +63,7 @@ export function SidebarNav({
       children: item.children?.filter((child) => !child.permission || can(child.permission)),
     }))
     .filter((item) => {
+      if (item.developmentOnly && !application.demoPagesEnabled) return false
       if (item.permission && !can(item.permission)) return false
       if (!item.href && item.children?.length === 0) return false
       return true
@@ -73,9 +77,7 @@ export function SidebarNav({
 
   const toggle = (title: string) =>
     setExpanded((previous) =>
-      previous.includes(title)
-        ? previous.filter((item) => item !== title)
-        : [...previous, title]
+      previous.includes(title) ? previous.filter((item) => item !== title) : [...previous, title]
     )
 
   return (

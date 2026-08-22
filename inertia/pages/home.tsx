@@ -1,235 +1,226 @@
 import { Head, Link } from '@inertiajs/react'
-import { ArrowRight } from 'lucide-react'
-import { Button } from '~/components/ui/core/button'
+import {
+  ArrowRight,
+  Blocks,
+  Building2,
+  Database,
+  FileText,
+  KeyRound,
+  ShieldCheck,
+  TestTube2,
+} from 'lucide-react'
 
-// Custom GitHub icon component to replace deprecated lucide-react Github icon
-const GitHubIcon = ({ className }: { className?: string }) => (
-  <svg className={className} fill="currentColor" viewBox="0 0 24 24">
-    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
-  </svg>
-)
+import { Button } from '~/components/ui/core/button'
+import { useApp } from '~/hooks/use_app'
+
+const features = [
+  {
+    title: 'Secure authentication',
+    description:
+      'HTTP-only JWT cookies, bearer access tokens, rotating opaque refresh tokens, verification and password reset.',
+    icon: KeyRound,
+  },
+  {
+    title: 'Global RBAC',
+    description:
+      'Roles, contextual permissions, direct grants, inheritance, cached checks and permission-aware navigation.',
+    icon: ShieldCheck,
+  },
+  {
+    title: 'Workspace foundation',
+    description:
+      'N:N membership, active-workspace selection and configurable personal workspace onboarding.',
+    icon: Building2,
+  },
+  {
+    title: 'File management',
+    description:
+      'Tenant-scoped uploads, listings and owner-aware deletion across local and cloud storage.',
+    icon: FileText,
+  },
+  {
+    title: 'Domain modules',
+    description:
+      'Controllers, services, repositories, models, validators and routes stay together by domain.',
+    icon: Blocks,
+  },
+  {
+    title: 'Tested delivery',
+    description:
+      'Japa, Playwright, Vitest, PostgreSQL, Redis, Docker and a production Inertia SSR build.',
+    icon: TestTube2,
+  },
+]
 
 export default function Home() {
+  const application = useApp()
+  const brandMark = application.name.trim().charAt(0).toUpperCase() || 'A'
+
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950">
-      <Head title="AdonisKit - AI-First Full-Stack Starter in 1 repo" />
+    <div className="min-h-screen bg-white text-gray-950 dark:bg-gray-950 dark:text-white">
+      <Head title={`${application.name} — Full-stack starter`} />
 
-      {/* Simple Header */}
       <header className="border-b border-gray-200 dark:border-gray-800">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">A</span>
-            </div>
-            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">AdonisKit</h1>
-          </div>
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+          <Link href="/" className="flex min-w-0 items-center gap-2">
+            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-sm font-bold text-white">
+              {brandMark}
+            </span>
+            <span className="truncate text-xl font-semibold">{application.name}</span>
+          </Link>
 
-          <nav className="flex items-center gap-6">
+          <nav className="flex items-center gap-3 sm:gap-5">
             <a
-              href="https://github.com/gabrielmaialva33/adonis-web-kit"
-              className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              href="/docs"
+              className="hidden text-sm text-gray-600 hover:text-gray-950 dark:text-gray-400 dark:hover:text-white sm:inline"
             >
-              GitHub
+              API docs
             </a>
+            {application.sourceUrl && (
+              <a
+                href={application.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden text-sm text-gray-600 hover:text-gray-950 dark:text-gray-400 dark:hover:text-white md:inline"
+              >
+                Source
+              </a>
+            )}
             <Link href="/login">
               <Button variant="outline" size="sm">
-                Login
+                Sign in
               </Button>
             </Link>
             <Link href="/register">
-              <Button size="sm">Get Started</Button>
+              <Button size="sm">Get started</Button>
             </Link>
           </nav>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <main className="max-w-6xl mx-auto px-6 py-16">
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-gray-900 dark:text-white mb-4">
-            AI-First Full-Stack Starter in 1 repo
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto leading-relaxed">
-            Enterprise-ready AdonisJS + React starter with authentication, RBAC, file storage, and
-            AI-optimized architecture. Production-ready from day one.
-          </p>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex items-center justify-center gap-4 mb-16">
-          <Link href="/register">
-            <Button size="lg" className="px-8">
-              Get Started
-            </Button>
-          </Link>
-          <a href="https://github.com/gabrielmaialva33/adonis-web-kit" target="_blank">
-            <Button variant="outline" size="lg" className="px-8">
-              <GitHubIcon className="w-4 h-4 mr-2" />
-              View on GitHub
-            </Button>
-          </a>
-        </div>
-
-        {/* Code Example - Main Feature */}
-        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
-            <p className="text-sm text-gray-600 dark:text-gray-400">// JavaScript SDK</p>
+      <main className="mx-auto max-w-6xl px-6 py-16 sm:py-20">
+        <section className="mx-auto max-w-4xl text-center">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm font-medium text-blue-700 dark:border-blue-900 dark:bg-blue-950/40 dark:text-blue-300">
+            <Database className="size-4" />
+            AdonisJS + React + Inertia
           </div>
-          <div className="p-6">
-            <pre className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed overflow-x-auto">
-              <code>{`import { useForm } from '@inertiajs/react'
-import { useAuth } from '~/hooks/useAuth'
+          <h1 className="text-balance text-4xl font-bold tracking-tight sm:text-6xl">
+            A production-minded foundation for SaaS and multi-tenant applications
+          </h1>
+          <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-gray-600 dark:text-gray-400">
+            Start with authentication, workspaces, RBAC, file management, API documentation, testing
+            and SSR instead of rebuilding infrastructure for every product.
+          </p>
+          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link href="/register">
+              <Button size="lg" className="px-8">
+                Create an account <ArrowRight className="ms-2 size-4" />
+              </Button>
+            </Link>
+            {application.sourceUrl && (
+              <a href={application.sourceUrl} target="_blank" rel="noopener noreferrer">
+                <Button variant="outline" size="lg" className="px-8">
+                  View source
+                </Button>
+              </a>
+            )}
+          </div>
+        </section>
 
-// Sign up a new user with AI-optimized validation
-const { data, setData, post } = useForm({
-  email: '',
-  password: '',
-  full_name: ''
-})
+        <section className="mt-20 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+          {features.map((feature) => (
+            <article
+              key={feature.title}
+              className="rounded-xl border border-gray-200 bg-gray-50 p-6 dark:border-gray-800 dark:bg-gray-900"
+            >
+              <span className="mb-4 flex size-10 items-center justify-center rounded-lg bg-blue-100 text-blue-700 dark:bg-blue-950 dark:text-blue-300">
+                <feature.icon className="size-5" />
+              </span>
+              <h2 className="font-semibold">{feature.title}</h2>
+              <p className="mt-2 text-sm leading-6 text-gray-600 dark:text-gray-400">
+                {feature.description}
+              </p>
+            </article>
+          ))}
+        </section>
 
-const handleSubmit = (e) => {
-  e.preventDefault()
-  post('/register') // Auto JWT + role assignment
+        <section className="mt-20 grid gap-8 lg:grid-cols-2">
+          <div className="rounded-xl border border-gray-200 p-6 dark:border-gray-800">
+            <h2 className="text-2xl font-bold">Real product flows included</h2>
+            <p className="mt-4 leading-7 text-gray-600 dark:text-gray-400">
+              Registration can create a personal workspace, API tokens carry its identity, users can
+              recover or delete their account, and files are manageable from the API and web UI.
+            </p>
+            <a
+              href="/docs"
+              className="mt-5 inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline dark:text-blue-400"
+            >
+              Explore the API contract <ArrowRight className="size-4" />
+            </a>
+          </div>
+
+          <div className="overflow-hidden rounded-xl border border-gray-800 bg-gray-950">
+            <div className="border-b border-gray-800 px-5 py-3 text-xs text-gray-400">
+              Typed from page to policy
+            </div>
+            <pre className="overflow-x-auto p-5 text-sm leading-6 text-gray-200">
+              <code>{`const { activeTenant, can } = useAuth()
+
+if (activeTenant && can('files.create')) {
+  // POST /api/v1/files/upload
+  // x-tenant-id: activeTenant.id
 }
 
-// Check permissions with advanced RBAC
-const { can } = useAuth()
-if (can('users.create')) {
-  // User has permission
-}
-
-// Upload files with multi-provider support
-const handleUpload = async (files) => {
-  const result = await upload(files, {
-    disk: 's3', // or 'local', 'gcs'
-    folder: 'avatars',
-    resize: { width: 200, height: 200 }
-  })
-  return result.urls
-}
-
-// Real-time with built-in WebSocket support
-import { useRealtime } from '~/hooks/useRealtime'
-
-useRealtime('notifications', (data) => {
-  console.log('New notification:', data)
-})`}</code>
+if (can('files.delete.own')) {
+  // Ownership is verified again by the server.
+}`}</code>
             </pre>
           </div>
-        </div>
+        </section>
 
-        {/* Features List */}
-        <div className="mt-20 grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Authentication</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-              Multi-guard auth with JWT, sessions, API tokens, and OAuth providers. Email
-              verification and password reset included.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Advanced RBAC</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-              Role-based access control with permissions, inheritance, and time-based rules. Perfect
-              for enterprise applications.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">File Storage</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-              Upload to local, S3, or Google Cloud Storage. Image resizing, validation, and secure
-              URLs out of the box.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Database Ready</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-              PostgreSQL with migrations, seeders, and Lucid ORM. SQLite for testing. Fully
-              type-safe queries.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">AI-Optimized</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-              Monorepo structure with clear architecture designed for seamless AI collaboration and
-              code generation.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Production Ready</h3>
-            <p className="text-gray-600 dark:text-gray-400 text-sm leading-relaxed">
-              Docker support, health checks, logging, rate limiting, and comprehensive testing setup
-              included.
-            </p>
-          </div>
-        </div>
-
-        {/* Quick Start */}
-        <div className="mt-20">
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-8 text-center">
-            Get started
-          </h2>
-
-          <div className="bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 overflow-hidden">
-            <div className="p-6">
-              <pre className="text-sm text-gray-800 dark:text-gray-200 leading-relaxed">
-                <code>{`# Clone the repository
-git clone https://github.com/gabrielmaialva33/adonis-web-kit.git
+        <section className="mt-20 text-center">
+          <h2 className="text-3xl font-bold tracking-tight">Run it locally</h2>
+          <p className="mt-3 text-gray-600 dark:text-gray-400">
+            PostgreSQL, Redis and Mailpit are included in the development Compose stack.
+          </p>
+          <div className="mx-auto mt-8 max-w-3xl overflow-hidden rounded-xl border border-gray-800 bg-gray-950 text-start">
+            <pre className="overflow-x-auto p-6 text-sm leading-6 text-gray-200">
+              <code>{`git clone ${application.sourceUrl ?? '<repository-url>'}
 cd adonis-web-kit
-
-# Install dependencies
 pnpm install
-
-# Set up environment
 cp .env.example .env
-
-# Run migrations and start
-node ace migration:run
-pnpm dev
-
-# Your app is now running at http://localhost:3333 🚀`}</code>
-              </pre>
-            </div>
+pnpm ace generate:key
+docker compose up -d postgres redis mailpit
+pnpm ace migration:run
+pnpm ace db:seed
+pnpm dev`}</code>
+            </pre>
           </div>
-        </div>
-
-        {/* Footer CTA */}
-        <div className="mt-20 text-center">
-          <Link href="/register">
+          <Link href="/register" className="mt-8 inline-block">
             <Button size="lg" className="px-8">
-              Start building now
-              <ArrowRight className="w-4 h-4 ml-2" />
+              Start building <ArrowRight className="ms-2 size-4" />
             </Button>
           </Link>
-        </div>
+        </section>
       </main>
 
-      {/* Simple Footer */}
-      <footer className="border-t border-gray-200 dark:border-gray-800 mt-20">
-        <div className="max-w-6xl mx-auto px-6 py-8">
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              Built with ❤️ using AdonisJS and React. MIT Licensed.
-            </p>
-            <div className="flex items-center gap-4">
+      <footer className="mt-20 border-t border-gray-200 dark:border-gray-800">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-8 text-sm text-gray-600 dark:text-gray-400 sm:flex-row sm:items-center sm:justify-between">
+          <p>{application.name} · AdonisJS, React and Inertia · MIT licensed</p>
+          <div className="flex gap-4">
+            <a href="/docs" className="hover:text-gray-950 dark:hover:text-white">
+              Documentation
+            </a>
+            {application.sourceUrl && (
               <a
-                href="https://github.com/gabrielmaialva33/adonis-web-kit"
-                className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                href={application.sourceUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-gray-950 dark:hover:text-white"
               >
-                GitHub
+                Source
               </a>
-              <a
-                href="/docs"
-                className="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
-              >
-                Documentation
-              </a>
-            </div>
+            )}
           </div>
         </div>
       </footer>

@@ -3,6 +3,7 @@ import { CheckCircle2, type LucideIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 import { ThemeToggle } from '~/components/theme/theme_toggle'
+import { useApp } from '~/hooks/use_app'
 
 interface Feature {
   title: string
@@ -33,6 +34,9 @@ export function AuthSplitLayout({
   children,
   footer,
 }: AuthSplitLayoutProps) {
+  const application = useApp()
+  const brandMark = application.name.trim().charAt(0).toUpperCase() || 'A'
+
   return (
     <div className="flex min-h-screen">
       {/* Form side */}
@@ -40,9 +44,9 @@ export function AuthSplitLayout({
         <header className="flex items-center justify-between p-6 lg:p-8">
           <Link href="/" className="flex items-center gap-2">
             <div className="flex size-10 items-center justify-center rounded-lg bg-primary">
-              <span className="text-lg font-bold text-primary-foreground">A</span>
+              <span className="text-lg font-bold text-primary-foreground">{brandMark}</span>
             </div>
-            <span className="text-xl font-bold">AdonisKit</span>
+            <span className="text-xl font-bold">{application.name}</span>
           </Link>
           <ThemeToggle />
         </header>
@@ -61,7 +65,7 @@ export function AuthSplitLayout({
         </div>
 
         <footer className="p-6 text-sm text-muted-foreground lg:p-8">
-          &copy; {new Date().getFullYear()} AdonisKit. All rights reserved.
+          &copy; {new Date().getFullYear()} {application.name}. All rights reserved.
         </footer>
       </div>
 

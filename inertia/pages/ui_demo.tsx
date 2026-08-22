@@ -269,11 +269,11 @@ export default function UiDemoPage() {
                     description="Get started by creating your first document"
                     action={{
                       label: 'Create Document',
-                      onClick: () => console.log('Create document'),
+                      onClick: () => undefined,
                     }}
                     secondaryAction={{
                       label: 'Learn more',
-                      onClick: () => console.log('Learn more'),
+                      onClick: () => undefined,
                     }}
                   />
                 </CardContent>

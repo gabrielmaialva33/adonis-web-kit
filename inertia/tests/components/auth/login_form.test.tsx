@@ -1,3 +1,4 @@
+import type { AnchorHTMLAttributes } from 'react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen } from '@testing-library/react'
 import { LoginForm } from '~/components/auth/login_form'
@@ -11,6 +12,15 @@ const { mockPost } = vi.hoisted(() => ({ mockPost: vi.fn() }))
 vi.mock('@inertiajs/react', async () => {
   const React = await import('react')
   return {
+    Link: ({
+      href,
+      children,
+      ...props
+    }: AnchorHTMLAttributes<HTMLAnchorElement> & { href: string }) => (
+      <a href={href} {...props}>
+        {children}
+      </a>
+    ),
     useForm: <T extends Record<string, unknown>>(initial: T) => {
       const [data, setData] = React.useState<T>(initial)
       return {
@@ -35,6 +45,10 @@ describe('LoginForm', () => {
     expect(screen.getByLabelText(/Email or Username/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/Password/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Sign in/i })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /Forgot password/i })).toHaveAttribute(
+      'href',
+      '/forgot-password'
+    )
   })
 
   it('allows entering credentials', async () => {

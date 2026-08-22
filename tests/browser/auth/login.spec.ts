@@ -30,30 +30,7 @@ test.group('Auth login', () => {
     await page.fill('input[name="uid"]', user.email)
     await page.fill('input[name="password"]', 'password123')
 
-    // Submit form
     await page.click('button[type="submit"]:has-text("Sign in")')
-
-    // Wait a bit for form submission
-    await page.waitForTimeout(2000)
-
-    // Check if we're still on login page (indicating error)
-    const currentUrl = page.url()
-    if (currentUrl.includes('/login')) {
-      // Check for error messages
-      const errorElements = await page
-        .locator('.error, .alert-error, [role="alert"], .text-red-500, .text-destructive')
-        .count()
-      if (errorElements > 0) {
-        const errorText = await page
-          .locator('.error, .alert-error, [role="alert"], .text-red-500, .text-destructive')
-          .first()
-          .textContent()
-        throw new Error(`Login failed with error: ${errorText}`)
-      }
-      throw new Error(`Login failed - still on login page: ${currentUrl}`)
-    }
-
-    // Should redirect to dashboard
     await page.waitForURL('**/dashboard', { timeout: 10000 })
 
     // Verify we're on dashboard page
@@ -98,6 +75,15 @@ test.group('Auth login', () => {
     // Form should still be visible
     await page.locator('input[name="uid"]').waitFor()
     await page.locator('input[name="password"]').waitFor()
+  })
+
+  test('should navigate to password recovery', async ({ browserContext }) => {
+    const page = await browserContext.newPage()
+    await page.goto('/login')
+
+    await page.getByRole('link', { name: 'Forgot password?' }).click()
+    await page.waitForURL('**/forgot-password')
+    await page.getByRole('heading', { name: 'Forgot your password?' }).waitFor()
   })
 
   test('should navigate to register page', async ({ browserContext }) => {

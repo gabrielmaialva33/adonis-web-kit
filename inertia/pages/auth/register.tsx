@@ -2,6 +2,7 @@ import { Head, Link } from '@inertiajs/react'
 import { Layers, Lock, Rocket } from 'lucide-react'
 
 import { RegisterForm } from '~/components/auth'
+import { useApp } from '~/hooks/use_app'
 import { AuthSplitLayout } from '~/layouts/auth/auth_split_layout'
 
 interface RegisterPageProps {
@@ -9,14 +10,16 @@ interface RegisterPageProps {
 }
 
 export default function RegisterPage({ errors }: RegisterPageProps) {
+  const application = useApp()
+
   return (
     <>
       <Head title="Register" />
       <AuthSplitLayout
         title="Create account"
         subtitle="Enter your information to create your account"
-        panelTitle="Join AdonisKit today"
-        panelDescription="Start building with a powerful toolkit: authentication, user management, file uploads and more."
+        panelTitle={`Join ${application.name}`}
+        panelDescription="Create an account with secure authentication, workspace onboarding, file management and recovery flows already wired."
         features={[
           {
             title: 'Secure by default',

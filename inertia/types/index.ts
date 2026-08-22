@@ -29,9 +29,18 @@ export interface AuthSharedProps {
   permissions: string[]
 }
 
+export interface AppSharedProps {
+  name: string
+  url: string
+  sourceUrl: string | null
+  environment: 'development' | 'production' | 'test'
+  demoPagesEnabled: boolean
+}
+
 // Extend shared props with our app-specific props (declaration merging)
 declare module '@adonisjs/inertia/types' {
   export interface SharedProps {
+    app?: AppSharedProps
     auth?: AuthSharedProps
     flash?: {
       success?: string

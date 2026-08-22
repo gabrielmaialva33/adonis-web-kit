@@ -13,6 +13,7 @@ import {
 } from '~/components/ui/dropdown-menu'
 import { Sheet, SheetContent, SheetTrigger } from '~/components/ui/sheet'
 import { ThemeToggle } from '~/components/theme/theme_toggle'
+import { useApp } from '~/hooks/use_app'
 import { useAuth } from '~/hooks/use_auth'
 import { SidebarNav } from './sidebar'
 import { cn } from '~/lib/utils'
@@ -94,7 +95,7 @@ function UserMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" mode="icon" className="rounded-full">
+        <Button variant="ghost" mode="icon" className="rounded-full" aria-label="Open user menu">
           <Avatar className="size-8">
             <AvatarFallback className="bg-primary/10 text-primary">
               {initialsOf(user.full_name)}
@@ -143,6 +144,9 @@ interface HeaderProps {
 }
 
 export function Header({ onToggleSidebar, collapsed = false }: HeaderProps) {
+  const application = useApp()
+  const brandMark = initialsOf(application.name).slice(0, 1) || 'A'
+
   return (
     <header className="sticky top-0 z-50 flex h-16 w-full items-center border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       {/* Brand column — aligned with the sidebar column below it (same width + divider) */}
@@ -162,9 +166,9 @@ export function Header({ onToggleSidebar, collapsed = false }: HeaderProps) {
           <SheetContent side="left" className="w-[280px] p-0">
             <Link href="/dashboard" className="flex h-16 items-center gap-2 border-b px-5">
               <div className="flex size-8 items-center justify-center rounded-lg bg-primary">
-                <span className="font-bold text-primary-foreground">A</span>
+                <span className="font-bold text-primary-foreground">{brandMark}</span>
               </div>
-              <span className="text-lg font-semibold">AdonisKit</span>
+              <span className="truncate text-lg font-semibold">{application.name}</span>
             </Link>
             <SidebarNav />
           </SheetContent>
@@ -173,9 +177,11 @@ export function Header({ onToggleSidebar, collapsed = false }: HeaderProps) {
         {/* Logo */}
         <Link href="/dashboard" className="flex items-center gap-2 overflow-hidden">
           <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary">
-            <span className="font-bold text-primary-foreground">A</span>
+            <span className="font-bold text-primary-foreground">{brandMark}</span>
           </div>
-          <span className={cn('text-lg font-semibold', collapsed && 'lg:hidden')}>AdonisKit</span>
+          <span className={cn('truncate text-lg font-semibold', collapsed && 'lg:hidden')}>
+            {application.name}
+          </span>
         </Link>
       </div>
 

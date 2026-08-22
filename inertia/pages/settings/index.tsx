@@ -1,6 +1,6 @@
 import { Head, useForm, usePage } from '@inertiajs/react'
 import { useTheme } from 'next-themes'
-import { Building2, Check, Monitor, Moon, Sun, type LucideIcon } from 'lucide-react'
+import { Building2, Check, Monitor, Moon, Sun, Trash2, type LucideIcon } from 'lucide-react'
 
 import { MainLayout } from '~/layouts'
 import { Card, CardContent, CardHeader, CardHeading, CardTitle } from '~/components/ui/card'
@@ -24,10 +24,6 @@ interface SettingsPageProps {
   profile: SettingsProfile
 }
 
-interface FlashProps {
-  flash?: { success?: string | null; error?: string | null }
-}
-
 const THEMES: { value: string; label: string; icon: LucideIcon }[] = [
   { value: 'light', label: 'Light', icon: Sun },
   { value: 'dark', label: 'Dark', icon: Moon },
@@ -35,7 +31,6 @@ const THEMES: { value: string; label: string; icon: LucideIcon }[] = [
 ]
 
 function ProfileTab({ profile }: { profile: SettingsProfile }) {
-  const { flash } = usePage().props as FlashProps
   const { data, setData, post, processing, errors } = useForm({
     full_name: profile.full_name,
     username: profile.username ?? '',
@@ -56,12 +51,6 @@ function ProfileTab({ profile }: { profile: SettingsProfile }) {
       </CardHeader>
       <CardContent>
         <form onSubmit={submit} className="max-w-xl space-y-5">
-          {flash?.success && (
-            <div className="rounded-md border border-success/30 bg-success/10 px-3 py-2 text-sm text-success">
-              {flash.success}
-            </div>
-          )}
-
           <div className="space-y-2">
             <Label htmlFor="full_name">Full name</Label>
             <Input
@@ -146,8 +135,104 @@ function AppearanceTab() {
   )
 }
 
+function AccountTab() {
+  const { errors: sharedErrors } = usePage().props as { errors?: Record<string, string> }
+  const {
+    data,
+    setData,
+    delete: deleteRequest,
+    processing,
+    errors,
+  } = useForm({
+    current_password: '',
+    confirmation: '',
+  })
+
+  const submit = (event: React.FormEvent) => {
+    event.preventDefault()
+    deleteRequest('/settings/account')
+  }
+
+  return (
+    <Card className="border-destructive/40">
+      <CardHeader>
+        <CardHeading>
+          <CardTitle className="text-destructive">Delete account</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Permanently disable your account, revoke active credentials and release your email for a
+            future registration. Historical audit references are retained as an anonymized user.
+          </p>
+        </CardHeading>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={submit} className="max-w-xl space-y-5">
+          {sharedErrors?.general && (
+            <div className="rounded-md border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+              {sharedErrors.general}
+            </div>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="current_password">Current password</Label>
+            <Input
+              id="current_password"
+              type="password"
+              value={data.current_password}
+              onChange={(event) => setData('current_password', event.target.value)}
+              autoComplete="current-password"
+              aria-invalid={!!errors.current_password}
+            />
+            {errors.current_password && (
+              <p className="text-sm text-destructive">{errors.current_password}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="delete_confirmation">
+              Type <span className="font-semibold">DELETE</span> to confirm
+            </Label>
+            <Input
+              id="delete_confirmation"
+              value={data.confirmation}
+              onChange={(event) => setData('confirmation', event.target.value)}
+              autoComplete="off"
+              aria-invalid={!!errors.confirmation}
+            />
+            {errors.confirmation && (
+              <p className="text-sm text-destructive">{errors.confirmation}</p>
+            )}
+          </div>
+
+          <Button
+            type="submit"
+            variant="destructive"
+            disabled={
+              processing ||
+              !data.current_password ||
+              data.confirmation.trim().toUpperCase() !== 'DELETE'
+            }
+          >
+            <Trash2 className="size-4" />
+            {processing ? 'Deleting account...' : 'Delete my account'}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
+  )
+}
+
 function WorkspacesTab() {
-  const { tenants, activeTenantId } = useAuth()
+  const { tenants, activeTenantId, can } = useAuth()
+  const { data, setData, post, processing, errors, reset } = useForm({ name: '' })
+  const canCreateWorkspace = can('tenants.create')
+
+  const submit = (event: React.FormEvent) => {
+    event.preventDefault()
+    post('/settings/workspaces', {
+      preserveScroll: true,
+      onSuccess: () => reset(),
+    })
+  }
 
   return (
     <Card>
@@ -155,14 +240,35 @@ function WorkspacesTab() {
         <CardHeading>
           <CardTitle>Workspaces</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Tenants you belong to and your role in each.
+            Workspaces you belong to and your membership role in each.
           </p>
         </CardHeading>
       </CardHeader>
       <CardContent className="p-0">
+        {canCreateWorkspace && (
+          <form onSubmit={submit} className="space-y-3 border-b border-border p-5">
+            <div className="grid gap-2 sm:grid-cols-[1fr_auto] sm:items-end">
+              <div className="space-y-2">
+                <Label htmlFor="workspace_name">New workspace</Label>
+                <Input
+                  id="workspace_name"
+                  value={data.name}
+                  onChange={(event) => setData('name', event.target.value)}
+                  placeholder="Acme Workspace"
+                  aria-invalid={!!errors.name}
+                />
+              </div>
+              <Button type="submit" variant="primary" disabled={processing || !data.name.trim()}>
+                {processing ? 'Creating...' : 'Create workspace'}
+              </Button>
+            </div>
+            {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
+          </form>
+        )}
+
         {tenants.length === 0 ? (
           <p className="p-5 text-sm text-muted-foreground">
-            You don&apos;t belong to any workspace yet.
+            You don&apos;t belong to any workspace yet. Create one to unlock tenant-scoped features.
           </p>
         ) : (
           <ul className="divide-y divide-border">
@@ -197,6 +303,12 @@ function WorkspacesTab() {
 }
 
 export default function SettingsPage({ profile }: SettingsPageProps) {
+  const { url } = usePage()
+  const requestedTab = new URL(url, 'http://localhost').searchParams.get('tab')
+  const defaultTab = ['profile', 'appearance', 'workspaces', 'account'].includes(requestedTab ?? '')
+    ? requestedTab!
+    : 'profile'
+
   return (
     <MainLayout>
       <Head title="Settings" />
@@ -207,11 +319,12 @@ export default function SettingsPage({ profile }: SettingsPageProps) {
           description="Manage your account, appearance and workspaces."
         />
 
-        <Tabs defaultValue="profile" className="space-y-4">
+        <Tabs defaultValue={defaultTab} className="space-y-4">
           <TabsList variant="line">
             <TabsTrigger value="profile">Profile</TabsTrigger>
             <TabsTrigger value="appearance">Appearance</TabsTrigger>
             <TabsTrigger value="workspaces">Workspaces</TabsTrigger>
+            <TabsTrigger value="account">Account</TabsTrigger>
           </TabsList>
 
           <TabsContent value="profile">
@@ -222,6 +335,9 @@ export default function SettingsPage({ profile }: SettingsPageProps) {
           </TabsContent>
           <TabsContent value="workspaces">
             <WorkspacesTab />
+          </TabsContent>
+          <TabsContent value="account">
+            <AccountTab />
           </TabsContent>
         </Tabs>
       </div>
