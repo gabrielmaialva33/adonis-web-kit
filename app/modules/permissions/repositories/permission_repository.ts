@@ -16,8 +16,17 @@ export default class PermissionRepository
     return this.model.findBy('name', name)
   }
 
-  async findByResourceAction(resource: string, action: string): Promise<Permission | null> {
-    return this.model.query().where('resource', resource).where('action', action).first()
+  async findByResourceAction(
+    resource: string,
+    action: string,
+    context: string = IPermission.Contexts.ANY
+  ): Promise<Permission | null> {
+    return this.model
+      .query()
+      .where('resource', resource)
+      .where('action', action)
+      .where('context', context)
+      .first()
   }
 
   async syncPermissions(
@@ -29,6 +38,7 @@ export default class PermissionRepository
         {
           resource: permissionData.resource,
           action: permissionData.action,
+          context: permissionData.context ?? IPermission.Contexts.ANY,
         },
         {
           name: permissionData.name,
@@ -101,18 +111,15 @@ export default class PermissionRepository
   }
 
   /**
-   * Permission ids granted to the USER role: read/update users and
-   * create/read/list files.
+   * The default USER role is intentionally narrow: it can enter the dashboard
+   * and work with files, but cannot enumerate or mutate platform users/roles.
+   * Own-profile operations use dedicated authenticated endpoints instead of
+   * global user-management permissions.
    */
   async findUserPermissionIds(trx?: TransactionClientContract): Promise<number[]> {
     const rows = await this.model
       .query({ client: trx })
       .where((query) => {
-        query
-          .where('resource', IPermission.Resources.USERS)
-          .whereIn('action', [IPermission.Actions.READ, IPermission.Actions.UPDATE])
-      })
-      .orWhere((query) => {
         query
           .where('resource', IPermission.Resources.FILES)
           .whereIn('action', [
@@ -121,23 +128,22 @@ export default class PermissionRepository
             IPermission.Actions.LIST,
           ])
       })
+      .orWhere((query) => {
+        query
+          .where('resource', IPermission.Resources.DASHBOARD)
+          .where('action', IPermission.Actions.READ)
+      })
       .select('id')
 
     return rows.map((row) => row.id)
   }
 
   /**
-   * Permission ids granted to the GUEST role: read/list on everything except
-   * permissions and audit.
+   * GUEST is a neutral role by default. Applications may opt in to public or
+   * guest capabilities explicitly instead of inheriting broad global reads.
    */
-  async findGuestPermissionIds(trx?: TransactionClientContract): Promise<number[]> {
-    const rows = await this.model
-      .query({ client: trx })
-      .whereIn('action', [IPermission.Actions.READ, IPermission.Actions.LIST])
-      .whereNotIn('resource', [IPermission.Resources.PERMISSIONS, IPermission.Resources.AUDIT])
-      .select('id')
-
-    return rows.map((row) => row.id)
+  async findGuestPermissionIds(_trx?: TransactionClientContract): Promise<number[]> {
+    return []
   }
 
   /**

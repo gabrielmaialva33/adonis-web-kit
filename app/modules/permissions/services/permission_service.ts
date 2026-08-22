@@ -7,13 +7,15 @@ import Permission from '#modules/permissions/models/permission'
 import UsersRepository from '#modules/users/repositories/users_repository'
 
 import IPermission from '#modules/permissions/interfaces/permission_interface'
+import OwnershipService from '#shared/services/ownership_service'
 
 @inject()
 export default class PermissionService {
   constructor(
     private cacheService: PermissionCacheService,
     private inheritanceService: PermissionInheritanceService,
-    private usersRepository: UsersRepository
+    private usersRepository: UsersRepository,
+    private ownershipService: OwnershipService
   ) {}
 
   /**
@@ -80,6 +82,26 @@ export default class PermissionService {
   }
 
   /**
+   * Resolve effective permissions through direct grants, roles and inheritance.
+   * The same cached path is shared by middleware and Inertia UI capabilities.
+   */
+  async getEffectivePermissions(userId: number): Promise<Permission[]> {
+    const cachedPermissions = await this.cacheService.getCachedUserPermissions(userId)
+    if (cachedPermissions) {
+      return cachedPermissions
+    }
+
+    const permissions = await this.loadUserPermissionsOptimized(userId)
+    await this.cacheService.cacheUserPermissions(userId, permissions)
+    return permissions
+  }
+
+  async getEffectivePermissionNames(userId: number): Promise<string[]> {
+    const permissions = await this.getEffectivePermissions(userId)
+    return permissions.map((permission) => permission.name)
+  }
+
+  /**
    * Get user permission summary
    */
   async getUserPermissionSummary(userId: number): Promise<{
@@ -143,34 +165,7 @@ export default class PermissionService {
     const action = parts[1]
     const permissionContext = parts[2] || context || 'any'
 
-    // Try cache first
-    const cachedPermissions = await this.cacheService.getCachedUserPermissions(userId)
-
-    if (cachedPermissions) {
-      const hasPermission = this.checkPermissionInList(
-        cachedPermissions,
-        resource,
-        action,
-        permissionContext
-      )
-
-      if (hasPermission) {
-        return await this.checkContextualPermission(
-          userId,
-          resource,
-          action,
-          permissionContext,
-          resourceId
-        )
-      }
-    }
-
-    // Load from database with optimized query
-    const userPermissions = await this.loadUserPermissionsOptimized(userId)
-
-    // Cache the results
-    await this.cacheService.cacheUserPermissions(userId, userPermissions)
-
+    const userPermissions = await this.getEffectivePermissions(userId)
     const hasPermission = this.checkPermissionInList(
       userPermissions,
       resource,
@@ -243,52 +238,30 @@ export default class PermissionService {
   private async checkContextualPermission(
     userId: number,
     resource: string,
-    _action: string,
+    action: string,
     context: string,
     resourceId?: number
   ): Promise<boolean> {
-    // If context is 'any', permission is granted
-    if (context === 'any') {
+    if (context === IPermission.Contexts.ANY) {
       return true
     }
 
-    // If context is 'own', check ownership
-    if (context === 'own' && resourceId) {
-      return await this.checkResourceOwnership(userId, resource, resourceId)
+    if (context === IPermission.Contexts.OWN) {
+      if (!resourceId) {
+        return false
+      }
+
+      return this.ownershipService.checkOwnership({
+        userId,
+        resource,
+        resourceId,
+        action,
+        context,
+      })
     }
 
-    // Add more contextual checks as needed
-    return true
-  }
-
-  /**
-   * Check resource ownership
-   */
-  private async checkResourceOwnership(
-    userId: number,
-    resource: string,
-    resourceId: number
-  ): Promise<boolean> {
-    // This is a simplified implementation
-    // You would implement specific ownership checks based on your domain
-
-    switch (resource) {
-      case 'users':
-        return userId === resourceId
-
-      case 'posts':
-        // Example: check if user owns the post
-        // const post = await Post.find(resourceId)
-        // return post?.user_id === userId
-        break
-
-      case 'files':
-        // Example: check if user uploaded the file
-        // const file = await File.find(resourceId)
-        // return file?.uploaded_by === userId
-        break
-    }
-
+    // Team and department contexts are denied until a concrete domain policy is
+    // registered. Unknown contextual permissions must never fail open.
     return false
   }
 }

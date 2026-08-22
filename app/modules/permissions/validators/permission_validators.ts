@@ -10,6 +10,7 @@ export const createPermissionValidator = vine.compile(
     description: vine.string().optional(),
     resource: vine.enum(Object.values(IPermission.Resources)),
     action: vine.enum(Object.values(IPermission.Actions)),
+    context: vine.enum(Object.values(IPermission.Contexts)).optional(),
   })
 )
 

@@ -288,7 +288,7 @@ test.group('Roles admin', (group) => {
     })
   })
 
-  test('should prevent duplicate role attachment', async ({ client }) => {
+  test('should make duplicate role attachment idempotent', async ({ client, assert }) => {
     const adminRole = await Role.firstOrCreate(
       { slug: IRole.Slugs.ADMIN },
       {
@@ -335,10 +335,16 @@ test.group('Roles admin', (group) => {
       })
       .loginAs(adminUser)
 
-    response.assertStatus(409)
+    response.assertStatus(200)
     response.assertBodyContains({
-      message: 'User already has this role',
+      message: 'Role attached successfully',
     })
+
+    const rows = await db
+      .from('user_roles')
+      .where('user_id', targetUser.id)
+      .where('role_id', userRole.id)
+    assert.lengthOf(rows, 1)
   })
 
   test('should require authentication for admin endpoints', async ({ client }) => {

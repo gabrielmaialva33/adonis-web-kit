@@ -51,7 +51,7 @@ export default class RolesRepository
     permissionIds: number[],
     trx?: TransactionClientContract
   ): Promise<void> {
-    await role.related('permissions').attach(permissionIds, trx)
+    await role.related('permissions').sync(permissionIds, false, trx)
   }
 
   /**

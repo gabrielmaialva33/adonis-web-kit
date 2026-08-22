@@ -37,16 +37,6 @@ export default class RolesController {
         return response.notFound({ message: 'Role not found' })
       }
 
-      // Check for existing role attachments
-      const existingRoles = await db
-        .from('user_roles')
-        .where('user_id', userId)
-        .whereIn('role_id', roleIds)
-
-      if (existingRoles.length > 0) {
-        return response.conflict({ message: 'User already has this role' })
-      }
-
       const syncRolesService = await app.container.make(SyncRolesService)
       await syncRolesService.run({ userId, roleIds })
 

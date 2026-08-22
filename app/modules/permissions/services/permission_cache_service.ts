@@ -192,24 +192,14 @@ export default class PermissionCacheService {
    * Invalidate all user caches (when permissions change globally)
    */
   async invalidateAllUserCaches(): Promise<void> {
-    const pattern = `${this.CACHE_PREFIX}:user:*`
-    const keys = await redis.keys(pattern)
-
-    if (keys.length > 0) {
-      await redis.del(...keys)
-    }
+    await this.deleteByPattern(`${this.CACHE_PREFIX}:user:*`)
   }
 
   /**
    * Invalidate all role caches
    */
   async invalidateAllRoleCaches(): Promise<void> {
-    const pattern = `${this.CACHE_PREFIX}:role:*`
-    const keys = await redis.keys(pattern)
-
-    if (keys.length > 0) {
-      await redis.del(...keys)
-    }
+    await this.deleteByPattern(`${this.CACHE_PREFIX}:role:*`)
   }
 
   /**
@@ -260,7 +250,7 @@ export default class PermissionCacheService {
     rolePermissions: number
     permissionChecks: number
   }> {
-    const allKeys = await redis.keys(`${this.CACHE_PREFIX}:*`)
+    const allKeys = await this.scanKeys(`${this.CACHE_PREFIX}:*`)
 
     const userPermissions = allKeys.filter(
       (key) => key.includes(':user:') && !key.includes(':user_roles:')
@@ -282,11 +272,27 @@ export default class PermissionCacheService {
    * Clear all ACL cache
    */
   async clearAllCache(): Promise<void> {
-    const pattern = `${this.CACHE_PREFIX}:*`
-    const keys = await redis.keys(pattern)
+    await this.deleteByPattern(`${this.CACHE_PREFIX}:*`)
+  }
 
-    if (keys.length > 0) {
-      await redis.del(...keys)
+  private async scanKeys(pattern: string): Promise<string[]> {
+    let cursor = '0'
+    const keys: string[] = []
+
+    do {
+      const [nextCursor, batch] = await redis.scan(cursor, 'MATCH', pattern, 'COUNT', 100)
+      cursor = nextCursor
+      keys.push(...batch)
+    } while (cursor !== '0')
+
+    return keys
+  }
+
+  private async deleteByPattern(pattern: string): Promise<void> {
+    const keys = await this.scanKeys(pattern)
+
+    for (let index = 0; index < keys.length; index += 500) {
+      await redis.del(...keys.slice(index, index + 500))
     }
   }
 

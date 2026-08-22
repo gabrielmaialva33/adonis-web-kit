@@ -7,7 +7,11 @@ namespace IPermission {
   export interface Repository extends LucidRepositoryInterface<typeof Permission> {
     findByName(name: string): Promise<Permission | null>
 
-    findByResourceAction(resource: string, action: string): Promise<Permission | null>
+    findByResourceAction(
+      resource: string,
+      action: string,
+      context?: string
+    ): Promise<Permission | null>
 
     syncPermissions(permissions: SyncPermissionData[]): Promise<void>
 
@@ -36,6 +40,7 @@ namespace IPermission {
     resource: string
     action: string
     description?: string
+    context?: string
   }
 
   export interface PermissionCheck {
@@ -54,6 +59,7 @@ namespace IPermission {
     SETTINGS = 'settings',
     REPORTS = 'reports',
     AUDIT = 'audit',
+    DASHBOARD = 'dashboard',
   }
 
   export enum Actions {
