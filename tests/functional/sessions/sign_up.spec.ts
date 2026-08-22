@@ -1,12 +1,14 @@
 import { test } from '@japa/runner'
 import testUtils from '@adonisjs/core/services/test_utils'
 
+import app from '@adonisjs/core/services/app'
 import db from '@adonisjs/lucid/services/db'
 import mail from '@adonisjs/mail/services/main'
 
 import User from '#modules/users/models/user'
 import Role from '#modules/roles/models/role'
 
+import PermissionService from '#modules/permissions/services/permission_service'
 import IRole from '#modules/roles/interfaces/role_interface'
 
 test.group('Sessions sign up', (group) => {
@@ -186,6 +188,34 @@ test.group('Sessions sign up', (group) => {
         },
       ],
     })
+  })
+
+  test('should assign a least-privilege default permission set', async ({ client, assert }) => {
+    const response = await client.post('/api/v1/sessions/sign-up').json({
+      full_name: 'Least Privilege',
+      email: 'least-privilege@example.com',
+      username: 'least-privilege',
+      password: 'password123',
+      password_confirmation: 'password123',
+    })
+
+    response.assertStatus(201)
+    const user = await User.findByOrFail('email', 'least-privilege@example.com')
+    const permissionService = await app.container.make(PermissionService)
+    const permissions = await permissionService.getEffectivePermissionNames(user.id)
+
+    assert.includeMembers(permissions, [
+      'dashboard.read',
+      'files.create',
+      'files.read',
+      'files.list',
+    ])
+    assert.notInclude(permissions, 'users.list')
+    assert.notInclude(permissions, 'users.read')
+    assert.notInclude(permissions, 'users.update')
+    assert.notInclude(permissions, 'users.delete')
+    assert.notInclude(permissions, 'roles.list')
+    assert.notInclude(permissions, 'permissions.list')
   })
 
   test('should assign default user role', async ({ client, assert }) => {

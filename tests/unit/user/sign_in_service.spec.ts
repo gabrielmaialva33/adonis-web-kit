@@ -45,13 +45,11 @@ test.group('SignInService', (group) => {
     })
 
     assert.exists(result.auth)
-    assert.exists(result.auth.access_token)
-    assert.exists(result.auth.refresh_token)
-    assert.isString(result.auth.access_token)
-    assert.isString(result.auth.refresh_token)
-    assert.equal(result.id, user.id)
-    assert.equal(result.email, user.email)
-    assert.equal(result.full_name, user.full_name)
+    assert.isString(result.auth!.access_token)
+    assert.isString(result.auth!.refresh_token)
+    assert.equal(result.user.id, user.id)
+    assert.equal(result.user.email, user.email)
+    assert.equal(result.user.full_name, user.full_name)
   })
 
   test('should throw exception for non-existent user', async ({ assert }) => {
@@ -136,8 +134,8 @@ test.group('SignInService', (group) => {
     })
 
     assert.exists(result.auth)
-    assert.exists(result.id)
-    assert.equal(result.email, user.email)
+    assert.exists(result.user.id)
+    assert.equal(result.user.email, user.email)
   })
 
   test('should handle user without roles', async ({ assert }) => {
@@ -169,9 +167,9 @@ test.group('SignInService', (group) => {
     })
 
     assert.exists(result.auth)
-    assert.exists(result.auth.access_token)
-    assert.exists(result.auth.refresh_token)
-    assert.equal(result.id, user.id)
+    assert.isString(result.auth!.access_token)
+    assert.isString(result.auth!.refresh_token)
+    assert.equal(result.user.id, user.id)
   })
 
   test('should handle soft deleted users', async ({ assert }) => {

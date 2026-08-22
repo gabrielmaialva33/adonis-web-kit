@@ -1,30 +1,31 @@
-import { DateTime } from 'luxon'
-import string from '@adonisjs/core/helpers/string'
+import { inject } from '@adonisjs/core'
 import mail from '@adonisjs/mail/services/main'
-import type User from '#modules/users/models/user'
+import { DateTime } from 'luxon'
+
+import EmailVerificationTokenService from '#modules/auth/services/email_verification_token_service'
 import VerifyEmailNotification from '#modules/auth/services/verify_email_notification'
+import type User from '#modules/users/models/user'
 
+@inject()
 export default class SendVerificationEmailService {
-  async handle(user: User): Promise<void> {
-    // Generate verification token
-    const token = string.generateRandom(32)
+  constructor(private tokenService: EmailVerificationTokenService) {}
 
-    // Initialize metadata if it doesn't exist
+  async handle(user: User): Promise<void> {
+    const { token, tokenHash } = this.tokenService.generate()
+
     if (!user.metadata) {
       user.metadata = {
         email_verified: false,
-        email_verification_token: null,
+        email_verification_token_hash: null,
         email_verification_sent_at: null,
         email_verified_at: null,
       }
     }
 
-    // Save token and timestamp
-    user.metadata.email_verification_token = token
+    user.metadata.email_verification_token_hash = tokenHash
     user.metadata.email_verification_sent_at = DateTime.now().toISO()
     await user.save()
 
-    // Send verification email
     await mail.send(new VerifyEmailNotification(user, token))
   }
 }

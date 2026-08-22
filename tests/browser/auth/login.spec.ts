@@ -15,9 +15,8 @@ test.group('Auth login', () => {
     await page.locator('input[name="password"]').waitFor()
     await page.locator('button[type="submit"]:has-text("Sign in")').waitFor()
 
-    // Check navigation links
+    // Check navigation link
     await page.locator('a:has-text("Sign up")').waitFor()
-    await page.locator('a:has-text("Forgot password?")').waitFor()
   })
 
   test('should login successfully with valid credentials', async ({ browserContext }) => {

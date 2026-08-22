@@ -1,40 +1,53 @@
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 
-import UsersRepository from '#modules/users/repositories/users_repository'
-import JwtAuthTokensService from '#modules/auth/services/jwt_auth_tokens_service'
-import SendVerificationEmailService from '#modules/auth/services/send_verification_email_service'
-import IUser from '#modules/users/interfaces/user_interface'
 import AuthEventService from '#modules/auth/services/auth_event_service'
+import JwtAuthTokensService, {
+  type GenerateAuthTokensResponse,
+} from '#modules/auth/services/jwt_auth_tokens_service'
+import SendVerificationEmailService from '#modules/auth/services/send_verification_email_service'
+import type IUser from '#modules/users/interfaces/user_interface'
+import User from '#modules/users/models/user'
+import CreateUserService from '#modules/users/services/create_user_service'
+import IRole from '#modules/roles/interfaces/role_interface'
+
+export type SignUpOptions = {
+  issueApiTokens?: boolean
+}
+
+export type SignUpResult = {
+  user: User
+  auth?: GenerateAuthTokensResponse
+}
 
 @inject()
 export default class SignUpService {
   constructor(
-    private usersRepository: UsersRepository,
+    private createUserService: CreateUserService,
     private jwtAuthTokensService: JwtAuthTokensService,
     private sendVerificationEmailService: SendVerificationEmailService
   ) {}
 
-  async run(payload: IUser.CreatePayload) {
+  async run(payload: IUser.CreatePayload, options: SignUpOptions = {}): Promise<SignUpResult> {
     const ctx = HttpContext.getOrFail()
-
-    const user = await this.usersRepository.create(payload)
+    const user = await this.createUserService.run(payload)
     await user.load('roles')
 
-    // Send verification email
     await this.sendVerificationEmailService.handle(user)
-
-    const auth = await this.jwtAuthTokensService.run({ userId: user.id })
-
-    // Emit user registered event
     AuthEventService.emitUserRegistered(user, 'sign-up', false, ctx)
 
-    // Emit login succeeded event (auto-login after registration)
-    const isAdmin = user.roles.some((role) => role.name === 'ADMIN' || role.name === 'ROOT')
-    AuthEventService.emitLoginSucceeded(user, 'password', isAdmin, ctx)
+    const auth =
+      options.issueApiTokens === false
+        ? undefined
+        : await this.jwtAuthTokensService.run({ userId: user.id })
 
-    const userJson = user.toJSON()
+    if (auth) {
+      const isAdmin = user.roles.some((role) =>
+        [IRole.Slugs.ADMIN, IRole.Slugs.ROOT].includes(role.slug)
+      )
+      AuthEventService.emitLoginSucceeded(user, 'password', isAdmin, ctx)
+    }
 
-    return { ...userJson, auth }
+    return { user, auth }
   }
 }

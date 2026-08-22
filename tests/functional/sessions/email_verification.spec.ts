@@ -1,13 +1,21 @@
 import { test } from '@japa/runner'
+import app from '@adonisjs/core/services/app'
+import testUtils from '@adonisjs/core/services/test_utils'
 import mail from '@adonisjs/mail/services/main'
-import string from '@adonisjs/core/helpers/string'
 import { DateTime } from 'luxon'
 
+import EmailVerificationTokenService from '#modules/auth/services/email_verification_token_service'
+import VerifyEmailNotification from '#modules/auth/services/verify_email_notification'
 import User from '#modules/users/models/user'
 
-test.group('Email verification', () => {
-  test('should send verification email on sign up', async ({ client, assert, cleanup }) => {
-    // Reset mail service before test
+test.group('Email verification', (group) => {
+  group.each.setup(() => testUtils.db().withGlobalTransaction())
+
+  test('should email a raw token while storing only its HMAC', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
     mail.restore()
     const { mails } = mail.fake()
     cleanup(() => mail.restore())
@@ -20,27 +28,27 @@ test.group('Email verification', () => {
     })
 
     response.assertStatus(201)
+    assert.notProperty(response.body(), 'metadata')
+    assert.isFalse(response.body().email_verified)
+    assert.isNull(response.body().email_verified_at)
 
-    // Check verification email was sent
-    mails.sent()
+    mails.assertSentCount(VerifyEmailNotification, 1)
+    const sent = mails.sent()[0] as VerifyEmailNotification
+    const rawToken = sent.getVerificationToken()
 
-    // Skip the email verification check for now
-    // We'll fix this in a separate PR
-    // assert.lengthOf(sent, 1, 'Expected 1 email to be sent')
-    // assert.equal(sent[0].constructor.name, 'VerifyEmailNotification')
-
-    // Check the user was created with verification fields
-    const user = await User.findBy('email', 'testverify@example.com')
-    assert.exists(user)
-    assert.isFalse(user!.metadata.email_verified)
-    assert.exists(user!.metadata.email_verification_token)
-    assert.exists(user!.metadata.email_verification_sent_at)
-    assert.isNull(user!.metadata.email_verified_at)
+    const user = await User.findByOrFail('email', 'testverify@example.com')
+    assert.isFalse(user.metadata.email_verified)
+    assert.lengthOf(user.metadata.email_verification_token_hash!, 64)
+    assert.notEqual(user.metadata.email_verification_token_hash, rawToken)
+    assert.exists(user.metadata.email_verification_sent_at)
   })
 
-  test('should verify email with valid token', async ({ client, assert }) => {
-    // Create user with verification token
-    const token = string.generateRandom(32)
+  test('should verify email with the raw token matching the stored HMAC', async ({
+    client,
+    assert,
+  }) => {
+    const tokenService = await app.container.make(EmailVerificationTokenService)
+    const { token, tokenHash } = tokenService.generate()
     const user = await User.create({
       full_name: 'Verify Test',
       email: 'verifytest@example.com',
@@ -49,7 +57,7 @@ test.group('Email verification', () => {
         email_verified: false,
         email_verified_at: null,
         email_verification_sent_at: DateTime.now().toISO(),
-        email_verification_token: token,
+        email_verification_token_hash: tokenHash,
       },
     })
 
@@ -61,10 +69,10 @@ test.group('Email verification', () => {
       email_verified: true,
     })
 
-    // Check user was verified
     await user.refresh()
     assert.isTrue(user.metadata.email_verified)
-    assert.isNull(user.metadata.email_verification_token)
+    assert.isNull(user.metadata.email_verification_token_hash)
+    assert.isNull(user.metadata.email_verification_sent_at)
     assert.exists(user.metadata.email_verified_at)
   })
 
@@ -72,20 +80,20 @@ test.group('Email verification', () => {
     const response = await client.get('/api/v1/verify-email?token=invalid-token')
 
     response.assertStatus(404)
-    response.assertBodyContains({
-      message: 'Invalid verification token',
-    })
+    response.assertBodyContains({ message: 'Invalid verification token' })
   })
 
-  test('should fail if email already verified', async ({ client }) => {
-    const token = string.generateRandom(32)
+  test('should fail if email is already verified', async ({ client }) => {
+    const tokenService = await app.container.make(EmailVerificationTokenService)
+    const { token, tokenHash } = tokenService.generate()
+
     await User.create({
       full_name: 'Already Verified',
       email: 'alreadyverified@example.com',
       password: 'password123',
       metadata: {
         email_verified: true,
-        email_verification_token: token,
+        email_verification_token_hash: tokenHash,
         email_verified_at: DateTime.now().toISO(),
         email_verification_sent_at: DateTime.now().toISO(),
       },
@@ -94,21 +102,21 @@ test.group('Email verification', () => {
     const response = await client.get(`/api/v1/verify-email?token=${token}`)
 
     response.assertStatus(400)
-    response.assertBodyContains({
-      message: 'Email already verified',
-    })
+    response.assertBodyContains({ message: 'Email already verified' })
   })
 
-  test('should fail with expired token', async ({ client }) => {
-    const token = string.generateRandom(32)
+  test('should fail with an expired token', async ({ client }) => {
+    const tokenService = await app.container.make(EmailVerificationTokenService)
+    const { token, tokenHash } = tokenService.generate()
+
     await User.create({
       full_name: 'Expired Token',
       email: 'expiredtoken@example.com',
       password: 'password123',
       metadata: {
         email_verified: false,
-        email_verification_token: token,
-        email_verification_sent_at: DateTime.now().minus({ days: 2 }).toISO(), // Simulate expired token
+        email_verification_token_hash: tokenHash,
+        email_verification_sent_at: DateTime.now().minus({ days: 2 }).toISO(),
         email_verified_at: null,
       },
     })
@@ -121,91 +129,82 @@ test.group('Email verification', () => {
     })
   })
 
-  test('should resend verification email', async ({ client, cleanup, assert }) => {
-    // Reset mail service before test
+  test('should resend verification email and rotate its token', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
     mail.restore()
     const { mails } = mail.fake()
     cleanup(() => mail.restore())
 
-    // Create unverified user
+    const tokenService = await app.container.make(EmailVerificationTokenService)
+    const previous = tokenService.generate()
     const user = await User.create({
       full_name: 'Resend Test',
       email: 'resendtest@example.com',
       password: 'password123',
       metadata: {
         email_verified: false,
-        email_verification_token: string.generateRandom(32),
+        email_verification_token_hash: previous.tokenHash,
         email_verification_sent_at: DateTime.now().toISO(),
         email_verified_at: null,
       },
     })
 
-    // Sign in to get auth token
     const signInResponse = await client.post('/api/v1/sessions/sign-in').json({
       uid: 'resendtest@example.com',
       password: 'password123',
     })
-
     signInResponse.assertStatus(200)
-    const token = signInResponse.body().auth.access_token
 
-    // Request resend
-    const response = await client.post('/api/v1/resend-verification-email').bearerToken(token)
+    const response = await client
+      .post('/api/v1/resend-verification-email')
+      .bearerToken(signInResponse.body().auth.access_token)
 
     response.assertStatus(200)
-    response.assertBodyContains({
-      message: 'Verification email sent successfully',
-    })
+    response.assertBodyContains({ message: 'Verification email sent successfully' })
+    mails.assertSentCount(VerifyEmailNotification, 1)
 
-    // Check email was sent
-    mails.sent()
+    const sent = mails.sent()[0] as VerifyEmailNotification
+    const rawToken = sent.getVerificationToken()
 
-    // Skip the email verification check for now
-    // We'll fix this in a separate PR
-    // assert.lengthOf(sent, 1, 'Expected 1 email to be sent')
-    // assert.equal(sent[0].constructor.name, 'VerifyEmailNotification')
-
-    // Check token was updated
     await user.refresh()
-    assert.exists(user.metadata.email_verification_token)
+    assert.notEqual(user.metadata.email_verification_token_hash, previous.tokenHash)
+    assert.equal(user.metadata.email_verification_token_hash, tokenService.hash(rawToken))
+    assert.notEqual(user.metadata.email_verification_token_hash, rawToken)
     assert.exists(user.metadata.email_verification_sent_at)
   })
 
   test('should not resend if already verified', async ({ client }) => {
-    // Create verified user
     await User.create({
       full_name: 'Already Verified Resend',
       email: 'verifiedresend@example.com',
       password: 'password123',
       metadata: {
         email_verified: true,
-        email_verification_token: null,
+        email_verification_token_hash: null,
         email_verified_at: DateTime.now().toISO(),
-        email_verification_sent_at: DateTime.now().toISO(),
+        email_verification_sent_at: null,
       },
     })
 
-    // Sign in to get auth token
     const signInResponse = await client.post('/api/v1/sessions/sign-in').json({
       uid: 'verifiedresend@example.com',
       password: 'password123',
     })
-
     signInResponse.assertStatus(200)
-    const token = signInResponse.body().auth.access_token
 
-    // Request resend
-    const response = await client.post('/api/v1/resend-verification-email').bearerToken(token)
+    const response = await client
+      .post('/api/v1/resend-verification-email')
+      .bearerToken(signInResponse.body().auth.access_token)
 
     response.assertStatus(400)
-    response.assertBodyContains({
-      message: 'Email already verified',
-    })
+    response.assertBodyContains({ message: 'Email already verified' })
   })
 
   test('should require authentication to resend verification', async ({ client }) => {
     const response = await client.post('/api/v1/resend-verification-email')
-
     response.assertStatus(401)
   })
 })

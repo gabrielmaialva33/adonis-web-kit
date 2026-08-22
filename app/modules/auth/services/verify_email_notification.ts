@@ -12,6 +12,10 @@ export default class VerifyEmailNotification extends BaseMail {
     super()
   }
 
+  getVerificationToken() {
+    return this.token
+  }
+
   /**
    * The "prepare" method is called automatically when
    * the email is sent or queued.
