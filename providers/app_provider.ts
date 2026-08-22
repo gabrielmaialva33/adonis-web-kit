@@ -11,9 +11,7 @@ export default class AppProvider {
   /**
    * The container bindings have booted
    */
-  async boot() {
-    await import('#shared/extensions/logged_user_extension')
-  }
+  async boot() {}
 
   /**
    * The application has been booted

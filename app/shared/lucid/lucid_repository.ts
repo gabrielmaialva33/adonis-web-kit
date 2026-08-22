@@ -54,16 +54,24 @@ export default class LucidRepository<
 
   async list(opts?: DefaultOptions<T>): Promise<InstanceType<T>[]> {
     const query = this.buildQuery({ opts })
+    const sortBy = opts?.sortBy || this.DEFAULT_SORT
+    const direction = opts?.direction || this.DEFAULT_DIRECTION
 
-    query.orderBy(opts?.sortBy || this.DEFAULT_SORT, opts?.direction || this.DEFAULT_DIRECTION)
+    this.validateSortBy(sortBy)
+    this.validateDirection(direction)
+    query.orderBy(sortBy, direction)
 
     return query
   }
 
-  async paginate(options: PaginateOptions<T>): Promise<PaginateResult<T>> {
+  async paginate(options: PaginateOptions<T> = {}): Promise<PaginateResult<T>> {
     const query = this.buildQuery({ opts: options })
+    const sortBy = options.sortBy || this.DEFAULT_SORT
+    const direction = options.direction || this.DEFAULT_DIRECTION
 
-    query.orderBy(options.sortBy || this.DEFAULT_SORT, options.direction || this.DEFAULT_DIRECTION)
+    this.validateSortBy(sortBy)
+    this.validateDirection(direction)
+    query.orderBy(sortBy, direction)
 
     return query.paginate(
       options.page || this.DEFAULT_PAGE,
@@ -138,7 +146,7 @@ export default class LucidRepository<
   protected validateSortBy(sort: string): void {
     const modelKeys = Array.from(this.model.$columnsDefinitions.keys())
     const modelKeysToSnakeCase = modelKeys.map((key) => stringHelpers.snakeCase(key))
-    const allKeys = modelKeys.concat(modelKeysToSnakeCase)
+    const allKeys = Array.from(new Set(modelKeys.concat(modelKeysToSnakeCase)))
 
     if (!allKeys.includes(sort)) {
       let message = `Invalid sort key: ${sort}. Must be one of: ${allKeys.join(', ')}`
@@ -189,7 +197,7 @@ export default class LucidRepository<
       query.useTransaction(opts.client)
     }
 
-    if (field && value) {
+    if (field !== undefined) {
       query.where({ [field]: value })
     }
 
