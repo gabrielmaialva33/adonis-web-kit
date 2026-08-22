@@ -5,7 +5,14 @@ import { basicAuthGuard, basicAuthUserProvider } from '@adonisjs/auth/basic_auth
 import { sessionGuard, sessionUserProvider } from '@adonisjs/auth/session'
 
 import { jwtGuard } from '#shared/jwt/define_config'
-import { type JwtGuardUser } from '#shared/jwt/types'
+import {
+  JWT_AUDIENCE,
+  JWT_COOKIE_NAME,
+  JWT_ISSUER,
+  WEB_ACCESS_TOKEN_EXPIRES_IN,
+} from '#shared/jwt/constants'
+import type { JwtGuardUser } from '#shared/jwt/types'
+import env from '#start/env'
 
 const authConfig = defineConfig({
   default: 'jwt',
@@ -28,25 +35,26 @@ const authConfig = defineConfig({
       }),
     }),
     jwt: jwtGuard({
-      tokenExpiresIn: '1h',
+      secret: env.get('ACCESS_TOKEN_SECRET', env.get('APP_KEY')),
+      tokenExpiresIn: WEB_ACCESS_TOKEN_EXPIRES_IN,
+      issuer: JWT_ISSUER,
+      audience: JWT_AUDIENCE,
       useCookies: true,
+      cookieName: JWT_COOKIE_NAME,
       provider: sessionUserProvider({
         model: () => import('#modules/users/models/user'),
       }),
-      content: <User>(user: JwtGuardUser<User>) => ({ userId: user.getId() }),
+      content: <User>(_user: JwtGuardUser<User>) => ({}),
     }),
   },
 })
 
 export default authConfig
 
-/**
- * Inferring types from the configured auth
- * guards.
- */
 declare module '@adonisjs/auth/types' {
   export interface Authenticators extends InferAuthenticators<typeof authConfig> {}
 }
+
 declare module '@adonisjs/core/types' {
   interface EventsList extends InferAuthEvents<Authenticators> {}
 }

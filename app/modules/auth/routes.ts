@@ -1,6 +1,6 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
-import { authThrottle } from '#start/limiter'
+import { apiThrottle, authThrottle } from '#start/limiter'
 
 const SessionsController = () => import('#modules/auth/controllers/sessions_controller')
 const EmailVerificationController = () =>
@@ -14,6 +14,8 @@ router
   .group(() => {
     router.post('/sign-in', [SessionsController, 'signIn']).as('session.signIn').use(authThrottle)
     router.post('/sign-up', [SessionsController, 'signUp']).as('session.signUp').use(authThrottle)
+    router.post('/refresh', [SessionsController, 'refresh']).as('session.refresh').use(apiThrottle)
+    router.post('/logout', [SessionsController, 'logout']).as('session.logout').use(apiThrottle)
   })
   .prefix('/api/v1/sessions')
 

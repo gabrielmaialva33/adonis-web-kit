@@ -1,35 +1,29 @@
+import { randomUUID } from 'node:crypto'
+
 import { errors, symbols } from '@adonisjs/auth'
 import { type AuthClientResponse, type GuardContract } from '@adonisjs/auth/types'
 import type { HttpContext } from '@adonisjs/core/http'
 import jwt from 'jsonwebtoken'
-import { type JwtGuardOptions, type JwtUserProviderContract } from './types.js'
+
+import { JWT_COOKIE_NAME } from '#shared/jwt/constants'
+import type {
+  AccessTokenPayload,
+  JwtGuardOptions,
+  JwtGuardUser,
+  JwtUserProviderContract,
+} from '#shared/jwt/types'
 
 export class JwtGuard<
   UserProvider extends JwtUserProviderContract<unknown>,
 > implements GuardContract<UserProvider[typeof symbols.PROVIDER_REAL_USER]> {
-  /**
-   * A list of events and their types emitted by
-   * the guard.
-   */
   declare [symbols.GUARD_KNOWN_EVENTS]: {}
-  /**
-   * A unique name for the guard driver
-   */
+
   driverName: 'jwt' = 'jwt'
-  /**
-   * A flag to know if the authentication was an attempt
-   * during the current HTTP request
-   */
-  authenticationAttempted: boolean = false
-  /**
-   * A boolean to know if the current request has
-   * been authenticated
-   */
-  isAuthenticated: boolean = false
-  /**
-   * Reference to the currently authenticated user
-   */
+  authenticationAttempted = false
+  isAuthenticated = false
   user?: UserProvider[typeof symbols.PROVIDER_REAL_USER]
+  tokenPayload?: AccessTokenPayload
+
   #ctx: HttpContext
   #userProvider: UserProvider
   #options: JwtGuardOptions<UserProvider[typeof symbols.PROVIDER_REAL_USER]>
@@ -37,136 +31,92 @@ export class JwtGuard<
   constructor(
     ctx: HttpContext,
     userProvider: UserProvider,
-    option: JwtGuardOptions<UserProvider[typeof symbols.PROVIDER_REAL_USER]>
+    options: JwtGuardOptions<UserProvider[typeof symbols.PROVIDER_REAL_USER]>
   ) {
     this.#ctx = ctx
     this.#userProvider = userProvider
-    this.#options = option
-    if (!this.#options.content) this.#options.content = (user) => ({ userId: user.getId() })
+    this.#options = options
   }
 
   /**
-   * Generate a JWT token for a given user.
+   * Creates an access token. Extra claims are intentionally limited to caller
+   * supplied application context (for example the active tenant); security
+   * claims are always overwritten by the guard.
    */
-  async generate(user: UserProvider[typeof symbols.PROVIDER_REAL_USER]) {
+  async generate(
+    user: UserProvider[typeof symbols.PROVIDER_REAL_USER],
+    extraClaims: Record<string, unknown> = {}
+  ) {
     const providerUser = await this.#userProvider.createUserForGuard(user)
-    const token = jwt.sign(
-      this.#options.content!(providerUser),
-      this.#options.secret,
-      this.#options.expiresIn
-        ? {
-            expiresIn: this.#options.expiresIn,
-          }
-        : {}
-    )
+    const token = this.#sign(providerUser, extraClaims)
 
     if (this.#options.useCookies) {
-      return this.#ctx.response.cookie('token', token, {
-        httpOnly: true,
+      this.#ctx.response.cookie(this.#options.cookieName ?? JWT_COOKIE_NAME, token, {
+        path: this.#options.cookieOptions?.path ?? '/',
+        httpOnly: this.#options.cookieOptions?.httpOnly ?? true,
+        secure: this.#options.cookieOptions?.secure ?? false,
+        sameSite: this.#options.cookieOptions?.sameSite ?? 'lax',
       })
     }
 
     return {
-      type: 'bearer',
-      token: token,
+      type: 'bearer' as const,
+      token,
       expiresIn: this.#options.expiresIn,
     }
   }
 
-  /**
-   * Authenticate the current HTTP request and return
-   * the user instance if there is a valid JWT token
-   * or throw an exception
-   */
+  clearCookie() {
+    this.#ctx.response.clearCookie(this.#options.cookieName ?? JWT_COOKIE_NAME, {
+      path: this.#options.cookieOptions?.path ?? '/',
+    })
+  }
+
   async authenticate(): Promise<UserProvider[typeof symbols.PROVIDER_REAL_USER]> {
-    /**
-     * Avoid re-authentication when it has been done already
-     * for the given request
-     */
     if (this.authenticationAttempted) {
       return this.getUserOrFail()
     }
+
     this.authenticationAttempted = true
+    const token = this.#getToken()
 
-    const cookieHeader = this.#ctx.request.request.headers.cookie
-    let token
-
-    /**
-     * If cookies are enabled, then read the token from the cookies
-     */
-    if (cookieHeader) {
-      token =
-        this.#ctx.request.cookie('token') ??
-        (this.#ctx.request.request.headers.cookie!.match(/token=(.*?)(;|$)/) || [])[1]
-    }
-
-    /**
-     * If token is missing on cookies, then try to read it from the header authorization
-     */
     if (!token) {
-      /**
-       * Ensure the auth header exists
-       */
-      const authHeader = this.#ctx.request.header('authorization')
-      if (!authHeader) {
-        const message = this.#ctx.i18n?.t('errors.unauthorized_access') || 'Unauthorized access'
-        throw new errors.E_UNAUTHORIZED_ACCESS(message, {
-          guardDriverName: this.driverName,
-        })
-      }
-
-      /**
-       * Split the header value and read the token from it
-       */
-      ;[, token] = authHeader!.split('Bearer ')
-      if (!token) {
-        const message = this.#ctx.i18n?.t('errors.unauthorized_access') || 'Unauthorized access'
-        throw new errors.E_UNAUTHORIZED_ACCESS(message, {
-          guardDriverName: this.driverName,
-        })
-      }
+      return this.#throwUnauthorized()
     }
 
-    /**
-     * Verify token
-     */
-    let payload
-
+    let payload: AccessTokenPayload
     try {
-      payload = jwt.verify(token, this.#options.secret)
-    } catch (error) {
-      const message = this.#ctx.i18n?.t('errors.unauthorized_access') || 'Unauthorized access'
-      throw new errors.E_UNAUTHORIZED_ACCESS(message, {
-        guardDriverName: this.driverName,
+      const verified = jwt.verify(token, this.#options.secret, {
+        issuer: this.#options.issuer,
+        audience: this.#options.audience,
       })
+
+      if (
+        typeof verified === 'string' ||
+        verified.token_use !== 'access' ||
+        !('userId' in verified) ||
+        (typeof verified.userId !== 'string' && typeof verified.userId !== 'number')
+      ) {
+        return this.#throwUnauthorized()
+      }
+
+      payload = verified as unknown as AccessTokenPayload
+    } catch {
+      return this.#throwUnauthorized()
     }
 
-    if (typeof payload !== 'object' || !('userId' in payload)) {
-      const message = this.#ctx.i18n?.t('errors.unauthorized_access') || 'Unauthorized access'
-      throw new errors.E_UNAUTHORIZED_ACCESS(message, {
-        guardDriverName: this.driverName,
-      })
-    }
-
-    /**
-     * Fetch the user by user ID and save a reference to it
-     */
     const providerUser = await this.#userProvider.findById(payload.userId)
     if (!providerUser) {
-      const message = this.#ctx.i18n?.t('errors.unauthorized_access') || 'Unauthorized access'
-      throw new errors.E_UNAUTHORIZED_ACCESS(message, {
-        guardDriverName: this.driverName,
-      })
+      return this.#throwUnauthorized()
     }
 
+    this.tokenPayload = payload
     this.isAuthenticated = true
     this.user = providerUser.getOriginal()
+
     return this.getUserOrFail()
   }
 
-  /**
-   * Same as authenticate, but does not throw an exception
-   */
   async check(): Promise<boolean> {
     try {
       await this.authenticate()
@@ -176,42 +126,75 @@ export class JwtGuard<
     }
   }
 
-  /**
-   * Returns the authenticated user or throws an error
-   */
   getUserOrFail(): UserProvider[typeof symbols.PROVIDER_REAL_USER] {
     if (!this.user) {
-      const message = this.#ctx.i18n?.t('errors.unauthorized_access') || 'Unauthorized access'
-      throw new errors.E_UNAUTHORIZED_ACCESS(message, {
-        guardDriverName: this.driverName,
-      })
+      return this.#throwUnauthorized()
     }
 
     return this.user
   }
 
-  /**
-   * This method is called by Japa during testing when "loginAs"
-   * method is used to login the user.
-   */
   async authenticateAsClient(
     user: UserProvider[typeof symbols.PROVIDER_REAL_USER]
   ): Promise<AuthClientResponse> {
     const providerUser = await this.#userProvider.createUserForGuard(user)
-    const token = jwt.sign(
-      this.#options.content!(providerUser),
-      this.#options.secret,
-      this.#options.expiresIn
-        ? {
-            expiresIn: this.#options.expiresIn,
-          }
-        : {}
-    )
+    const token = this.#sign(providerUser)
 
     return {
       headers: {
         authorization: `Bearer ${token}`,
       },
     }
+  }
+
+  #sign(
+    providerUser: JwtGuardUser<UserProvider[typeof symbols.PROVIDER_REAL_USER]>,
+    extraClaims: Record<string, unknown> = {}
+  ) {
+    const rawId = providerUser.getId()
+    const userId = typeof rawId === 'number' || typeof rawId === 'string' ? rawId : rawId.toString()
+    const customContent = this.#options.content?.(providerUser) ?? {}
+
+    return jwt.sign(
+      {
+        ...customContent,
+        ...extraClaims,
+        sub: String(userId),
+        userId,
+        token_use: 'access',
+      },
+      this.#options.secret,
+      {
+        expiresIn: this.#options.expiresIn,
+        issuer: this.#options.issuer,
+        audience: this.#options.audience,
+        jwtid: randomUUID(),
+      }
+    )
+  }
+
+  #getToken(): string | undefined {
+    const authorization = this.#ctx.request.header('authorization')
+    if (authorization) {
+      const match = /^Bearer\s+(.+)$/i.exec(authorization.trim())
+      if (!match) {
+        return undefined
+      }
+      return match[1]
+    }
+
+    if (!this.#options.useCookies) {
+      return undefined
+    }
+
+    const cookie = this.#ctx.request.cookie(this.#options.cookieName ?? JWT_COOKIE_NAME)
+    return typeof cookie === 'string' ? cookie : undefined
+  }
+
+  #throwUnauthorized(): never {
+    const message = this.#ctx.i18n?.t('errors.unauthorized_access') || 'Unauthorized access'
+    throw new errors.E_UNAUTHORIZED_ACCESS(message, {
+      guardDriverName: this.driverName,
+    })
   }
 }
