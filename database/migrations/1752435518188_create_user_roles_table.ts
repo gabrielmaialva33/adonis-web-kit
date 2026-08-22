@@ -23,6 +23,8 @@ export default class extends BaseSchema {
         .inTable('roles')
         .onDelete('CASCADE')
 
+      table.unique(['user_id', 'role_id'], 'user_roles_user_id_role_id_unique')
+
       table.timestamp('created_at').notNullable().defaultTo(this.now())
       table.timestamp('updated_at').notNullable().defaultTo(this.now())
     })

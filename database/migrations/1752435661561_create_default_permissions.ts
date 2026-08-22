@@ -2,6 +2,7 @@ import { BaseSchema } from '@adonisjs/lucid/schema'
 import app from '@adonisjs/core/services/app'
 
 import AssignDefaultPermissionsService from '#modules/permissions/services/assign_default_permissions_service'
+import { getDefaultPermissionNames } from '#modules/permissions/services/create_default_permissions_service'
 
 export default class extends BaseSchema {
   async up() {
@@ -17,9 +18,6 @@ export default class extends BaseSchema {
   }
 
   async down() {
-    // Remove all permission associations
-    await this.db.from('role_permissions').delete()
-    await this.db.from('user_permissions').delete()
-    await this.db.from('permissions').delete()
+    await this.db.from('permissions').whereIn('name', getDefaultPermissionNames()).delete()
   }
 }
