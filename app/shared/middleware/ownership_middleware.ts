@@ -1,15 +1,17 @@
+import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
-import { inject } from '@adonisjs/core'
-import OwnershipService from '#shared/services/ownership_service'
+
 import AuditService from '#modules/audits/services/audit_service'
+import IOwnership from '#shared/interfaces/ownership_interface'
+import OwnershipService from '#shared/services/ownership_service'
 
 export interface OwnershipMiddlewareOptions {
   resource: string
   resourceIdParam?: string
   action?: string
   context?: string
-  allowedLevels?: string[]
+  allowedLevels?: IOwnership.OwnershipLevel[]
 }
 
 @inject()
@@ -26,31 +28,20 @@ export default class OwnershipMiddleware {
       resourceIdParam = 'id',
       action = 'access',
       context = 'own',
-      allowedLevels = ['owner'],
+      allowedLevels = [IOwnership.OwnershipLevel.OWNER],
     } = options
 
-    // Check if user is authenticated
     const user = auth.user
     if (!user) {
       await this.auditService.logPermissionCheck(
-        {
-          resource,
-          action,
-          context,
-          result: 'denied',
-          reason: 'User not authenticated',
-        },
+        { resource, action, context, result: 'denied', reason: 'User not authenticated' },
         ctx
       )
-
-      return response.unauthorized({
-        message: 'Authentication required',
-      })
+      return response.unauthorized({ message: 'Authentication required' })
     }
 
-    // Get resource ID from params
-    const resourceId = Number.parseInt(params[resourceIdParam])
-    if (!resourceId || Number.isNaN(resourceId)) {
+    const resourceId = Number(params[resourceIdParam])
+    if (!Number.isSafeInteger(resourceId) || resourceId <= 0) {
       await this.auditService.logPermissionCheck(
         {
           userId: user.id,
@@ -62,58 +53,12 @@ export default class OwnershipMiddleware {
         },
         ctx
       )
-
-      return response.badRequest({
-        message: 'Invalid resource ID',
-      })
+      return response.badRequest({ message: 'Invalid resource ID' })
     }
 
+    let ownershipLevel: IOwnership.OwnershipLevel | null
     try {
-      // Check ownership
-      const ownershipLevel = await this.ownershipService.getOwnershipLevel(
-        user.id,
-        resource,
-        resourceId
-      )
-
-      if (!ownershipLevel || !allowedLevels.includes(ownershipLevel)) {
-        await this.auditService.logPermissionCheck(
-          {
-            userId: user.id,
-            resource,
-            action,
-            context,
-            resourceId,
-            result: 'denied',
-            reason: `Insufficient ownership level: ${ownershipLevel || 'none'}`,
-          },
-          ctx
-        )
-
-        return response.forbidden({
-          message: 'Insufficient permissions to access this resource',
-        })
-      }
-
-      // Log successful access
-      await this.auditService.logPermissionCheck(
-        {
-          userId: user.id,
-          resource,
-          action,
-          context,
-          resourceId,
-          result: 'granted',
-          reason: `Ownership level: ${ownershipLevel}`,
-        },
-        ctx
-      )
-
-      // Add ownership info to context for use in controllers
-      ;(ctx as any).ownershipLevel = ownershipLevel
-      ;(ctx as any).resourceId = resourceId
-
-      await next()
+      ownershipLevel = await this.ownershipService.getOwnershipLevel(user.id, resource, resourceId)
     } catch (error) {
       await this.auditService.logPermissionCheck(
         {
@@ -127,20 +72,54 @@ export default class OwnershipMiddleware {
         },
         ctx
       )
-
-      return response.internalServerError({
-        message: 'Error checking resource permissions',
-      })
+      throw error
     }
+
+    if (!ownershipLevel || !allowedLevels.includes(ownershipLevel)) {
+      await this.auditService.logPermissionCheck(
+        {
+          userId: user.id,
+          resource,
+          action,
+          context,
+          resourceId,
+          result: 'denied',
+          reason: `Insufficient ownership level: ${ownershipLevel ?? 'none'}`,
+        },
+        ctx
+      )
+      return response.forbidden({ message: 'Insufficient permissions to access this resource' })
+    }
+
+    await this.auditService.logPermissionCheck(
+      {
+        userId: user.id,
+        resource,
+        action,
+        context,
+        resourceId,
+        result: 'granted',
+        reason: `Ownership level: ${ownershipLevel}`,
+      },
+      ctx
+    )
+
+    ctx.ownershipLevel = ownershipLevel
+    ctx.resourceId = resourceId
+    return next()
   }
 }
 
-/**
- * Helper function to create ownership middleware instances
- */
 export function ownership(options: OwnershipMiddlewareOptions) {
   return async (ctx: HttpContext, next: NextFn) => {
     const middleware = await ctx.containerResolver.make(OwnershipMiddleware)
     return middleware.handle(ctx, next, options)
+  }
+}
+
+declare module '@adonisjs/core/http' {
+  interface HttpContext {
+    ownershipLevel?: IOwnership.OwnershipLevel
+    resourceId?: number
   }
 }
