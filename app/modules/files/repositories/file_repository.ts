@@ -9,4 +9,9 @@ export default class FileRepository
   constructor() {
     super(File)
   }
+
+  async countForTenant(tenantId: number): Promise<number> {
+    const rows = await this.model.query().where('tenant_id', tenantId).count('* as total')
+    return Number(rows[0].$extras.total)
+  }
 }

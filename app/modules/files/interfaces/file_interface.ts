@@ -2,7 +2,9 @@ import type LucidRepositoryInterface from '#shared/lucid/lucid_repository_interf
 import type File from '#modules/files/models/file'
 
 namespace IFile {
-  export interface Repository extends LucidRepositoryInterface<typeof File> {}
+  export interface Repository extends LucidRepositoryInterface<typeof File> {
+    countForTenant(tenantId: number): Promise<number>
+  }
 }
 
 export default IFile

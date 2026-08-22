@@ -15,7 +15,7 @@ export default class File extends BaseModel {
   declare owner_id: number
 
   @column()
-  declare tenant_id: number | null
+  declare tenant_id: number
 
   @column()
   declare client_name: string

@@ -44,6 +44,16 @@ test.group('Files upload', (group) => {
     await role.related('permissions').sync(permissions.map((p) => p.id))
   }
 
+  async function attachActiveTenant(user: User) {
+    const tenant = await Tenant.create({
+      name: 'Test Workspace',
+      slug: `test-workspace-${user.id}`,
+      is_active: true,
+    })
+    await user.related('tenants').attach({ [tenant.id]: { role: 'owner' } })
+    return tenant
+  }
+
   test('should upload a file with authentication', async ({ client, assert }) => {
     const userRole = await Role.firstOrCreate(
       { slug: IRole.Slugs.USER },
@@ -68,6 +78,7 @@ test.group('Files upload', (group) => {
 
     // Assign create permission to user role
     await assignPermissions(userRole, [IPermission.Actions.CREATE])
+    await attachActiveTenant(user)
 
     // Create a test file
     const testFilePath = join(app.tmpPath(), `test.txt`)
@@ -118,6 +129,7 @@ test.group('Files upload', (group) => {
 
     // Assign create permission to user role
     await assignPermissions(userRole, [IPermission.Actions.CREATE])
+    await attachActiveTenant(user)
 
     // Create a test image file (1x1 PNG)
     const testFilePath = join(app.tmpPath(), `test.png`)
@@ -171,6 +183,7 @@ test.group('Files upload', (group) => {
 
     // Assign create permission to user role
     await assignPermissions(userRole, [IPermission.Actions.CREATE])
+    await attachActiveTenant(user)
 
     const response = await client.post('/api/v1/files/upload').loginAs(user)
 
@@ -209,6 +222,7 @@ test.group('Files upload', (group) => {
 
     // Assign create permission to user role
     await assignPermissions(userRole, [IPermission.Actions.CREATE])
+    await attachActiveTenant(user)
 
     // Create a large test file (11MB - exceeds 10MB limit)
     const testFilePath = join(app.tmpPath(), `test-${randomUUID()}.txt`)
@@ -259,6 +273,7 @@ test.group('Files upload', (group) => {
 
     // Assign create permission to user role
     await assignPermissions(userRole, [IPermission.Actions.CREATE])
+    await attachActiveTenant(user)
 
     // Create a test file with disallowed extension
     const testFilePath = join(app.tmpPath(), `test-${randomUUID()}.exe`)
@@ -308,6 +323,7 @@ test.group('Files upload', (group) => {
 
     // Assign create permission to user role
     await assignPermissions(userRole, [IPermission.Actions.CREATE])
+    await attachActiveTenant(user)
 
     // Create test files
     const testFile1Path = join(app.tmpPath(), `test1-${randomUUID()}.txt`)
@@ -367,6 +383,7 @@ test.group('Files upload', (group) => {
 
     // Assign create permission to user role
     await assignPermissions(userRole, [IPermission.Actions.CREATE])
+    await attachActiveTenant(user)
 
     const testFiles = [
       { name: `image.jpg`, category: 'image' },
@@ -518,6 +535,56 @@ test.group('Files upload', (group) => {
     response.assertStatus(403)
 
     await import('node:fs').then((fs) => fs.promises.unlink(testFilePath))
+  })
+
+  test('should reject a malformed tenant header instead of falling back', async ({ client }) => {
+    const user = await User.create({
+      full_name: 'Malformed Tenant',
+      email: 'malformed-tenant@example.com',
+      username: 'malformed-tenant',
+      password: 'password123',
+    })
+
+    const response = await client
+      .post('/api/v1/files/upload')
+      .header('x-tenant-id', 'abc')
+      .loginAs(user)
+
+    response.assertStatus(400)
+  })
+
+  test('should require an active tenant for tenant-scoped uploads', async ({ client }) => {
+    const user = await User.create({
+      full_name: 'No Tenant',
+      email: 'no-tenant-upload@example.com',
+      username: 'no-tenant-upload',
+      password: 'password123',
+    })
+
+    const response = await client.post('/api/v1/files/upload').loginAs(user)
+    response.assertStatus(400)
+  })
+
+  test('should reject an inactive tenant membership', async ({ client }) => {
+    const user = await User.create({
+      full_name: 'Inactive Tenant',
+      email: 'inactive-tenant-upload@example.com',
+      username: 'inactive-tenant-upload',
+      password: 'password123',
+    })
+    const tenant = await Tenant.create({
+      name: 'Inactive Upload',
+      slug: 'inactive-upload',
+      is_active: false,
+    })
+    await user.related('tenants').attach({ [tenant.id]: { role: 'owner' } })
+
+    const response = await client
+      .post('/api/v1/files/upload')
+      .header('x-tenant-id', String(tenant.id))
+      .loginAs(user)
+
+    response.assertStatus(403)
   })
 
   test('should require authentication for file upload', async ({ client }) => {
