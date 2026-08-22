@@ -1,44 +1,34 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import jwt from 'jsonwebtoken'
 
-import env from '#start/env'
-import ForbiddenException from '#exceptions/forbidden_exception'
 import BadRequestException from '#exceptions/bad_request_exception'
+import ForbiddenException from '#exceptions/forbidden_exception'
 
 /**
- * Inertia (web) tenant controller.
- *
- * Handles switching the active tenant for a browser session. The JWT guard
- * stores its token in the `token` httpOnly cookie carrying only `{ userId }`.
- * To switch tenants we re-mint a token that ALSO carries `tenantId` so the
- * `tenant_middleware` resolves the requested tenant on subsequent requests.
- *
- * We sign the token here (instead of `auth.use('jwt').generate`) because the
- * configured guard `content` callback only emits `{ userId }`; replicating the
- * sign lets us inject `tenantId` while keeping the exact shape/secret the guard
- * verifies against (it only requires `userId` to be present).
+ * Switches the active browser tenant by reissuing the signed HTTP-only access
+ * cookie through the JWT guard. The guard owns all security claims and cookie
+ * options, preventing this controller from drifting from API authentication.
  */
 export default class InertiaTenantController {
   async switch({ auth, request, response }: HttpContext) {
     const user = auth.getUserOrFail()
+    const tenantId = Number(request.input('tenant_id'))
 
-    const tenantIdInput: unknown = request.input('tenant_id')
-    const tenantId = Number(tenantIdInput)
-
-    if (!Number.isInteger(tenantId)) {
-      throw new BadRequestException('tenant_id is required and must be an integer')
+    if (!Number.isInteger(tenantId) || tenantId <= 0) {
+      throw new BadRequestException('tenant_id is required and must be a positive integer')
     }
 
-    const tenant = await user.related('tenants').query().where('tenants.id', tenantId).first()
+    const tenant = await user
+      .related('tenants')
+      .query()
+      .where('tenants.id', tenantId)
+      .where('tenants.is_active', true)
+      .first()
+
     if (!tenant) {
-      throw new ForbiddenException('You do not belong to this tenant')
+      throw new ForbiddenException('You do not belong to this active tenant')
     }
 
-    const token = jwt.sign({ userId: user.id, tenantId: tenant.id }, env.get('APP_KEY'), {
-      expiresIn: '1h',
-    })
-
-    response.cookie('token', token, { httpOnly: true })
+    await auth.use('jwt').generate(user, { tenantId: tenant.id })
 
     return response.redirect().back()
   }

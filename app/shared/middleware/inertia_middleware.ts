@@ -1,7 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import app from '@adonisjs/core/services/app'
 import type { NextFn } from '@adonisjs/core/types/http'
 import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware'
-import jwt from 'jsonwebtoken'
+
+import PermissionService from '#modules/permissions/services/permission_service'
 
 type SharedUser = {
   id: number
@@ -17,21 +19,9 @@ type SharedTenant = {
   role: string | null
 }
 
-/**
- * Concrete Inertia middleware.
- *
- * In Inertia v4 the framework ships an abstract `BaseInertiaMiddleware`, so the
- * host application must provide a concrete subclass that wires up the request
- * lifecycle and (optionally) shares data with every page.
- *
- * Beyond validation errors and flash messages, this shares the authenticated
- * user, the tenants the user belongs to (with their pivot role) and the active
- * tenant id, so the React layout (header/sidebar/tenant switcher) can read them
- * straight from `usePage().props`.
- */
 export default class InertiaMiddleware extends BaseInertiaMiddleware {
   async share(ctx: HttpContext) {
-    const auth = await this.#resolveAuth(ctx)
+    const auth = await this.resolveAuth(ctx)
 
     return {
       errors: this.getValidationErrors(ctx),
@@ -45,33 +35,43 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
 
   async handle(ctx: HttpContext, next: NextFn) {
     await this.init(ctx)
-    const result = await next()
-    this.dispose(ctx)
-    return result
+
+    try {
+      return await next()
+    } finally {
+      this.dispose(ctx)
+    }
   }
 
-  /**
-   * Silently authenticates the request (does not throw) and, when a user is
-   * present, loads the tenants they belong to plus the active tenant id.
-   */
-  async #resolveAuth(ctx: HttpContext): Promise<{
+  private async resolveAuth(ctx: HttpContext): Promise<{
     user: SharedUser | null
     tenants: SharedTenant[]
     activeTenantId: number | null
+    permissions: string[]
   }> {
-    const empty = { user: null, tenants: [] as SharedTenant[], activeTenantId: null }
+    const empty = {
+      user: null,
+      tenants: [] as SharedTenant[],
+      activeTenantId: null,
+      permissions: [] as string[],
+    }
 
     if (!ctx.auth) {
       return empty
     }
 
-    const isAuthenticated = await ctx.auth.use('jwt').check()
-    const user = ctx.auth.user
+    const guard = ctx.auth.use('jwt')
+    const isAuthenticated = await guard.check()
+    const user = guard.user
     if (!isAuthenticated || !user) {
       return empty
     }
 
-    const tenantRecords = await user.related('tenants').query()
+    const tenantRecords = await user
+      .related('tenants')
+      .query()
+      .where('tenants.is_active', true)
+      .orderBy('tenants.id', 'asc')
 
     const tenants: SharedTenant[] = tenantRecords.map((tenant) => ({
       id: tenant.id,
@@ -81,36 +81,20 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       role: (tenant.$extras.pivot_role as string | undefined) ?? null,
     }))
 
-    const activeTenantId = this.#resolveActiveTenantId(ctx, tenants)
+    const claimedTenantId = guard.tokenPayload?.tenantId
+    const activeTenantId =
+      claimedTenantId && tenants.some((tenant) => tenant.id === claimedTenantId)
+        ? claimedTenantId
+        : (tenants[0]?.id ?? null)
+
+    const permissionService = await app.container.make(PermissionService)
+    const permissions = await permissionService.getEffectivePermissionNames(user.id)
 
     return {
       user: { id: user.id, full_name: user.full_name, email: user.email },
       tenants,
       activeTenantId,
+      permissions,
     }
-  }
-
-  /**
-   * Reads the active tenant from the JWT `tenantId` claim (token cookie),
-   * falling back to the first tenant the user belongs to.
-   */
-  #resolveActiveTenantId(ctx: HttpContext, tenants: SharedTenant[]): number | null {
-    const cookieToken = ctx.request.cookie('token')
-    if (typeof cookieToken === 'string') {
-      const payload: unknown = jwt.decode(cookieToken)
-      if (
-        payload &&
-        typeof payload === 'object' &&
-        'tenantId' in payload &&
-        typeof (payload as { tenantId: unknown }).tenantId === 'number'
-      ) {
-        const claimed = (payload as { tenantId: number }).tenantId
-        if (tenants.some((tenant) => tenant.id === claimed)) {
-          return claimed
-        }
-      }
-    }
-
-    return tenants[0]?.id ?? null
   }
 }
