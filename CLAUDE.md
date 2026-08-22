@@ -88,7 +88,7 @@ organized **by domain (modular)**, not by technical layer.
 - **Frontend**: React 19 with Inertia.js for an SPA-like experience
 - **Database**: PostgreSQL (dev/prod); SQLite (`better-sqlite3`) available for tests
 - **Styling**: TailwindCSS v4
-- **Authentication**: Multiple guards — JWT (default, cookie + header), API tokens, session, basic
+- **Authentication**: Multiple guards — access JWT (default, cookie + header), rotating opaque refresh tokens, API tokens, session, basic
 - **Multi-tenancy**: N:N (users ↔ tenants via `user_tenants` pivot), JWT-carried active tenant
 - **Validation**: VineJS
 - **Testing**: Japa (backend) + Vitest (frontend)
@@ -118,8 +118,6 @@ app/
 │   ├── services/     ownership_service
 │   ├── jwt/          custom JWT guard (define_config, jwt, jwt_service, types)
 │   ├── lucid/        base repository + interface (lucid_repository)
-│   ├── models/       tenant_base_model (tenant-scoped + soft delete base)
-│   ├── extensions/   logged_user_extension
 │   └── interfaces/   ownership_interface
 └── exceptions/     # typed exceptions at the root
     ├── base_exception.ts
@@ -158,9 +156,9 @@ The app is multi-tenant with an **N:N** relationship:
 
 - **`Tenant`** model (`tenants` table) and a **`user_tenants`** pivot carrying a `role` column
   (`owner` / `admin` / `member`, defaults to `member`). `User` `manyToMany` `Tenant`.
-- The **active tenant rides in the JWT** as a `tenantId` claim (minted on sign-in and on tenant
-  switch). Tenant-scoped entities can extend `#shared/models/tenant_base_model` (gives
-  `tenant_id`, soft-delete `deletedAt`, and `notDeleted` / `withTenant(id)` scopes).
+- The **active tenant rides in the verified access JWT** as a `tenantId` claim (minted on sign-in
+  and on tenant switch). Tenant-scoped entities explicitly declare a non-null `tenant_id` and their
+  repositories must scope reads and writes to `ctx.tenant.id`.
 - **`#shared/middleware/tenant_middleware`** resolves `ctx.tenant` in this order:
   1. `x-tenant-id` request header
   2. `tenantId` claim from the JWT (bearer header or `token` cookie)
@@ -202,7 +200,8 @@ and are being phased out — prefer the top-level `ui/` components for new work.
 
 - **ORM**: Lucid with snake_case naming strategy
 - **Migrations**: `database/migrations/` (includes `create_tenants_table`, `create_user_tenants_table`)
-- **Soft Deletes**: via `tenant_base_model` for tenant-scoped entities (and on `User`)
+- **Pre-1.0 migration policy**: this is an unreleased template, so unshipped schema changes belong in the original `create_*` migration. Recreate dev/test databases instead of adding compatibility alters. Add a new migration only for a genuinely new table/schema object. After the first stable release, migrations become append-only.
+- **Soft Deletes**: `User` uses an `is_deleted` flag; other domains must opt in explicitly
 - **Relationships**: heavy use of many-to-many (RBAC roles/permissions, user↔tenant)
 
 ### Testing
@@ -338,10 +337,15 @@ await loadHelpers() // helpers
    - `pnpm typecheck` — must pass (checks backend **and** `inertia/`)
    - `pnpm test` — must pass (and `pnpm test:ui` if you touched the frontend)
 
-6. **Multi-tenancy awareness** — for tenant-scoped data, extend `tenant_base_model` and scope by
-   `ctx.tenant`; remember `roles`, `permissions`, and `audit_logs` are global.
+6. **Multi-tenancy awareness** — tenant-scoped tables declare a non-null `tenant_id`; require the
+   tenant middleware and scope every read/write by `ctx.tenant.id`. Roles, permissions and audit
+   logs remain global in the current RBAC model.
 
-7. **Example workflow** (new "products" feature)
+7. **Keep pre-1.0 migrations native** — update the original create migration for unshipped schema
+   changes and rebuild the disposable dev/test database. Do not add alter/backfill migrations for
+   compatibility with a schema that has never been released.
+
+8. **Example workflow** (new "products" feature)
 
    ```bash
    pnpm ace make:model Product -m

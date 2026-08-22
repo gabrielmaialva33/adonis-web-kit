@@ -44,7 +44,7 @@ letting developers (both human and AI) focus on unique business logic instead of
 
 The backend is **modular (domain-driven)**: each domain (`auth`, `users`, `roles`, `permissions`, `files`, `audits`,
 `tenants`, `health`, `web`) owns its controllers, services, repositories, models, validators, and routes under
-`app/modules/<domain>/`. Cross-cutting code (middleware, JWT guard, base repository/models) lives in `app/shared/`, and
+`app/modules/<domain>/`. Cross-cutting code (middleware, JWT guard, shared repository and services) lives in `app/shared/`, and
 typed exceptions in `app/exceptions/`.
 
 ```mermaid
@@ -102,12 +102,12 @@ This starter kit is uniquely designed to maximize the effectiveness of AI-assist
 
 ## 🌟 Key Features
 
-- **🔐 Multi-Guard Authentication**: Four guards out of the box — JWT (default, cookie + header), API access tokens,
-  session, and basic auth.
-- **👥 Advanced Role-Based Access Control (RBAC)**: Roles, permissions, direct user permissions, role inheritance, and
-  cached permission checks.
+- **🔐 Multi-Guard Authentication**: Short-lived access JWTs (HTTP-only cookie or bearer header), rotating opaque refresh
+  tokens stored only as hashes, API access tokens, session auth, and basic auth.
+- **👥 Advanced Global RBAC**: Roles, permissions, direct user permissions, role inheritance, cached checks, and
+  permission-aware Inertia navigation. Tenant membership roles are workspace metadata, not RBAC grants.
 - **🏢 Multi-Tenancy (N:N)**: Users belong to many tenants via a `user_tenants` pivot (with `owner`/`admin`/`member`
-  roles). The active tenant is carried in the JWT and switchable through both API and web endpoints.
+  membership roles). The verified access JWT carries the active tenant, while tenant middleware scopes workspace data.
 - **📁 File Management**: Pre-configured file upload service with support for local, S3, Spaces, R2, and GCS drivers.
 - **⚡️ Full-Stack Reactivity**: The power of React combined with the simplicity of a traditional server-rendered app,
   thanks to Inertia.js.
@@ -202,6 +202,9 @@ This starter kit is uniquely designed to maximize the effectiveness of AI-assist
    pnpm ace migration:run
    pnpm ace db:seed
    ```
+
+   > Until the first stable release, migrations describe a clean installation. Unshipped schema changes are folded into
+   > their original `create_*` migration; recreate disposable dev/test databases instead of stacking compatibility alters.
 
 6. **Start the development server:**
    ```sh

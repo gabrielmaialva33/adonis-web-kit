@@ -354,6 +354,8 @@ tags:
     description: User authentication and session management
   - name: Users
     description: User management operations
+  - name: Tenants
+    description: Tenant membership and active workspace operations
   - name: Roles
     description: Role management operations (admin only)
   - name: Files
@@ -364,7 +366,7 @@ tags:
     description: Permission management operations (admin only)
 
 paths:
-  /:
+  /version:
     get:
       operationId: getApiInfo
       summary: Get API information
@@ -385,7 +387,7 @@ paths:
                     example: 'adonis-web-kit'
                   description:
                     type: string
-                    example: 'Base ACL API built with AdonisJS'
+                    example: 'Full-stack AdonisJS 7 and React starter kit'
                   version:
                     type: string
                     example: '0.0.0'

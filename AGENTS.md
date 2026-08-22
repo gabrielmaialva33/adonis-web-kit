@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This is an AdonisJS 7, React 19, and Inertia application. Backend features live in `app/modules/<domain>/`; each domain owns its controllers, services, repositories, models, validators, and `routes.ts`. Put cross-cutting middleware, JWT support, base Lucid classes, and shared services in `app/shared/`, and typed errors in `app/exceptions/`.
+This is an AdonisJS 7, React 19, and Inertia application. Backend features live in `app/modules/<domain>/`; each domain owns its controllers, services, repositories, models, validators, and `routes.ts`. Put cross-cutting middleware, JWT support, the shared Lucid repository, and shared services in `app/shared/`, and typed errors in `app/exceptions/`.
 
 Frontend pages, layouts, components, hooks, and styles live under `inertia/`. Database migrations, factories, and seeders are in `database/`; server-rendered views and translations are in `resources/`. Backend tests mirror their suite under `tests/{unit,functional,browser}/`, while frontend tests live in `inertia/tests/`.
 
@@ -18,6 +18,10 @@ Adonis generators target the framework's default layout, which this repository d
 - `pnpm test:e2e && pnpm test:ui` runs all Japa suites, then Vitest. Use `pnpm test` for backend unit tests only.
 
 Use Node 24 from `.nvmrc`. Copy `.env.example` to `.env` for local development; never commit real credentials.
+
+## Migration Policy Before 1.0
+
+This repository is still a pre-release template. Keep migrations optimized for a clean installation: when an unshipped table or constraint changes, update its original `create_*` migration and recreate the development/test database. Add a new migration only for a genuinely new table or other new schema object. After the first stable release, switch to append-only forward migrations and never rewrite published history.
 
 ## Coding Style & Naming Conventions
 

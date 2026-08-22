@@ -45,7 +45,7 @@ repetitivo.
 
 O backend é **modular (orientado a domínio)**: cada domínio (`auth`, `users`, `roles`, `permissions`, `files`, `audits`,
 `tenants`, `health`, `web`) é dono dos seus controllers, serviços, repositórios, modelos, validators e rotas em
-`app/modules/<domínio>/`. Código transversal (middleware, guard JWT, repositório/modelos base) fica em `app/shared/`, e
+`app/modules/<domínio>/`. Código transversal (middleware, guard JWT, repositório compartilhado e serviços) fica em `app/shared/`, e
 as exceptions tipadas em `app/exceptions/`.
 
 ```mermaid
@@ -103,12 +103,12 @@ Este _starter kit_ foi projetado de forma única para maximizar a eficácia da c
 
 ## 🌟 Principais Funcionalidades
 
-- **🔐 Autenticação Multi-Guard**: Quatro guards prontos — JWT (padrão, cookie + header), API access tokens, sessão e
-  basic auth.
-- **👥 Controle de Acesso Avançado (RBAC)**: Papéis, permissões, permissões diretas no usuário, herança de papéis e
-  checagem de permissão com cache.
-- **🏢 Multi-Tenancy (N:N)**: Usuários pertencem a vários tenants via pivot `user_tenants` (com papéis
-  `owner`/`admin`/`member`). O tenant ativo viaja no JWT e é alternável por endpoints de API e web.
+- **🔐 Autenticação Multi-Guard**: JWTs de acesso curtos (cookie HTTP-only ou bearer header), refresh tokens opacos com
+  rotação e armazenamento apenas do hash, API access tokens, sessão e basic auth.
+- **👥 RBAC Global Avançado**: Papéis, permissões diretas no usuário, herança, cache e navegação Inertia orientada por
+  permissões. Os papéis de associação ao tenant são metadados do workspace, não concessões de RBAC.
+- **🏢 Multi-Tenancy (N:N)**: Usuários pertencem a vários tenants via pivot `user_tenants` (com papéis de associação
+  `owner`/`admin`/`member`). O JWT de acesso verificado carrega o tenant ativo e o middleware isola os dados do workspace.
 - **📁 Gerenciamento de Arquivos**: Serviço de upload pré-configurado com suporte para drivers local, S3, Spaces, R2 e
   GCS.
 - **⚡️ Reatividade Full-Stack**: O poder do React combinado com a simplicidade de uma aplicação tradicional renderizada
@@ -204,6 +204,9 @@ Este _starter kit_ foi projetado de forma única para maximizar a eficácia da c
    pnpm ace migration:run
    pnpm ace db:seed
    ```
+
+   > Até a primeira versão estável, as migrations descrevem uma instalação limpa. Mudanças de schema ainda não
+   > publicadas entram na migration `create_*` original; recrie os bancos descartáveis de dev/test em vez de empilhar alters de compatibilidade.
 
 6. **Inicie o servidor de desenvolvimento:**
    ```sh
