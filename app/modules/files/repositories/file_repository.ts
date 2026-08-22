@@ -14,4 +14,17 @@ export default class FileRepository
     const rows = await this.model.query().where('tenant_id', tenantId).count('* as total')
     return Number(rows[0].$extras.total)
   }
+
+  async paginateForTenant(tenantId: number, page: number, perPage: number) {
+    return this.model
+      .query()
+      .where('tenant_id', tenantId)
+      .preload('owner')
+      .orderBy('created_at', 'desc')
+      .paginate(page, perPage)
+  }
+
+  async findByIdForTenant(fileId: number, tenantId: number): Promise<File | null> {
+    return this.model.query().where('id', fileId).where('tenant_id', tenantId).first()
+  }
 }

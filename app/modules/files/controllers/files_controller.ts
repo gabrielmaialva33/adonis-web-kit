@@ -1,9 +1,22 @@
 import { type HttpContext } from '@adonisjs/core/http'
 
 import app from '@adonisjs/core/services/app'
+import DeleteFileService from '#modules/files/services/delete_file_service'
+import ListFilesService from '#modules/files/services/list_files_service'
 import UploadFileService from '#modules/files/services/upload_file_service'
 
 export default class FilesController {
+  async list({ request, response, tenant }: HttpContext) {
+    const service = await app.container.make(ListFilesService)
+    const files = await service.run({
+      tenantId: tenant!.id,
+      page: Number(request.input('page', 1)),
+      perPage: Number(request.input('per_page', 20)),
+    })
+
+    return response.ok(files)
+  }
+
   async upload({ request, response }: HttpContext) {
     const file = request.file('file', {
       size: '10mb',
@@ -77,5 +90,12 @@ export default class FilesController {
     const data = await service.run(file)
 
     return response.created(data)
+  }
+
+  async delete({ params, response, tenant }: HttpContext) {
+    const service = await app.container.make(DeleteFileService)
+    await service.run(Number(params.id), tenant!.id)
+
+    return response.noContent()
   }
 }
