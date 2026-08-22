@@ -6,6 +6,7 @@
  * the props passed from the controller. Pages without page-specific props use
  * an empty object.
  */
+import type { FileListResult } from '#modules/files/services/list_files_service'
 import type { DashboardStats } from '#modules/web/services/get_dashboard_stats_service'
 import type { WebRole } from '#modules/web/services/list_roles_with_permissions_service'
 import type { WebPermission } from '#modules/web/services/list_all_permissions_service'
@@ -22,6 +23,8 @@ declare module '@adonisjs/inertia/types' {
     // Auth
     'auth/login': Record<string, never>
     'auth/register': Record<string, never>
+    'auth/forgot_password': Record<string, never>
+    'auth/reset_password': { token: string }
 
     // Root / misc
     'home': Record<string, never>
@@ -30,7 +33,7 @@ declare module '@adonisjs/inertia/types' {
     'dashboard': { stats: DashboardStats }
 
     // Files
-    'files/index': Record<string, never>
+    'files/index': { files: FileListResult }
 
     // Roles
     'roles/index': { roles: WebRole[] }

@@ -4,6 +4,7 @@ import type { NextFn } from '@adonisjs/core/types/http'
 import BaseInertiaMiddleware from '@adonisjs/inertia/inertia_middleware'
 
 import PermissionService from '#modules/permissions/services/permission_service'
+import env from '#start/env'
 
 type SharedUser = {
   id: number
@@ -22,8 +23,16 @@ type SharedTenant = {
 export default class InertiaMiddleware extends BaseInertiaMiddleware {
   async share(ctx: HttpContext) {
     const auth = await this.resolveAuth(ctx)
+    const environment = env.get('NODE_ENV')
 
     return {
+      app: {
+        name: env.get('APP_NAME', 'Adonis Web Kit'),
+        url: env.get('APP_URL', `http://${env.get('HOST')}:${env.get('PORT')}`),
+        sourceUrl: env.get('APP_SOURCE_URL') ?? null,
+        environment,
+        demoPagesEnabled: env.get('DEMO_PAGES_ENABLED', environment === 'development'),
+      },
       errors: this.getValidationErrors(ctx),
       flash: {
         success: ctx.session?.flashMessages.get('success') ?? null,
