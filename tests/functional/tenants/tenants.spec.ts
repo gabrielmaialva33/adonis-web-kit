@@ -64,7 +64,10 @@ test.group('Tenants', (group) => {
     assert.equal(body.tenant.id, tenantB.id)
     assert.equal(body.tenant.role, 'member')
 
-    const payload = jwt.verify(body.auth.access_token, env.get('APP_KEY')) as { tenantId?: number }
+    const payload = jwt.verify(
+      body.auth.access_token,
+      env.get('ACCESS_TOKEN_SECRET', env.get('APP_KEY'))
+    ) as { tenantId?: number }
     assert.equal(payload.tenantId, tenantB.id)
   })
 
@@ -85,6 +88,48 @@ test.group('Tenants', (group) => {
       .loginAs(user)
 
     response.assertStatus(403)
+  })
+
+  test('POST /switch rejects an inactive tenant even when the user is a member', async ({
+    client,
+  }) => {
+    const user = await User.create({
+      full_name: 'Inactive Member',
+      email: 'inactive-member@example.com',
+      username: 'inactive-member',
+      password: 'password123',
+    })
+    const inactive = await Tenant.create({
+      name: 'Inactive',
+      slug: 'inactive-switch',
+      is_active: false,
+    })
+    await user.related('tenants').attach({ [inactive.id]: { role: 'owner' } })
+
+    const response = await client
+      .post('/api/v1/tenants/switch')
+      .json({ tenant_id: inactive.id })
+      .loginAs(user)
+
+    response.assertStatus(403)
+  })
+
+  test('POST /switch validates tenant_id as a positive integer', async ({ client }) => {
+    const user = await User.create({
+      full_name: 'Invalid Switch',
+      email: 'invalid-switch@example.com',
+      username: 'invalid-switch',
+      password: 'password123',
+    })
+
+    for (const tenantId of ['abc', 0, -1]) {
+      const response = await client
+        .post('/api/v1/tenants/switch')
+        .json({ tenant_id: tenantId })
+        .loginAs(user)
+
+      response.assertStatus(400)
+    }
   })
 
   test('GET /me requires authentication', async ({ client }) => {
