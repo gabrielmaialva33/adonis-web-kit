@@ -26,6 +26,7 @@ export interface AuthSharedProps {
   user: AuthUser | null
   tenants: TenantSummary[]
   activeTenantId: number | null
+  permissions: string[]
 }
 
 // Extend shared props with our app-specific props (declaration merging)

@@ -1,11 +1,11 @@
 import { Head, Link, useForm } from '@inertiajs/react'
 import { ArrowLeft } from 'lucide-react'
 
-import { MainLayout } from '~/layouts'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/ui/card'
-import { Button } from '~/components/ui/button'
 import { Field } from '~/components/forms/field'
 import { PageHeader } from '~/components/page_header'
+import { Button } from '~/components/ui/button'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '~/components/ui/card'
+import { MainLayout } from '~/layouts'
 import type { User } from '~/types'
 
 interface EditUserPageProps {
@@ -15,7 +15,6 @@ interface EditUserPageProps {
 export default function EditUserPage({ user }: EditUserPageProps) {
   const { data, setData, put, processing, errors } = useForm({
     full_name: user.full_name || '',
-    email: user.email || '',
   })
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -30,7 +29,7 @@ export default function EditUserPage({ user }: EditUserPageProps) {
       <div className="space-y-6">
         <PageHeader
           title="Edit user"
-          description="Update the user's details."
+          description="Update the user's editable profile details."
           actions={
             <Link href="/users">
               <Button variant="outline">
@@ -60,11 +59,10 @@ export default function EditUserPage({ user }: EditUserPageProps) {
                 label="Email"
                 name="email"
                 type="email"
-                value={data.email}
-                onChange={(event) => setData('email', event.target.value)}
-                error={errors.email}
-                autoComplete="email"
-                required
+                value={user.email}
+                hint="The sign-in email cannot be changed from this screen."
+                disabled
+                readOnly
               />
             </CardContent>
             <CardFooter className="justify-end gap-2 border-t pt-5">

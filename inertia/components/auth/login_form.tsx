@@ -1,5 +1,5 @@
 import { FormEvent } from 'react'
-import { useForm, Link } from '@inertiajs/react'
+import { useForm } from '@inertiajs/react'
 import { Loader2, Mail, Lock } from 'lucide-react'
 
 import { Button } from '~/components/ui/button'
@@ -43,11 +43,6 @@ export function LoginForm() {
         required
         autoComplete="current-password"
         leftIcon={<Lock className="size-4" />}
-        labelAction={
-          <Link href="/forgot-password" className="text-xs text-primary hover:underline">
-            Forgot password?
-          </Link>
-        }
       />
 
       <div className="space-y-4">

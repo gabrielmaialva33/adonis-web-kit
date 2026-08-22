@@ -19,15 +19,18 @@ export const authHandlers = [
     // Validate credentials
     if (body.uid === 'test@example.com' && body.password === 'password123') {
       return HttpResponse.json({
-        user: {
-          id: 1,
-          email: 'test@example.com',
-          full_name: 'Test User',
-          avatar_url: null,
-          created_at: '2023-01-01T00:00:00.000Z',
-          updated_at: '2023-01-01T00:00:00.000Z',
+        id: 1,
+        email: 'test@example.com',
+        username: 'test-user',
+        full_name: 'Test User',
+        email_verified: true,
+        email_verified_at: '2023-01-01T00:00:00.000Z',
+        created_at: '2023-01-01T00:00:00.000Z',
+        updated_at: '2023-01-01T00:00:00.000Z',
+        auth: {
+          access_token: 'mock-access-token',
+          refresh_token: 'mock-refresh-token',
         },
-        token: 'mock-jwt-token',
       })
     }
 
@@ -42,7 +45,7 @@ export const authHandlers = [
         ],
       }),
       {
-        status: 401,
+        status: 400,
         headers: {
           'Content-Type': 'application/json',
         },
@@ -75,23 +78,26 @@ export const authHandlers = [
     }
 
     // Return success response
-    return HttpResponse.json({
-      user: {
+    const now = new Date().toISOString()
+    return HttpResponse.json(
+      {
         id: 2,
         email: body.email,
+        username: null,
         full_name: body.full_name,
-        avatar_url: null,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
+        email_verified: false,
+        email_verified_at: null,
+        created_at: now,
+        updated_at: now,
+        auth: {
+          access_token: 'mock-access-token',
+          refresh_token: 'mock-refresh-token',
+        },
       },
-      message: 'User registered successfully',
-    })
+      { status: 201 }
+    )
   }),
 
   // Mock logout endpoint
-  http.post('/api/v1/sessions/sign-out', () => {
-    return HttpResponse.json({
-      message: 'Logged out successfully',
-    })
-  }),
+  http.post('/api/v1/sessions/logout', () => new HttpResponse(null, { status: 204 })),
 ]

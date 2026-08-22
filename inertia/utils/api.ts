@@ -1,4 +1,5 @@
 import { router } from '@inertiajs/react'
+
 import type { ApiErrorResponse } from '~/types'
 
 export class ApiClient {
@@ -9,87 +10,107 @@ export class ApiClient {
   }
 
   private async request<T>(path: string, options: RequestInit = {}): Promise<T> {
-    const url = `${this.baseURL}${path}`
     const token = this.getToken()
+    const headers = new Headers(options.headers)
 
-    const headers = new Headers({
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      ...options.headers,
-    })
-
+    headers.set('Accept', 'application/json')
+    if (options.body && !(options.body instanceof FormData)) {
+      headers.set('Content-Type', 'application/json')
+    }
     if (token) {
       headers.set('Authorization', `Bearer ${token}`)
     }
 
-    const response = await fetch(url, {
+    const response = await fetch(`${this.baseURL}${path}`, {
+      credentials: 'same-origin',
       ...options,
       headers,
     })
 
     if (!response.ok) {
-      if (response.status === 401) {
-        localStorage.removeItem('auth_token')
-        router.visit('/login')
-      }
-      const error = (await response.json()) as ApiErrorResponse
-      throw new ApiError(error, response.status)
+      await this.handleUnauthorized(response)
+      throw new ApiError(await this.parseError(response), response.status)
     }
 
-    return response.json()
+    return this.parseSuccess<T>(response)
   }
 
   async get<T>(path: string): Promise<T> {
     return this.request<T>(path, { method: 'GET' })
   }
 
-  async post<T>(path: string, data?: any): Promise<T> {
+  async post<T, Data = unknown>(path: string, data?: Data): Promise<T> {
     return this.request<T>(path, {
       method: 'POST',
-      body: data ? JSON.stringify(data) : undefined,
+      body: data === undefined ? undefined : JSON.stringify(data),
     })
   }
 
-  async put<T>(path: string, data?: any): Promise<T> {
+  async put<T, Data = unknown>(path: string, data?: Data): Promise<T> {
     return this.request<T>(path, {
       method: 'PUT',
-      body: data ? JSON.stringify(data) : undefined,
+      body: data === undefined ? undefined : JSON.stringify(data),
     })
   }
 
-  async delete<T>(path: string): Promise<T> {
+  async delete<T = void>(path: string): Promise<T> {
     return this.request<T>(path, { method: 'DELETE' })
   }
 
   async upload<T>(path: string, file: File): Promise<T> {
     const formData = new FormData()
     formData.append('file', file)
-    const token = this.getToken()
 
-    const headers = new Headers({
-      Accept: 'application/json',
-    })
-
-    if (token) {
-      headers.set('Authorization', `Bearer ${token}`)
-    }
-
-    const response = await fetch(`${this.baseURL}${path}`, {
+    return this.request<T>(path, {
       method: 'POST',
-      headers,
       body: formData,
     })
+  }
 
-    if (!response.ok) {
-      if (response.status === 401) {
-        localStorage.removeItem('auth_token')
-        router.visit('/login')
-      }
-      const error = (await response.json()) as ApiErrorResponse
-      throw new ApiError(error, response.status)
+  private async parseSuccess<T>(response: Response): Promise<T> {
+    if (response.status === 204) {
+      return undefined as T
     }
 
-    return response.json()
+    const contentType = response.headers.get('content-type') ?? ''
+    if (contentType.includes('application/json')) {
+      return (await response.json()) as T
+    }
+
+    return (await response.text()) as T
+  }
+
+  private async parseError(response: Response): Promise<ApiErrorResponse> {
+    const contentType = response.headers.get('content-type') ?? ''
+
+    if (contentType.includes('application/json')) {
+      const payload = (await response.json()) as Partial<ApiErrorResponse> & {
+        message?: string
+      }
+      if (Array.isArray(payload.errors)) {
+        return { errors: payload.errors }
+      }
+      if (payload.message) {
+        return { errors: [{ message: payload.message }] }
+      }
+    }
+
+    return {
+      errors: [
+        {
+          message: response.statusText || `Request failed with status ${response.status}`,
+        },
+      ],
+    }
+  }
+
+  private async handleUnauthorized(response: Response): Promise<void> {
+    if (response.status !== 401) {
+      return
+    }
+
+    localStorage.removeItem('auth_token')
+    await router.visit('/login')
   }
 }
 
@@ -104,11 +125,13 @@ export class ApiError extends Error {
 
   getFieldErrors(): Record<string, string> {
     const fieldErrors: Record<string, string> = {}
-    this.response.errors.forEach((error) => {
+
+    for (const error of this.response.errors) {
       if (error.field) {
         fieldErrors[error.field] = error.message
       }
-    })
+    }
+
     return fieldErrors
   }
 }

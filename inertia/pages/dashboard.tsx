@@ -78,7 +78,7 @@ function StatCard({
   title: string
   value: number
   icon: LucideIcon
-  href: string
+  href?: string
 }) {
   return (
     <Card>
@@ -86,12 +86,14 @@ function StatCard({
         <div className="space-y-1.5">
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
           <p className="text-2xl font-semibold tracking-tight">{value.toLocaleString()}</p>
-          <Link
-            href={href}
-            className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
-          >
-            View all <ArrowUpRight className="size-3" />
-          </Link>
+          {href && (
+            <Link
+              href={href}
+              className="inline-flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+            >
+              View all <ArrowUpRight className="size-3" />
+            </Link>
+          )}
         </div>
         <div className="flex size-11 items-center justify-center rounded-lg bg-primary/10 text-primary">
           <Icon className="size-5" />
@@ -102,7 +104,8 @@ function StatCard({
 }
 
 export default function DashboardPage({ stats }: DashboardPageProps) {
-  const { user, activeTenant } = useAuth()
+  const { user, activeTenant, can } = useAuth()
+  const canListUsers = can('users.list')
 
   return (
     <MainLayout>
@@ -114,29 +117,38 @@ export default function DashboardPage({ stats }: DashboardPageProps) {
           description={
             activeTenant
               ? `You're working in ${activeTenant.name}.`
-              : "Here's what's happening across your workspace."
+              : 'Join an active workspace to see tenant-scoped activity.'
           }
           actions={
-            <>
-              <Button variant="outline">Download report</Button>
+            can('users.create') ? (
               <Link href="/users/create">
                 <Button variant="primary">Add user</Button>
               </Link>
-            </>
+            ) : undefined
           }
         />
 
         {/* Stats */}
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard title="Total users" value={stats.totals.users} icon={Users} href="/users" />
           <StatCard
-            title="Tenants"
-            value={stats.totals.tenants}
-            icon={Building2}
-            href="/dashboard"
+            title="Workspace users"
+            value={stats.totals.users}
+            icon={Users}
+            href={canListUsers ? '/users' : undefined}
           />
-          <StatCard title="Files" value={stats.totals.files} icon={FileText} href="/files" />
-          <StatCard title="Roles" value={stats.totals.roles} icon={ShieldCheck} href="/roles" />
+          <StatCard title="My workspaces" value={stats.totals.tenants} icon={Building2} />
+          <StatCard
+            title="Workspace files"
+            value={stats.totals.files}
+            icon={FileText}
+            href={can('files.list') ? '/files' : undefined}
+          />
+          <StatCard
+            title="Global roles"
+            value={stats.totals.roles}
+            icon={ShieldCheck}
+            href={can('roles.list') ? '/roles' : undefined}
+          />
         </div>
 
         {/* Charts */}
@@ -144,7 +156,7 @@ export default function DashboardPage({ stats }: DashboardPageProps) {
           <Card>
             <CardHeader>
               <CardHeading>
-                <CardTitle>New users</CardTitle>
+                <CardTitle>New workspace users</CardTitle>
                 <p className="text-sm text-muted-foreground">Sign-ups over the last 6 months</p>
               </CardHeading>
             </CardHeader>
@@ -176,7 +188,9 @@ export default function DashboardPage({ stats }: DashboardPageProps) {
             <CardHeader>
               <CardHeading>
                 <CardTitle>Monthly activity</CardTitle>
-                <p className="text-sm text-muted-foreground">User registrations per month</p>
+                <p className="text-sm text-muted-foreground">
+                  Registrations in the active workspace
+                </p>
               </CardHeading>
             </CardHeader>
             <CardContent>
@@ -196,20 +210,24 @@ export default function DashboardPage({ stats }: DashboardPageProps) {
         <Card>
           <CardHeader>
             <CardHeading>
-              <CardTitle>Recent users</CardTitle>
+              <CardTitle>Recent workspace users</CardTitle>
               <p className="text-sm text-muted-foreground">The latest people to join</p>
             </CardHeading>
-            <CardToolbar>
-              <Link href="/users">
-                <Button variant="outline" size="sm">
-                  View all
-                </Button>
-              </Link>
-            </CardToolbar>
+            {canListUsers && (
+              <CardToolbar>
+                <Link href="/users">
+                  <Button variant="outline" size="sm">
+                    View all
+                  </Button>
+                </Link>
+              </CardToolbar>
+            )}
           </CardHeader>
           <CardContent className="p-0">
             {stats.recentUsers.length === 0 ? (
-              <p className="p-5 text-sm text-muted-foreground">No users yet.</p>
+              <p className="p-5 text-sm text-muted-foreground">
+                No users in the active workspace yet.
+              </p>
             ) : (
               <ul className="divide-y divide-border">
                 {stats.recentUsers.map((recent) => (

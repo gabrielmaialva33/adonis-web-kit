@@ -1,11 +1,8 @@
 import { Link, router } from '@inertiajs/react'
-import { Bell, Check, ChevronsUpDown, LogOut, Menu, Search, Settings, User } from 'lucide-react'
+import { Check, ChevronsUpDown, LogOut, Menu, Settings, User } from 'lucide-react'
 
 import { Button } from '~/components/ui/button'
 import { Avatar, AvatarFallback } from '~/components/ui/avatar'
-import { Badge } from '~/components/ui/badge'
-import { Separator } from '~/components/ui/separator'
-import { Input } from '~/components/ui/input'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -195,26 +192,9 @@ export function Header({ onToggleSidebar, collapsed = false }: HeaderProps) {
           <Menu className="size-5" />
         </Button>
 
-        {/* Search */}
-        <div className="relative hidden w-full max-w-md md:block">
-          <Search className="absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input type="search" placeholder="Search..." className="ps-9" />
-        </div>
-
         {/* Right actions */}
         <div className="ms-auto flex items-center gap-2">
           <TenantSwitcher />
-
-          <Separator orientation="vertical" className="hidden h-6 sm:block" />
-
-          <Button variant="ghost" mode="icon" className="relative">
-            <Bell className="size-5" />
-            <Badge
-              variant="destructive"
-              shape="circle"
-              className="absolute -end-0.5 -top-0.5 size-2 min-w-0 p-0"
-            />
-          </Button>
 
           <ThemeToggle />
           <UserMenu />

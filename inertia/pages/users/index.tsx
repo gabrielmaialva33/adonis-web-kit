@@ -46,6 +46,7 @@ import {
   AlertDialogTitle,
 } from '~/components/ui/alert-dialog'
 import { PageHeader } from '~/components/page_header'
+import { useAuth } from '~/hooks/use_auth'
 import type { PaginatedResponse } from '~/types'
 
 interface UserRole {
@@ -92,6 +93,11 @@ function formatDate(iso: string) {
 }
 
 export default function UsersPage({ users, search, sortBy, direction }: UsersPageProps) {
+  const { can } = useAuth()
+  const canCreate = can('users.create')
+  const canEdit = can('users.read') && can('users.update')
+  const canDelete = can('users.delete')
+
   const [userToDelete, setUserToDelete] = useState<UserRow | null>(null)
   const [searchValue, setSearchValue] = useState(search)
 
@@ -209,40 +215,48 @@ export default function UsersPage({ users, search, sortBy, direction }: UsersPag
           cell: ({ row }) => (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" mode="icon" size="sm">
+                <Button variant="ghost" mode="icon" size="sm" aria-label="Open user actions">
                   <MoreVertical className="size-4" />
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>Actions</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem asChild>
-                  <Link href={`/users/${row.original.id}/edit`}>
-                    <Edit className="size-4" />
-                    Edit user
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem
-                  variant="destructive"
-                  onSelect={() => setUserToDelete(row.original)}
-                >
-                  <Trash2 className="size-4" />
-                  Delete user
-                </DropdownMenuItem>
+                {canEdit && (
+                  <DropdownMenuItem asChild>
+                    <Link href={`/users/${row.original.id}/edit`}>
+                      <Edit className="size-4" />
+                      Edit user
+                    </Link>
+                  </DropdownMenuItem>
+                )}
+                {canEdit && canDelete && <DropdownMenuSeparator />}
+                {canDelete && (
+                  <DropdownMenuItem
+                    variant="destructive"
+                    onSelect={() => setUserToDelete(row.original)}
+                  >
+                    <Trash2 className="size-4" />
+                    Deactivate user
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           ),
         }),
       ]),
-    []
+    [canDelete, canEdit]
   )
 
   const table = useTable({
     features: dataGridFeatures,
     data: users.data,
     columns,
-    state: { sorting, pagination },
+    state: {
+      sorting,
+      pagination,
+      columnVisibility: { actions: canEdit || canDelete },
+    },
     onSortingChange: handleSortingChange,
     onPaginationChange: handlePaginationChange,
     manualSorting: true,
@@ -252,7 +266,7 @@ export default function UsersPage({ users, search, sortBy, direction }: UsersPag
   })
 
   const confirmDelete = () => {
-    if (!userToDelete) return
+    if (!userToDelete || !canDelete) return
     router.delete(`/users/${userToDelete.id}`, {
       preserveScroll: true,
       onFinish: () => setUserToDelete(null),
@@ -263,13 +277,16 @@ export default function UsersPage({ users, search, sortBy, direction }: UsersPag
     <MainLayout>
       <Head title="Users" />
 
-      <AlertDialog open={!!userToDelete} onOpenChange={(open) => !open && setUserToDelete(null)}>
+      <AlertDialog
+        open={Boolean(userToDelete)}
+        onOpenChange={(open) => !open && setUserToDelete(null)}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete user?</AlertDialogTitle>
+            <AlertDialogTitle>Deactivate user?</AlertDialogTitle>
             <AlertDialogDescription>
-              This permanently deletes <strong>{userToDelete?.full_name}</strong>. This action
-              cannot be undone.
+              <strong>{userToDelete?.full_name}</strong> will no longer be able to sign in and will
+              disappear from normal user listings.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -278,7 +295,7 @@ export default function UsersPage({ users, search, sortBy, direction }: UsersPag
               onClick={confirmDelete}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              Delete
+              Deactivate
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -287,14 +304,16 @@ export default function UsersPage({ users, search, sortBy, direction }: UsersPag
       <div className="space-y-6">
         <PageHeader
           title="Users"
-          description="Manage your application users and their roles."
+          description="Manage application users and their global roles."
           actions={
-            <Link href="/users/create">
-              <Button variant="primary">
-                <Plus className="size-4" />
-                Add user
-              </Button>
-            </Link>
+            canCreate ? (
+              <Link href="/users/create">
+                <Button variant="primary">
+                  <Plus className="size-4" />
+                  Add user
+                </Button>
+              </Link>
+            ) : undefined
           }
         />
 

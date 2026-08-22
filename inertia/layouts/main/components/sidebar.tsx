@@ -1,63 +1,49 @@
 import { Link, usePage } from '@inertiajs/react'
 import { useState } from 'react'
-import {
-  ChevronDown,
-  FileText,
-  Home,
-  type LucideIcon,
-  Settings,
-  Shield,
-  Upload,
-  Users,
-} from 'lucide-react'
+import { ChevronDown, FileText, Home, type LucideIcon, Settings, Upload, Users } from 'lucide-react'
 
+import { useAuth } from '~/hooks/use_auth'
 import { cn } from '~/lib/utils'
+
+interface MenuLink {
+  title: string
+  href: string
+  permission?: string
+}
 
 interface MenuItem {
   title: string
   href?: string
+  permission?: string
   icon?: LucideIcon
-  children?: { title: string; href: string }[]
+  children?: MenuLink[]
 }
 
 const menuItems: MenuItem[] = [
-  { title: 'Dashboard', href: '/dashboard', icon: Home },
+  { title: 'Dashboard', href: '/dashboard', icon: Home, permission: 'dashboard.read' },
   {
     title: 'Users',
     icon: Users,
     children: [
-      { title: 'All Users', href: '/users' },
-      { title: 'Roles', href: '/roles' },
-      { title: 'Permissions', href: '/permissions' },
+      { title: 'All Users', href: '/users', permission: 'users.list' },
+      { title: 'Roles', href: '/roles', permission: 'roles.list' },
+      { title: 'Permissions', href: '/permissions', permission: 'permissions.list' },
     ],
   },
-  { title: 'Files', href: '/files', icon: Upload },
-  {
-    title: 'Security',
-    icon: Shield,
-    children: [
-      { title: 'Audit Logs', href: '/audit-logs' },
-      { title: 'Sessions', href: '/sessions' },
-    ],
-  },
+  { title: 'Files', href: '/files', icon: Upload, permission: 'files.list' },
   { title: 'Components', href: '/ui-demo', icon: FileText },
   { title: 'Settings', href: '/settings', icon: Settings },
 ]
 
 function useCurrentUrl() {
-  const { url } = usePage()
-  return url
+  return usePage().url
 }
 
 function isActive(url: string, href?: string) {
   if (!href) return false
-  return url === href || url.startsWith(href + '/')
+  return url === href || url.startsWith(`${href}/`)
 }
 
-/**
- * The navigation tree. Shared between the fixed desktop sidebar and the mobile
- * Sheet, so both stay in sync. `collapsed` renders an icon-only rail.
- */
 export function SidebarNav({
   collapsed = false,
   onNavigate,
@@ -66,23 +52,39 @@ export function SidebarNav({
   onNavigate?: () => void
 }) {
   const url = useCurrentUrl()
+  const { can } = useAuth()
+
+  const visibleItems = menuItems
+    .map((item) => ({
+      ...item,
+      children: item.children?.filter((child) => !child.permission || can(child.permission)),
+    }))
+    .filter((item) => {
+      if (item.permission && !can(item.permission)) return false
+      if (!item.href && item.children?.length === 0) return false
+      return true
+    })
+
   const [expanded, setExpanded] = useState<string[]>(() =>
-    menuItems
+    visibleItems
       .filter((item) => item.children?.some((child) => isActive(url, child.href)))
       .map((item) => item.title)
   )
 
   const toggle = (title: string) =>
-    setExpanded((prev) =>
-      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
+    setExpanded((previous) =>
+      previous.includes(title)
+        ? previous.filter((item) => item !== title)
+        : [...previous, title]
     )
 
   return (
     <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-      {menuItems.map((item) => {
+      {visibleItems.map((item) => {
         const open = expanded.includes(item.title)
         const parentActive =
-          isActive(url, item.href) || !!item.children?.some((c) => isActive(url, c.href))
+          isActive(url, item.href) ||
+          Boolean(item.children?.some((child) => isActive(url, child.href)))
 
         if (item.href) {
           return (
@@ -160,10 +162,6 @@ interface SidebarProps {
   isCollapsed?: boolean
 }
 
-/**
- * Fixed desktop sidebar. Mobile navigation is handled by the Sheet rendered in
- * the header, so this is hidden below `lg`.
- */
 export function Sidebar({ isCollapsed = false }: SidebarProps) {
   return (
     <aside

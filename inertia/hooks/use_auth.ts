@@ -1,4 +1,5 @@
 import { usePage } from '@inertiajs/react'
+
 import type { AuthSharedProps } from '~/types'
 
 export function useAuth() {
@@ -7,6 +8,7 @@ export function useAuth() {
   const tenants = auth?.tenants ?? []
   const activeTenantId = auth?.activeTenantId ?? null
   const activeTenant = tenants.find((tenant) => tenant.id === activeTenantId) ?? tenants[0] ?? null
+  const permissions = auth?.permissions ?? []
 
   return {
     user: auth?.user ?? null,
@@ -14,5 +16,10 @@ export function useAuth() {
     tenants,
     activeTenant,
     activeTenantId,
+    permissions,
+    can: (permission: string) => permissions.includes(permission),
+    canAny: (required: string[]) => required.some((permission) => permissions.includes(permission)),
+    canAll: (required: string[]) =>
+      required.every((permission) => permissions.includes(permission)),
   }
 }

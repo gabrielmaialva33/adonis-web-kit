@@ -21,19 +21,6 @@ vi.mock('@inertiajs/react', async () => {
         errors: {} as Record<string, string>,
       }
     },
-    Link: ({
-      href,
-      children,
-      className,
-    }: {
-      href: string
-      children: React.ReactNode
-      className?: string
-    }) => (
-      <a href={href} className={className}>
-        {children}
-      </a>
-    ),
   }
 })
 
@@ -48,7 +35,6 @@ describe('LoginForm', () => {
     expect(screen.getByLabelText(/Email or Username/i)).toBeInTheDocument()
     expect(screen.getByLabelText(/Password/i)).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Sign in/i })).toBeInTheDocument()
-    expect(screen.getByText(/Forgot password\?/i)).toBeInTheDocument()
   })
 
   it('allows entering credentials', async () => {
@@ -72,13 +58,5 @@ describe('LoginForm', () => {
     await user.click(screen.getByRole('button', { name: /Sign in/i }))
 
     expect(mockPost).toHaveBeenCalledWith('/login')
-  })
-
-  it('shows the forgot password link', () => {
-    render(<LoginForm />)
-
-    const forgotPasswordLink = screen.getByText(/Forgot password\?/i)
-    expect(forgotPasswordLink).toBeInTheDocument()
-    expect(forgotPasswordLink.closest('a')).toHaveAttribute('href', '/forgot-password')
   })
 })

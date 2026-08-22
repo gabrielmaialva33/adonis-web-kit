@@ -1,21 +1,20 @@
-// API Response Types
-
 export interface User {
   id: number
   full_name: string
   email: string
-  username?: string
-  email_verified_at?: string
+  username: string | null
+  email_verified: boolean
+  email_verified_at: string | null
   created_at: string
-  updated_at: string
-  deleted_at?: string
+  updated_at: string | null
+  roles?: Role[]
 }
 
 export interface Role {
   id: number
   name: string
-  display_name: string
-  description?: string
+  slug: string
+  description?: string | null
   created_at: string
   updated_at: string
 }
@@ -23,17 +22,17 @@ export interface Role {
 export interface Permission {
   id: number
   name: string
-  display_name: string
-  description?: string
+  description?: string | null
   resource: string
   action: string
+  context: string
   created_at: string
   updated_at: string
 }
 
 export interface UserPermission extends Permission {
   granted: boolean
-  expires_at?: string
+  expires_at?: string | null
 }
 
 export interface FileUploadResponse {
@@ -66,6 +65,8 @@ export interface ApiError {
   message: string
   field?: string
   rule?: string
+  code?: string
+  status?: number
 }
 
 export interface ApiErrorResponse {
@@ -73,21 +74,17 @@ export interface ApiErrorResponse {
 }
 
 export interface AuthTokens {
-  token: string
-  type: string
-  expires_at?: string
+  access_token: string
+  refresh_token: string
 }
 
-export interface AuthResponse {
-  user: User
-  tokens?: AuthTokens
+export interface AuthResponse extends User {
+  auth: AuthTokens
 }
 
-// Form Data Types
 export interface LoginFormData {
   uid: string
   password: string
-  [key: string]: any
 }
 
 export interface RegisterFormData {
@@ -100,8 +97,6 @@ export interface RegisterFormData {
 
 export interface UpdateUserFormData {
   full_name?: string
-  email?: string
-  username?: string
   password?: string
   password_confirmation?: string
 }
@@ -111,6 +106,7 @@ export interface CreatePermissionFormData {
   description?: string
   resource: string
   action: string
+  context?: string
 }
 
 export interface AttachRolesFormData {
@@ -128,7 +124,7 @@ export interface UserPermissionSyncFormData {
   permissions: Array<{
     permission_id: number
     granted?: boolean
-    expires_at?: string
+    expires_at?: string | null
   }>
 }
 
