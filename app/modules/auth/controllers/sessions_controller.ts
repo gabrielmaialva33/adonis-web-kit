@@ -35,13 +35,17 @@ export default class SessionsController {
   async signUp({ request, response }: HttpContext) {
     const payload = await request.validateUsing(createUserValidator)
     const service = await app.container.make(SignUpService)
-    const { user, auth } = await service.run(payload)
+    const { user, auth, emailVerificationSent } = await service.run(payload)
 
     if (!auth) {
       throw new Error('Authentication tokens were not issued')
     }
 
-    return response.created({ ...user.toJSON(), auth })
+    return response.created({
+      ...user.toJSON(),
+      auth,
+      email_verification_sent: emailVerificationSent,
+    })
   }
 
   async refresh({ request, response }: HttpContext) {

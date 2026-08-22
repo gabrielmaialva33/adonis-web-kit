@@ -10,6 +10,7 @@ import type IUser from '#modules/users/interfaces/user_interface'
 import User from '#modules/users/models/user'
 import CreateUserService from '#modules/users/services/create_user_service'
 import IRole from '#modules/roles/interfaces/role_interface'
+import env from '#start/env'
 
 export type SignUpOptions = {
   issueApiTokens?: boolean
@@ -18,6 +19,8 @@ export type SignUpOptions = {
 export type SignUpResult = {
   user: User
   auth?: GenerateAuthTokensResponse
+  activeTenantId?: number
+  emailVerificationSent: boolean
 }
 
 @inject()
@@ -30,16 +33,28 @@ export default class SignUpService {
 
   async run(payload: IUser.CreatePayload, options: SignUpOptions = {}): Promise<SignUpResult> {
     const ctx = HttpContext.getOrFail()
-    const user = await this.createUserService.run(payload)
+    const createPersonalWorkspace =
+      env.get('REGISTRATION_WORKSPACE_MODE', 'personal') === 'personal'
+    const user = await this.createUserService.run(payload, { createPersonalWorkspace })
     await user.load('roles')
 
-    await this.sendVerificationEmailService.handle(user)
+    const activeTenant = await user
+      .related('tenants')
+      .query()
+      .where('tenants.is_active', true)
+      .orderBy('tenants.id', 'asc')
+      .first()
+
+    const emailVerificationSent = await this.sendVerificationEmailService.handle(user)
     AuthEventService.emitUserRegistered(user, 'sign-up', false, ctx)
 
     const auth =
       options.issueApiTokens === false
         ? undefined
-        : await this.jwtAuthTokensService.run({ userId: user.id })
+        : await this.jwtAuthTokensService.run({
+            userId: user.id,
+            tenantId: activeTenant?.id,
+          })
 
     if (auth) {
       const isAdmin = user.roles.some((role) =>
@@ -48,6 +63,6 @@ export default class SignUpService {
       AuthEventService.emitLoginSucceeded(user, 'password', isAdmin, ctx)
     }
 
-    return { user, auth }
+    return { user, auth, activeTenantId: activeTenant?.id, emailVerificationSent }
   }
 }

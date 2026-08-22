@@ -1,4 +1,5 @@
 import { inject } from '@adonisjs/core'
+import { HttpContext } from '@adonisjs/core/http'
 import mail from '@adonisjs/mail/services/main'
 import { DateTime } from 'luxon'
 
@@ -10,7 +11,7 @@ import type User from '#modules/users/models/user'
 export default class SendVerificationEmailService {
   constructor(private tokenService: EmailVerificationTokenService) {}
 
-  async handle(user: User): Promise<void> {
+  async handle(user: User): Promise<boolean> {
     const { token, tokenHash } = this.tokenService.generate()
 
     if (!user.metadata) {
@@ -26,6 +27,15 @@ export default class SendVerificationEmailService {
     user.metadata.email_verification_sent_at = DateTime.now().toISO()
     await user.save()
 
-    await mail.send(new VerifyEmailNotification(user, token))
+    try {
+      await mail.send(new VerifyEmailNotification(user, token))
+      return true
+    } catch (error) {
+      HttpContext.get()?.logger.error(
+        { error, userId: user.id },
+        'Failed to deliver email verification message'
+      )
+      return false
+    }
   }
 }

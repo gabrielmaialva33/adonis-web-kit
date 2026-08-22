@@ -45,7 +45,12 @@ export default class EmailVerificationController {
       })
     }
 
-    await this.sendVerificationEmailService.handle(user)
+    const delivered = await this.sendVerificationEmailService.handle(user)
+    if (!delivered) {
+      return response.serviceUnavailable({
+        message: 'Verification email could not be delivered. Please try again later.',
+      })
+    }
 
     return response.ok({
       message: 'Verification email sent successfully',

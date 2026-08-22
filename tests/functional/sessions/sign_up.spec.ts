@@ -4,12 +4,14 @@ import testUtils from '@adonisjs/core/services/test_utils'
 import app from '@adonisjs/core/services/app'
 import db from '@adonisjs/lucid/services/db'
 import mail from '@adonisjs/mail/services/main'
+import jwt from 'jsonwebtoken'
 
 import User from '#modules/users/models/user'
 import Role from '#modules/roles/models/role'
 
 import PermissionService from '#modules/permissions/services/permission_service'
 import IRole from '#modules/roles/interfaces/role_interface'
+import env from '#start/env'
 
 test.group('Sessions sign up', (group) => {
   group.each.setup(() => {
@@ -33,11 +35,6 @@ test.group('Sessions sign up', (group) => {
 
     const response = await client.post('/api/v1/sessions/sign-up').json(userData)
 
-    if (response.status() !== 201) {
-      console.log('Response status:', response.status())
-      console.log('Response body:', response.body())
-    }
-
     response.assertStatus(201)
     response.assertBodyContains({
       auth: {
@@ -47,6 +44,7 @@ test.group('Sessions sign up', (group) => {
       email: userData.email,
       username: userData.username,
       full_name: userData.full_name,
+      email_verification_sent: true,
     })
 
     assert.isDefined(response.body().auth?.access_token)
@@ -54,6 +52,46 @@ test.group('Sessions sign up', (group) => {
 
     const user = await User.findBy('email', userData.email)
     assert.isNotNull(user)
+
+    const workspaces = await user!.related('tenants').query()
+    assert.lengthOf(workspaces, 1)
+    assert.equal(workspaces[0].$extras.pivot_role, 'owner')
+
+    const payload = jwt.verify(
+      response.body().auth.access_token,
+      env.get('ACCESS_TOKEN_SECRET', env.get('APP_KEY'))
+    ) as { tenantId?: number }
+    assert.equal(payload.tenantId, workspaces[0].id)
+  })
+
+  test('should keep a persisted registration successful when email delivery fails', async ({
+    client,
+    assert,
+    cleanup,
+  }) => {
+    const mutableMail = mail as unknown as {
+      send: typeof mail.send
+    }
+    const originalSend = mutableMail.send
+    mutableMail.send = (() => Promise.reject(new Error('SMTP unavailable'))) as typeof mail.send
+    cleanup(() => {
+      mutableMail.send = originalSend
+    })
+
+    const response = await client.post('/api/v1/sessions/sign-up').json({
+      full_name: 'Delivery Failure',
+      email: 'delivery-failure@example.com',
+      username: 'delivery-failure',
+      password: 'password123',
+      password_confirmation: 'password123',
+    })
+
+    response.assertStatus(201)
+    response.assertBodyContains({
+      email: 'delivery-failure@example.com',
+      email_verification_sent: false,
+    })
+    assert.isNotNull(await User.findBy('email', 'delivery-failure@example.com'))
   })
 
   test('should fail with duplicate email', async ({ client }) => {
@@ -209,6 +247,10 @@ test.group('Sessions sign up', (group) => {
       'files.create',
       'files.read',
       'files.list',
+      'files.delete.own',
+      'tenants.create',
+      'tenants.read',
+      'tenants.list',
     ])
     assert.notInclude(permissions, 'users.list')
     assert.notInclude(permissions, 'users.read')
