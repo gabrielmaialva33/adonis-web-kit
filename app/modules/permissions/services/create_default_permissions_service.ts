@@ -39,6 +39,13 @@ export const DEFAULT_PERMISSION_ACTIONS: Partial<
     IPermission.Actions.DELETE,
     IPermission.Actions.LIST,
   ],
+  [IPermission.Resources.TENANTS]: [
+    IPermission.Actions.CREATE,
+    IPermission.Actions.READ,
+    IPermission.Actions.UPDATE,
+    IPermission.Actions.DELETE,
+    IPermission.Actions.LIST,
+  ],
   [IPermission.Resources.SETTINGS]: [IPermission.Actions.READ, IPermission.Actions.UPDATE],
   [IPermission.Resources.REPORTS]: [
     IPermission.Actions.READ,
@@ -53,10 +60,25 @@ export const DEFAULT_PERMISSION_ACTIONS: Partial<
   [IPermission.Resources.DASHBOARD]: [IPermission.Actions.READ],
 }
 
+export const DEFAULT_CONTEXTUAL_PERMISSIONS: IPermission.SyncPermissionData[] = [
+  {
+    name: `${IPermission.Resources.FILES}.${IPermission.Actions.DELETE}.${IPermission.Contexts.OWN}`,
+    resource: IPermission.Resources.FILES,
+    action: IPermission.Actions.DELETE,
+    context: IPermission.Contexts.OWN,
+    description: 'Delete own files',
+  },
+]
+
 export function getDefaultPermissionNames(): string[] {
-  return Object.entries(DEFAULT_PERMISSION_ACTIONS).flatMap(([resource, actions]) =>
-    (actions ?? []).map((action) => `${resource}.${action}`)
+  const globalPermissions = Object.entries(DEFAULT_PERMISSION_ACTIONS).flatMap(
+    ([resource, actions]) => (actions ?? []).map((action) => `${resource}.${action}`)
   )
+
+  return [
+    ...globalPermissions,
+    ...DEFAULT_CONTEXTUAL_PERMISSIONS.map((permission) => permission.name),
+  ]
 }
 
 @inject()
@@ -68,15 +90,18 @@ export default class CreateDefaultPermissionsService {
   }
 
   private getDefaultPermissions(): IPermission.SyncPermissionData[] {
-    return Object.entries(DEFAULT_PERMISSION_ACTIONS).flatMap(([resource, actions]) =>
-      (actions ?? []).map((action) => ({
-        name: `${resource}.${action}`,
-        resource,
-        action,
-        context: IPermission.Contexts.ANY,
-        description: `${this.capitalize(action)} ${resource}`,
-      }))
+    const globalPermissions = Object.entries(DEFAULT_PERMISSION_ACTIONS).flatMap(
+      ([resource, actions]) =>
+        (actions ?? []).map((action) => ({
+          name: `${resource}.${action}`,
+          resource,
+          action,
+          context: IPermission.Contexts.ANY,
+          description: `${this.capitalize(action)} ${resource}`,
+        }))
     )
+
+    return [...globalPermissions, ...DEFAULT_CONTEXTUAL_PERMISSIONS]
   }
 
   private capitalize(value: string): string {

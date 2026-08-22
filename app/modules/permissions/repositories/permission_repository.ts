@@ -130,6 +130,21 @@ export default class PermissionRepository
       })
       .orWhere((query) => {
         query
+          .where('resource', IPermission.Resources.FILES)
+          .where('action', IPermission.Actions.DELETE)
+          .where('context', IPermission.Contexts.OWN)
+      })
+      .orWhere((query) => {
+        query
+          .where('resource', IPermission.Resources.TENANTS)
+          .whereIn('action', [
+            IPermission.Actions.CREATE,
+            IPermission.Actions.READ,
+            IPermission.Actions.LIST,
+          ])
+      })
+      .orWhere((query) => {
+        query
           .where('resource', IPermission.Resources.DASHBOARD)
           .where('action', IPermission.Actions.READ)
       })

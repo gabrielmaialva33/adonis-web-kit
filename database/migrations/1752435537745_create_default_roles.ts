@@ -1,18 +1,45 @@
 import { BaseSchema } from '@adonisjs/lucid/schema'
-import app from '@adonisjs/core/services/app'
 
-import IRole from '#modules/roles/interfaces/role_interface'
-import CreateDefaultRolesService from '#modules/roles/services/create_default_roles_service'
+const defaultRoles = [
+  {
+    name: 'Root',
+    slug: 'root',
+    description: 'Unrestricted platform owner with every available permission.',
+  },
+  {
+    name: 'Admin',
+    slug: 'admin',
+    description: 'Platform administrator without unrestricted permission-management access.',
+  },
+  {
+    name: 'Editor',
+    slug: 'editor',
+    description: 'Content-oriented role that inherits the standard user capabilities.',
+  },
+  {
+    name: 'User',
+    slug: 'user',
+    description: 'Default authenticated application user.',
+  },
+  {
+    name: 'Guest',
+    slug: 'guest',
+    description: 'Neutral role for applications that explicitly enable guest capabilities.',
+  },
+] as const
 
 export default class extends BaseSchema {
   async up() {
-    const service = await app.container.make(CreateDefaultRolesService)
-    const trx = await this.db.transaction()
-    await service.run(trx)
-    await trx.commit()
+    await this.db.table('roles').multiInsert(defaultRoles.map((role) => ({ ...role })))
   }
 
   async down() {
-    await this.db.from('roles').whereIn('slug', Object.values(IRole.Slugs)).delete()
+    await this.db
+      .from('roles')
+      .whereIn(
+        'slug',
+        defaultRoles.map((role) => role.slug)
+      )
+      .delete()
   }
 }
