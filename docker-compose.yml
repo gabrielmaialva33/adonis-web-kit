@@ -57,6 +57,9 @@ services:
       LOG_LEVEL: info
       # Dev placeholder — override with `export APP_KEY=...` (node ace generate:key).
       APP_KEY: ${APP_KEY:-dev_app_key_change_me_32_chars_min}
+      ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET:-dev_access_token_secret_change_me}
+      REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET:-dev_refresh_token_secret_change_me}
+      EMAIL_VERIFICATION_SECRET: ${EMAIL_VERIFICATION_SECRET:-dev_email_verification_secret_change_me}
       SESSION_DRIVER: cookie
       LIMITER_STORE: redis
       DRIVE_DISK: fs
@@ -68,6 +71,7 @@ services:
       REDIS_HOST: redis
       REDIS_PORT: 6379
       REDIS_PASSWORD: redis
+      REDIS_DB: 0
       QUEUE_REDIS_HOST: redis
       QUEUE_REDIS_PORT: 6379
       QUEUE_REDIS_PASSWORD: redis

@@ -15,6 +15,9 @@ export default await Env.create(new URL('../', import.meta.url), {
   NODE_ENV: Env.schema.enum(['development', 'production', 'test'] as const),
   PORT: Env.schema.number(),
   APP_KEY: Env.schema.string(),
+  ACCESS_TOKEN_SECRET: Env.schema.string.optional(),
+  REFRESH_TOKEN_SECRET: Env.schema.string.optional(),
+  EMAIL_VERIFICATION_SECRET: Env.schema.string.optional(),
   HOST: Env.schema.string({ format: 'host' }),
   LOG_LEVEL: Env.schema.string(),
 
@@ -57,6 +60,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   REDIS_HOST: Env.schema.string.optional({ format: 'host' }),
   REDIS_PORT: Env.schema.number.optional(),
   REDIS_PASSWORD: Env.schema.string.optional(),
+  REDIS_DB: Env.schema.number.optional(),
   /*
   |----------------------------------------------------------
   | Variables for @rlanz/bull-queue
