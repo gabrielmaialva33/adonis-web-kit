@@ -4,9 +4,12 @@ import app from '@adonisjs/core/services/app'
 import GetUserService from '#modules/users/services/get_user_service'
 import GetUserPermissionsService from '#modules/users/services/get_user_permissions_service'
 import GetUserRolesService from '#modules/users/services/get_user_roles_service'
+import DeleteOwnAccountService from '#modules/users/services/delete_own_account_service'
+import { deleteOwnAccountValidator } from '#modules/users/validators/account_validator'
 
 @inject()
 export default class MeController {
+  constructor(private deleteOwnAccountService: DeleteOwnAccountService) {}
   /**
    * Get current user profile
    */
@@ -38,5 +41,15 @@ export default class MeController {
 
     const roles = await service.run(user.id)
     return response.json(roles)
+  }
+
+  async delete({ auth, request, response }: HttpContext) {
+    const user = auth.getUserOrFail()
+    const { current_password: currentPassword, confirmation } =
+      await request.validateUsing(deleteOwnAccountValidator)
+
+    await this.deleteOwnAccountService.run(user.id, { currentPassword, confirmation })
+
+    return response.noContent()
   }
 }
