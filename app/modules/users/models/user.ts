@@ -2,7 +2,6 @@ import { DateTime } from 'luxon'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
 import {
-  afterCreate,
   BaseModel,
   beforeCreate,
   beforeFetch,
@@ -10,6 +9,7 @@ import {
   beforePaginate,
   beforeSave,
   column,
+  computed,
   manyToMany,
   SnakeCaseNamingStrategy,
 } from '@adonisjs/lucid/orm'
@@ -20,19 +20,21 @@ import type { ManyToMany } from '@adonisjs/lucid/types/relations'
 import Role from '#modules/roles/models/role'
 import Permission from '#modules/permissions/models/permission'
 import Tenant from '#modules/tenants/models/tenant'
-import IRole from '#modules/roles/interfaces/role_interface'
 
 const AuthFinder = withAuthFinder(() => hash.use('argon'), {
   uids: ['email', 'username'],
   passwordColumnName: 'password',
 })
 
+export type UserMetadata = {
+  email_verified: boolean
+  email_verification_token_hash: string | null
+  email_verification_sent_at: string | null
+  email_verified_at: string | null
+}
+
 export default class User extends compose(BaseModel, AuthFinder) {
   static accessTokens = DbAccessTokensProvider.forModel(User)
-  static refreshTokens = DbAccessTokensProvider.forModel(User, {
-    type: 'refresh_token',
-    expiresIn: '3d',
-  })
 
   static table = 'users'
   static namingStrategy = new SnakeCaseNamingStrategy()
@@ -61,6 +63,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare is_deleted: boolean
 
   @column({
+    serializeAs: null,
     prepare: (value) => JSON.stringify(value),
     consume: (value) => {
       if (typeof value === 'string') {
@@ -69,11 +72,20 @@ export default class User extends compose(BaseModel, AuthFinder) {
       return value
     },
   })
-  declare metadata: {
-    email_verified: boolean
-    email_verification_token: string | null
-    email_verification_sent_at: string | null
-    email_verified_at: string | null
+  declare metadata: UserMetadata
+
+  /**
+   * Only non-sensitive verification state is exposed by model serialization.
+   * Verification tokens and delivery timestamps stay server-side.
+   */
+  @computed()
+  get email_verified() {
+    return this.metadata?.email_verified ?? false
+  }
+
+  @computed()
+  get email_verified_at() {
+    return this.metadata?.email_verified_at ?? null
   }
 
   @column.dateTime({ autoCreate: true })
@@ -138,14 +150,6 @@ export default class User extends compose(BaseModel, AuthFinder) {
   static async hashUserPassword(user: User) {
     if (user.$dirty.password && !hash.isValidHash(user.password)) {
       user.password = await hash.make(user.password)
-    }
-  }
-
-  @afterCreate()
-  static async setDefaultRole(user: User) {
-    const role = await Role.findBy('slug', IRole.Slugs.USER)
-    if (role) {
-      await user.related('roles').attach([role.id])
     }
   }
 

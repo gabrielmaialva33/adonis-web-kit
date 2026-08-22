@@ -1,5 +1,4 @@
 import type LucidRepositoryInterface from '#shared/lucid/lucid_repository_interface'
-import { type AccessToken } from '@adonisjs/auth/access_tokens'
 import type User from '#modules/users/models/user'
 
 namespace IUser {
@@ -11,20 +10,6 @@ namespace IUser {
      */
     verifyCredentials(uid: string, password: string): Promise<User>
 
-    /**
-     * Generate an access token for the user with the given abilities
-     * @param userId
-     * @param abilities
-     */
-    generateAccessToken(userId: number, abilities?: string[]): Promise<AccessToken>
-
-    /**
-     * Generate a refresh token for the user with the given abilities
-     * @param userId
-     * @param abilities
-     */
-    generateRefreshToken(userId: number, abilities?: string[]): Promise<AccessToken>
-
     findByIdWithPermissionsAndRoles(userId: number): Promise<User | null>
 
     findByIdWithPermissionsAndRolesOrFail(userId: number): Promise<User>
@@ -33,9 +18,15 @@ namespace IUser {
 
     findCreatedSince(startSql: string): Promise<User[]>
 
+    findCreatedSinceForTenant(startSql: string, tenantId: number): Promise<User[]>
+
     listRecentWithRoles(limit: number): Promise<User[]>
 
-    findByEmailVerificationToken(token: string): Promise<User | null>
+    listRecentWithRolesForTenant(limit: number, tenantId: number): Promise<User[]>
+
+    countForTenant(tenantId: number): Promise<number>
+
+    findByEmailVerificationTokenHash(tokenHash: string): Promise<User | null>
 
     syncPermissions(user: User, syncData: PermissionPivotMap): Promise<void>
 
@@ -72,8 +63,6 @@ namespace IUser {
 
   export interface EditPayload {
     full_name?: string
-    email?: string
-    username?: string
     password?: string
   }
 }

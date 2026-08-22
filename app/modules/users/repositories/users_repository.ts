@@ -2,7 +2,6 @@ import User from '#modules/users/models/user'
 
 import type IUser from '#modules/users/interfaces/user_interface'
 import LucidRepository from '#shared/lucid/lucid_repository'
-import { type AccessToken } from '@adonisjs/auth/access_tokens'
 
 export default class UsersRepository
   extends LucidRepository<typeof User>
@@ -75,6 +74,14 @@ export default class UsersRepository
     return this.model.query().where('created_at', '>=', startSql).select('created_at')
   }
 
+  async findCreatedSinceForTenant(startSql: string, tenantId: number): Promise<User[]> {
+    return this.model
+      .query()
+      .where('created_at', '>=', startSql)
+      .whereHas('tenants', (query) => query.where('tenants.id', tenantId))
+      .select('created_at')
+  }
+
   /**
    * Most recently created users with their roles preloaded.
    */
@@ -82,14 +89,32 @@ export default class UsersRepository
     return this.model.query().preload('roles').orderBy('created_at', 'desc').limit(limit)
   }
 
-  /**
-   * Find a user by the email verification token stored in metadata, ignoring
-   * soft-deleted records.
-   */
-  async findByEmailVerificationToken(token: string): Promise<User | null> {
+  async listRecentWithRolesForTenant(limit: number, tenantId: number): Promise<User[]> {
     return this.model
       .query()
-      .whereRaw("metadata->>'email_verification_token' = ?", [token])
+      .whereHas('tenants', (query) => query.where('tenants.id', tenantId))
+      .preload('roles')
+      .orderBy('created_at', 'desc')
+      .limit(limit)
+  }
+
+  async countForTenant(tenantId: number): Promise<number> {
+    const rows = await this.model
+      .query()
+      .whereHas('tenants', (query) => query.where('tenants.id', tenantId))
+      .count('* as total')
+
+    return Number(rows[0].$extras.total)
+  }
+
+  /**
+   * Find a user by the HMAC of the email verification token stored in metadata,
+   * ignoring soft-deleted records. Raw tokens are never persisted.
+   */
+  async findByEmailVerificationTokenHash(tokenHash: string): Promise<User | null> {
+    return this.model
+      .query()
+      .whereRaw("metadata->>'email_verification_token_hash' = ?", [tokenHash])
       .where('is_deleted', false)
       .first()
   }
@@ -144,19 +169,5 @@ export default class UsersRepository
    */
   async detachPermissions(user: User, permissionIds: number[]): Promise<void> {
     await user.related('permissions').detach(permissionIds)
-  }
-
-  async generateAccessToken(userId: number, abilities?: string[]): Promise<AccessToken> {
-    const user = await this.model.findByOrFail({ id: userId })
-    return this.model.accessTokens.create(user, abilities, {
-      name: `access_token:${user.id}:${user.email}`,
-    })
-  }
-
-  async generateRefreshToken(userId: number, abilities?: string[]): Promise<AccessToken> {
-    const user = await this.model.findByOrFail({ id: userId })
-    return this.model.refreshTokens.create(user, abilities, {
-      name: `refresh_token:${user.id}:${user.email}`,
-    })
   }
 }
