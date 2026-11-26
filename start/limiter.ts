@@ -1,4 +1,11 @@
+import { createHash } from 'node:crypto'
 import limiter from '@adonisjs/limiter/services/main'
+
+/** Bound every request-derived key component, including forwarded client addresses. */
+function requestDigest(ip: string, identity?: string) {
+  const parts = identity === undefined ? [ip] : [ip, identity.trim().toLowerCase()]
+  return createHash('sha256').update(JSON.stringify(parts)).digest('hex')
+}
 
 /**
  * Global throttle for general API endpoints
@@ -21,7 +28,10 @@ export const throttle = limiter.define('global', async (ctx) => {
   /**
    * Stricter rate limit for guest users
    */
-  return limiter.allowRequests(20).every('1 minute').usingKey(`ip_${ctx.request.ip()}`)
+  return limiter
+    .allowRequests(20)
+    .every('1 minute')
+    .usingKey(`ip_${requestDigest(ctx.request.ip())}`)
 })
 
 /**
@@ -31,14 +41,12 @@ export const throttle = limiter.define('global', async (ctx) => {
  */
 export const authThrottle = limiter.define('auth', (ctx) => {
   const uid = String(ctx.request.input('uid') || ctx.request.input('email') || 'unknown')
-    .trim()
-    .toLowerCase()
 
   return limiter
     .allowRequests(5)
     .every('15 minutes')
     .blockFor('30 minutes')
-    .usingKey(`auth_${ctx.request.ip()}_${uid}`)
+    .usingKey(`auth_${requestDigest(ctx.request.ip(), uid)}`)
     .limitExceeded((error) => {
       const i18n = ctx.i18n
       if (i18n) {
@@ -51,14 +59,12 @@ export const authThrottle = limiter.define('auth', (ctx) => {
 
 export const passwordResetRequestThrottle = limiter.define('password-reset-request', (ctx) => {
   const email = String(ctx.request.input('email') ?? 'unknown')
-    .trim()
-    .toLowerCase()
 
   return limiter
     .allowRequests(5)
     .every('15 minutes')
     .blockFor('30 minutes')
-    .usingKey(`password_reset_request_${ctx.request.ip()}_${email}`)
+    .usingKey(`password_reset_request_${requestDigest(ctx.request.ip(), email)}`)
     .limitExceeded((error) => {
       error.setMessage('Too many password reset requests. Please try again later.')
     })
@@ -69,7 +75,7 @@ export const passwordResetThrottle = limiter.define('password-reset', (ctx) => {
     .allowRequests(10)
     .every('15 minutes')
     .blockFor('30 minutes')
-    .usingKey(`password_reset_${ctx.request.ip()}`)
+    .usingKey(`password_reset_${requestDigest(ctx.request.ip())}`)
     .limitExceeded((error) => {
       error.setMessage('Too many password reset attempts. Please try again later.')
     })
@@ -98,7 +104,10 @@ export const apiThrottle = limiter.define('api', async (ctx) => {
   /**
    * Lower rate limit for unauthenticated API requests
    */
-  return limiter.allowRequests(10).every('1 minute').usingKey(`api_ip_${ctx.request.ip()}`)
+  return limiter
+    .allowRequests(10)
+    .every('1 minute')
+    .usingKey(`api_ip_${requestDigest(ctx.request.ip())}`)
 })
 
 /**
@@ -195,7 +204,10 @@ export const adminThrottle = limiter.define('admin', async (ctx) => {
 
 /** Bound distributed usernames at one source IP as well as each identity. */
 export const authIpThrottle = limiter.define('auth-ip', (ctx) =>
-  limiter.allowRequests(30).every('15 minutes').usingKey(`auth_ip_${ctx.request.ip()}`)
+  limiter
+    .allowRequests(30)
+    .every('15 minutes')
+    .usingKey(`auth_ip_${requestDigest(ctx.request.ip())}`)
 )
 
 export const verificationThrottle = limiter.define('verification-resend', (ctx) =>
