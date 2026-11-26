@@ -56,6 +56,8 @@ services:
         condition: service_healthy
       mailpit:
         condition: service_started
+    volumes:
+      - uploads:/app/storage
     ports:
       - '3333:3333'
     environment:
@@ -105,3 +107,4 @@ services:
 volumes:
   pgdata:
   redisdata:
+  uploads:

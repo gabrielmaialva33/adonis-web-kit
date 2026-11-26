@@ -5,7 +5,9 @@ dist
 coverage
 .vscode
 .DS_STORE
-.env
+**/.env
+**/.env.*
+!**/.env.example
 tmp
 
 # Additional .gitignore ignores (any custom file you wish)
