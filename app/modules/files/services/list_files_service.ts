@@ -19,7 +19,7 @@ export type FileListItem = {
   owner: {
     id: number
     full_name: string
-  }
+  } | null
   created_at: string | null
 }
 
@@ -67,10 +67,7 @@ export default class ListFilesService {
         file_type: file.file_type,
         file_category: file.file_category,
         url: file.url,
-        owner: {
-          id: file.owner.id,
-          full_name: file.owner.full_name,
-        },
+        owner: file.owner ? { id: file.owner.id, full_name: file.owner.full_name } : null,
         created_at: file.created_at.toISO(),
       })),
     }

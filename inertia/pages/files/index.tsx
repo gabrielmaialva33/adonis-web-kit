@@ -20,7 +20,7 @@ interface FileRow {
   owner: {
     id: number
     full_name: string
-  }
+  } | null
   created_at: string | null
 }
 
@@ -121,7 +121,7 @@ export default function FilesPage({ files }: FilesPageProps) {
             ) : (
               <div className="divide-y divide-border">
                 {files.data.map((file) => {
-                  const canDelete = canDeleteAny || (canDeleteOwn && file.owner.id === user?.id)
+                  const canDelete = canDeleteAny || (canDeleteOwn && file.owner?.id === user?.id)
 
                   return (
                     <div
@@ -142,7 +142,7 @@ export default function FilesPage({ files }: FilesPageProps) {
                         <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs text-muted-foreground">
                           <span>{formatFileSize(file.file_size)}</span>
                           <span>{file.file_type}</span>
-                          <span>Uploaded by {file.owner.full_name}</span>
+                          <span>Uploaded by {file.owner?.full_name ?? 'Deleted user'}</span>
                           <span>{formatDate(file.created_at)}</span>
                         </div>
                       </div>
