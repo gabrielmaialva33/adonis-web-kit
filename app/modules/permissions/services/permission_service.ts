@@ -1,5 +1,6 @@
 import { inject } from '@adonisjs/core'
 
+import EffectivePermissionsService from '#modules/permissions/services/effective_permissions_service'
 import PermissionCacheService from '#modules/permissions/services/permission_cache_service'
 import PermissionInheritanceService from '#modules/permissions/services/permission_inheritance_service'
 
@@ -15,7 +16,8 @@ export default class PermissionService {
     private cacheService: PermissionCacheService,
     private inheritanceService: PermissionInheritanceService,
     private usersRepository: UsersRepository,
-    private ownershipService: OwnershipService
+    private ownershipService: OwnershipService,
+    private effectivePermissions: EffectivePermissionsService
   ) {}
 
   /**
@@ -190,28 +192,7 @@ export default class PermissionService {
    * Load user permissions with optimized queries
    */
   private async loadUserPermissionsOptimized(userId: number): Promise<Permission[]> {
-    const user = await this.usersRepository.findByIdWithActivePermissions(userId)
-
-    if (!user) {
-      return []
-    }
-
-    const allPermissions = new Map<number, Permission>()
-
-    // Add direct user permissions
-    user.permissions.forEach((permission) => {
-      allPermissions.set(permission.id, permission)
-    })
-
-    // Add permissions from roles with inheritance
-    for (const role of user.roles) {
-      const effectivePermissions = await this.inheritanceService.getEffectivePermissions(role.slug)
-      effectivePermissions.forEach((permission) => {
-        allPermissions.set(permission.id, permission)
-      })
-    }
-
-    return Array.from(allPermissions.values())
+    return this.effectivePermissions.forUser(userId)
   }
 
   /**
