@@ -231,6 +231,8 @@ contra containers de serviço de PostgreSQL e Redis.
 
 ## Contribuição
 
+Leia o [guia de contribuição](CONTRIBUTING.md), o [Código de Conduta](CODE_OF_CONDUCT.md) e a [política de segurança](SECURITY.md).
+
 ```bash
 git checkout -b feature/sua-feature
 pnpm lint && pnpm typecheck

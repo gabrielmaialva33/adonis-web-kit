@@ -228,6 +228,8 @@ PostgreSQL and Redis service containers.
 
 ## Contributing
 
+Read the [contribution guide](CONTRIBUTING.md), [Code of Conduct](CODE_OF_CONDUCT.md), and [security policy](SECURITY.md).
+
 ```bash
 git checkout -b feature/your-feature
 pnpm lint && pnpm typecheck
