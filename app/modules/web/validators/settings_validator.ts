@@ -7,11 +7,13 @@ import vine from '@vinejs/vine'
  */
 export const updateProfileValidator = vine.withMetaData<{ userId: number }>().compile(
   vine.object({
-    full_name: vine.string().trim().minLength(1),
+    full_name: vine.string().trim().minLength(1).maxLength(255),
     username: vine
       .string()
       .trim()
+      .toLowerCase()
       .minLength(3)
+      .maxLength(80)
       .unique(async (db, value, field) => {
         const user = await db
           .from('users')
