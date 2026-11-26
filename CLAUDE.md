@@ -29,7 +29,7 @@ don't trust the default ace output paths.
 ## Common Development Commands
 
 Package manager is **pnpm** (there is a `pnpm-workspace.yaml` with `allowBuilds` /
-`verifyDepsBeforeRun`). Node **24 LTS** (`.nvmrc` → `v24.13.0`).
+`verifyDepsBeforeRun`). Node **24 LTS** (`.nvmrc` → `v24.21.0`).
 
 > **TypeScript runs side by side.** `typescript` is aliased to
 > `@typescript/typescript6` (TS 6, binary `tsc6`) because `typescript-eslint`

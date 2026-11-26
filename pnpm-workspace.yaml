@@ -7,3 +7,10 @@ allowBuilds:
   esbuild: true
   msgpackr-extract: true
   msw: true
+# Drive 4.0.0 re-exports Flydrive's GCS adapter unchanged. Flydrive 2.2.0
+# accepts storage ^8.2.0; the wrapper's ^7.17.0 peer has not caught up.
+# Keep this exception scoped to that wrapper/version. Offline SDK error and
+# metadata compatibility are exercised in inertia/tests/deployment/.
+peerDependencyRules:
+  allowedVersions:
+    '@adonisjs/drive@4.0.0>@google-cloud/storage': '^8.2.0'

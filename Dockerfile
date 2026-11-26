@@ -3,7 +3,7 @@
 # Multi-stage image to run the AdonisJS v7 app in a container (local/dev infra).
 # Build: `docker compose build` (or `docker build -t adonis-web-kit .`).
 #
-ARG NODE_VERSION=24.13.0
+ARG NODE_VERSION=24.21.0
 
 # --- Base: node + pnpm + toolchain for native modules (argon2, better-sqlite3) ---
 FROM node:${NODE_VERSION}-slim AS base
