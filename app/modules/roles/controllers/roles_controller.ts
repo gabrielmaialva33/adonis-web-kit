@@ -19,7 +19,7 @@ export default class RolesController {
     return response.json(roles)
   }
 
-  async attach({ request, response }: HttpContext) {
+  async attach({ request, response, auth }: HttpContext) {
     try {
       const { user_id: userId, role_ids: roleIds } = await attachRoleValidator.validate(
         request.all()
@@ -38,7 +38,7 @@ export default class RolesController {
       }
 
       const syncRolesService = await app.container.make(SyncRolesService)
-      await syncRolesService.run({ userId, roleIds })
+      await syncRolesService.run({ actorId: auth.user!.id, userId, roleIds })
 
       return response.json({
         message: 'Role attached successfully',

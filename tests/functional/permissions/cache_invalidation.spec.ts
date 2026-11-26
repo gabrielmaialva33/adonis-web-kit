@@ -82,7 +82,14 @@ test.group('Permission cache invalidation', (group) => {
       })
     )
 
-    await syncRoles.run({ userId: user.id, roleIds: [readerRole.id] })
+    const actor = await User.create({
+      full_name: 'Root Actor',
+      email: 'cache-root@example.com',
+      password: 'password123',
+    })
+    const rootRole = await Role.findByOrFail('slug', 'root')
+    await actor.related('roles').attach([rootRole.id])
+    await syncRoles.run({ actorId: actor.id, userId: user.id, roleIds: [readerRole.id] })
 
     assert.isTrue(
       await permissionService.checkUserPermission({

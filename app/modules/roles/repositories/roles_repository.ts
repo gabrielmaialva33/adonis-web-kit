@@ -11,6 +11,10 @@ export default class RolesRepository
     super(Role)
   }
 
+  async findByIds(roleIds: number[]): Promise<Role[]> {
+    return this.model.query().whereIn('id', roleIds)
+  }
+
   isAdmin(roles: Role[]): boolean {
     const { ROOT, ADMIN } = IRole.Slugs
 

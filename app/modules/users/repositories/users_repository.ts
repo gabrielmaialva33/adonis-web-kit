@@ -12,6 +12,14 @@ export default class UsersRepository
     super(User)
   }
 
+  async findByIdWithRoles(userId: number): Promise<User | null> {
+    return this.model.query().where('id', userId).preload('roles').first()
+  }
+
+  async attachRoles(user: User, roleIds: number[]): Promise<void> {
+    await user.related('roles').sync(roleIds, false)
+  }
+
   async findForUpdate(userId: number, client: TransactionClientContract) {
     return this.model.query({ client }).where('id', userId).forUpdate().first()
   }

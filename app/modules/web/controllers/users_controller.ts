@@ -53,21 +53,21 @@ export default class InertiaUsersController {
     return inertia.render('users/edit', { user })
   }
 
-  async update({ request, response, params }: HttpContext) {
+  async update({ request, response, params, auth }: HttpContext) {
     const payload = await request.validateUsing(editUserValidator, {
       meta: {
         userId: params.id,
       },
     })
     const editUserService = await app.container.make(EditUserService)
-    await editUserService.run(params.id, payload)
+    await editUserService.run(+params.id, payload, auth.user!.id)
 
     return response.redirect().toPath('/users')
   }
 
-  async destroy({ response, params }: HttpContext) {
+  async destroy({ response, params, auth }: HttpContext) {
     const deleteUserService = await app.container.make(DeleteUserService)
-    await deleteUserService.run(params.id)
+    await deleteUserService.run(+params.id, auth.user!.id)
 
     return response.redirect().toPath('/users')
   }

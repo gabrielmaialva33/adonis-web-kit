@@ -54,21 +54,21 @@ export default class UsersController {
     return response.created(user)
   }
 
-  async update({ params, request, response }: HttpContext) {
+  async update({ params, request, response, auth }: HttpContext) {
     const userId = +params.id
     const payload = await editUserValidator.validate(request.all(), { meta: { userId } })
 
     const service = await app.container.make(EditUserService)
 
-    const user = await service.run(userId, payload)
+    const user = await service.run(userId, payload, auth.user!.id)
     return response.json(user)
   }
 
-  async delete({ params, response }: HttpContext) {
+  async delete({ params, response, auth }: HttpContext) {
     const userId = +params.id
 
     const service = await app.container.make(DeleteUserService)
-    await service.run(userId)
+    await service.run(userId, auth.user!.id)
 
     return response.noContent()
   }
