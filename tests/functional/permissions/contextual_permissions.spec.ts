@@ -32,7 +32,6 @@ test.group('Contextual permissions', (group) => {
       file_size: 10,
       file_type: 'text/plain',
       file_category: 'file',
-      url: '/uploads/context-file.txt',
     })
 
     const ownPermission = await Permission.create({

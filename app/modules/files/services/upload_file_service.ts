@@ -7,7 +7,6 @@ import drive from '@adonisjs/drive/services/main'
 
 import BadRequestException from '#exceptions/bad_request_exception'
 import FileRepository from '#modules/files/repositories/file_repository'
-import env from '#start/env'
 
 const IMAGE_EXTENSIONS = new Set(['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'])
 const DOCUMENT_EXTENSIONS = new Set(['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'])
@@ -60,20 +59,14 @@ export default class UploadFileService {
     const key = `uploads/${randomUUID()}${extname ? `.${extname}` : ''}`
     const disk = drive.use()
 
-    await file.moveToDisk(key)
+    await file.moveToDisk(key, { visibility: 'private' })
 
     try {
-      const relativeUrl = await disk.getUrl(key)
-      const finalUrl =
-        env.get('DRIVE_DISK') === 'fs'
-          ? `${ctx.request.protocol()}://${ctx.request.host()}${relativeUrl}`
-          : relativeUrl
-
       const fileCategory = this.getCategory(extname)
       const fileType = this.getMimeType(file, extname)
       const clientName = file.clientName?.replace(/\.[^.]+$/, '') ?? ''
 
-      await this.fileRepository.create({
+      const uploadedFile = await this.fileRepository.create({
         owner_id: user.id,
         tenant_id: tenantId,
         client_name: clientName,
@@ -81,11 +74,10 @@ export default class UploadFileService {
         file_size: file.size ?? 0,
         file_type: fileType,
         file_category: fileCategory,
-        url: finalUrl,
       })
 
       return {
-        url: finalUrl,
+        url: uploadedFile.url,
         clientName,
         fileCategory,
         fileType,

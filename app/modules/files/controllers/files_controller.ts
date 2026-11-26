@@ -2,10 +2,30 @@ import { type HttpContext } from '@adonisjs/core/http'
 
 import app from '@adonisjs/core/services/app'
 import DeleteFileService from '#modules/files/services/delete_file_service'
+import DownloadFileService from '#modules/files/services/download_file_service'
 import ListFilesService from '#modules/files/services/list_files_service'
 import UploadFileService from '#modules/files/services/upload_file_service'
 
 export default class FilesController {
+  async download({ auth, params, response }: HttpContext) {
+    const service = await app.container.make(DownloadFileService)
+    const file = await service.run(
+      Number(params.id),
+      Number(params.tenantId),
+      auth.getUserOrFail().id
+    )
+    const filename = encodeURIComponent(file.filename).replace(
+      /[!'()*]/g,
+      (char) => `%${char.charCodeAt(0).toString(16).toUpperCase()}`
+    )
+
+    response.header('Cache-Control', 'private, no-store')
+    response.header('X-Content-Type-Options', 'nosniff')
+    response.header('Content-Disposition', `attachment; filename*=UTF-8''${filename}`)
+    response.type(file.contentType)
+    return response.stream(file.stream)
+  }
+
   async list({ request, response, tenant }: HttpContext) {
     const service = await app.container.make(ListFilesService)
     const files = await service.run({

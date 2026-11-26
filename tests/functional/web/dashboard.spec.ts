@@ -55,7 +55,6 @@ test.group('Dashboard workspace scoping', (group) => {
         file_size: 10,
         file_type: 'text/plain',
         file_category: 'file',
-        url: '/uploads/alpha-one.txt',
       },
       {
         owner_id: alphaMember.id,
@@ -65,7 +64,6 @@ test.group('Dashboard workspace scoping', (group) => {
         file_size: 20,
         file_type: 'text/plain',
         file_category: 'file',
-        url: '/uploads/alpha-two.txt',
       },
       {
         owner_id: betaMember.id,
@@ -75,7 +73,6 @@ test.group('Dashboard workspace scoping', (group) => {
         file_size: 30,
         file_type: 'text/plain',
         file_category: 'file',
-        url: '/uploads/beta-one.txt',
       },
     ])
 

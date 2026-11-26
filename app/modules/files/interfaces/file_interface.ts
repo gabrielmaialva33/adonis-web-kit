@@ -11,6 +11,7 @@ namespace IFile {
       perPage: number
     ): Promise<PaginateResult<typeof File>>
     findByIdForTenant(fileId: number, tenantId: number): Promise<File | null>
+    hasActiveMembership(userId: number, tenantId: number): Promise<boolean>
   }
 }
 

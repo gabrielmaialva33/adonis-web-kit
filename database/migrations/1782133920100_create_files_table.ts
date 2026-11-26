@@ -26,7 +26,6 @@ export default class extends BaseSchema {
       table.integer('file_size').unsigned().notNullable()
       table.string('file_type').notNullable()
       table.string('file_category').notNullable()
-      table.string('url').notNullable()
 
       table.timestamp('created_at', { useTz: true }).notNullable().defaultTo(this.now())
       table.timestamp('updated_at', { useTz: true }).notNullable().defaultTo(this.now())

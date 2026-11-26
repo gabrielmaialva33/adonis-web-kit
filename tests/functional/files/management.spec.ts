@@ -66,7 +66,6 @@ test.group('File management', (group) => {
       file_size: 128,
       file_type: 'text/plain',
       file_category: 'file',
-      url: `/uploads/${ownKey}`,
     })
     const teammateFile = await File.create({
       owner_id: teammate.id,
@@ -76,7 +75,6 @@ test.group('File management', (group) => {
       file_size: 256,
       file_type: 'text/plain',
       file_category: 'file',
-      url: `/uploads/${teammateKey}`,
     })
     await File.create({
       owner_id: owner.id,
@@ -86,7 +84,6 @@ test.group('File management', (group) => {
       file_size: 512,
       file_type: 'text/plain',
       file_category: 'file',
-      url: `/uploads/${otherKey}`,
     })
 
     const list = await client

@@ -5,6 +5,20 @@ import IPermission from '#modules/permissions/interfaces/permission_interface'
 
 const FilesController = () => import('#modules/files/controllers/files_controller')
 
+// The URL identifies its workspace; membership is checked by DownloadFileService
+// independently of the active workspace selected in a browser cookie or header.
+router
+  .get('/api/v1/files/:tenantId/:id/download', [FilesController, 'download'])
+  .where('tenantId', /^[0-9]+$/)
+  .where('id', /^[0-9]+$/)
+  .use([
+    middleware.auth(),
+    middleware.permission({
+      permissions: `${IPermission.Resources.FILES}.${IPermission.Actions.READ}`,
+    }),
+  ])
+  .as('files.download')
+
 router
   .group(() => {
     router

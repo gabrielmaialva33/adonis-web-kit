@@ -12,9 +12,8 @@ const driveConfig = defineConfig({
   services: {
     fs: services.fs({
       location: app.makePath('storage'),
-      serveFiles: true,
-      routeBasePath: '/uploads',
-      visibility: 'public',
+      serveFiles: false,
+      visibility: 'private',
     }),
     s3: services.s3({
       credentials: {
@@ -23,7 +22,7 @@ const driveConfig = defineConfig({
       },
       region: env.get('AWS_REGION'),
       bucket: env.get('S3_BUCKET', ''),
-      visibility: 'public',
+      visibility: 'private',
     }),
     r2: services.s3({
       credentials: {
@@ -33,7 +32,7 @@ const driveConfig = defineConfig({
       region: 'auto',
       bucket: env.get('R2_BUCKET', ''),
       endpoint: env.get('R2_ENDPOINT'),
-      visibility: 'public',
+      visibility: 'private',
     }),
     spaces: services.s3({
       credentials: {
@@ -43,12 +42,12 @@ const driveConfig = defineConfig({
       region: env.get('SPACES_REGION'),
       bucket: env.get('SPACES_BUCKET', ''),
       endpoint: env.get('SPACES_ENDPOINT'),
-      visibility: 'public',
+      visibility: 'private',
     }),
     gcs: services.gcs({
       credentials: env.get('GCS_KEY') as any,
       bucket: env.get('GCS_BUCKET', ''),
-      visibility: 'public',
+      visibility: 'private',
     }),
   },
 })
