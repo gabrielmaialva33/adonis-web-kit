@@ -15,6 +15,9 @@ export default class PasswordResetToken extends BaseModel {
   declare user_id: number
 
   @column({ serializeAs: null })
+  declare auth_version: string
+
+  @column({ serializeAs: null })
   declare token_hash: string
 
   @column.dateTime()

@@ -14,6 +14,7 @@ export default class extends BaseSchema {
         .inTable('users')
         .onDelete('CASCADE')
 
+      table.string('auth_version', 36).notNullable()
       table.string('token_hash', 64).notNullable().unique()
       table.timestamp('expires_at', { useTz: true }).notNullable()
       table.timestamp('consumed_at', { useTz: true }).nullable()

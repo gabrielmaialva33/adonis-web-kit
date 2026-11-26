@@ -28,7 +28,8 @@ export default class PasswordResetTokenService {
 
   async issue(userId: number): Promise<IssuedPasswordResetToken> {
     return db.transaction(async (client) => {
-      await this.usersRepository.findForUpdate(userId, client)
+      const user = await this.usersRepository.findForUpdate(userId, client)
+      if (!user) throw new BadRequestException('Invalid or expired password reset token')
       const now = DateTime.now()
       const expiresAt = now.plus({ minutes: env.get('PASSWORD_RESET_TTL_MINUTES', 60) })
       const token = randomBytes(PASSWORD_RESET_TOKEN_BYTES).toString('base64url')
@@ -37,6 +38,7 @@ export default class PasswordResetTokenService {
       await this.passwordResetTokenRepository.create(
         {
           user_id: userId,
+          auth_version: user.auth_version,
           token_hash: this.hashToken(token),
           expires_at: expiresAt,
           consumed_at: null,
@@ -58,11 +60,13 @@ export default class PasswordResetTokenService {
       const current = await this.passwordResetTokenRepository.findByHashForUpdate(tokenHash, client)
       const now = DateTime.now()
 
-      if (!current || current.consumed_at || current.expires_at.toMillis() <= now.toMillis()) {
-        throw new BadRequestException('Invalid or expired password reset token')
-      }
-
-      if (!user) {
+      if (
+        !user ||
+        !current ||
+        current.auth_version !== user.auth_version ||
+        current.consumed_at ||
+        current.expires_at.toMillis() <= now.toMillis()
+      ) {
         throw new BadRequestException('Invalid or expired password reset token')
       }
 
