@@ -2,11 +2,13 @@ import vine from '@vinejs/vine'
 
 export const createUserValidator = vine.compile(
   vine.object({
-    full_name: vine.string().trim(),
+    full_name: vine.string().trim().maxLength(255),
     email: vine
       .string()
       .email()
       .trim()
+      .toLowerCase()
+      .maxLength(254)
       .unique(async (db, value) => {
         const user = await db.from('users').where('email', value).first()
         return !user
@@ -14,6 +16,8 @@ export const createUserValidator = vine.compile(
     username: vine
       .string()
       .trim()
+      .toLowerCase()
+      .maxLength(80)
       .minLength(3)
       .unique(async (db, value) => {
         const user = await db.from('users').where('username', value).first()
@@ -26,7 +30,7 @@ export const createUserValidator = vine.compile(
 
 export const editUserValidator = vine.withMetaData<{ userId: number }>().compile(
   vine.object({
-    full_name: vine.string().trim().optional(),
+    full_name: vine.string().trim().maxLength(255).optional(),
     password: vine
       .string()
       .minLength(8)

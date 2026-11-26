@@ -146,12 +146,14 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @beforeCreate()
   static async setUsername(user: User) {
     if (!user.username) {
-      user.username = user.email.split('@')[0].trim().toLowerCase()
+      user.username = `user-${randomUUID()}`
     }
   }
 
   @beforeSave()
   static async hashUserPassword(user: User) {
+    if (user.$dirty.email) user.email = user.email.trim().toLowerCase()
+    if (user.$dirty.username) user.username = user.username?.trim().toLowerCase() ?? null
     if (user.$dirty.password || !user.auth_version) user.auth_version = randomUUID()
     if (user.$dirty.password && !hash.isValidHash(user.password)) {
       user.password = await hash.make(user.password)

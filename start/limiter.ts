@@ -30,7 +30,9 @@ export const throttle = limiter.define('global', async (ctx) => {
  * - Blocks for 30 minutes after exhausting attempts
  */
 export const authThrottle = limiter.define('auth', (ctx) => {
-  const uid = ctx.request.input('uid') || ctx.request.input('email') || 'unknown'
+  const uid = String(ctx.request.input('uid') || ctx.request.input('email') || 'unknown')
+    .trim()
+    .toLowerCase()
 
   return limiter
     .allowRequests(5)
@@ -190,3 +192,12 @@ export const adminThrottle = limiter.define('admin', async (ctx) => {
 
   return limiter.allowRequests(200).every('1 minute').usingKey(`admin_user_${ctx.auth.user.id}`)
 })
+
+/** Bound distributed usernames at one source IP as well as each identity. */
+export const authIpThrottle = limiter.define('auth-ip', (ctx) =>
+  limiter.allowRequests(30).every('15 minutes').usingKey(`auth_ip_${ctx.request.ip()}`)
+)
+
+export const verificationThrottle = limiter.define('verification-resend', (ctx) =>
+  limiter.allowRequests(1).every('1 minute').usingKey(`verification_${ctx.auth.user!.id}`)
+)

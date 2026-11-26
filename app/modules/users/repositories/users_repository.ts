@@ -17,7 +17,7 @@ export default class UsersRepository
   }
 
   async verifyCredentials(uid: string, password: string): Promise<User> {
-    return this.model.verifyCredentials(uid, password)
+    return this.model.verifyCredentials(uid.trim().toLowerCase(), password)
   }
 
   /**

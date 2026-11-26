@@ -8,6 +8,7 @@ import type { Config } from '@japa/runner/types'
 import { pluginAdonisJS } from '@japa/plugin-adonisjs'
 import testUtils from '@adonisjs/core/services/test_utils'
 import redis from '@adonisjs/redis/services/main'
+import limiter from '@adonisjs/limiter/services/main'
 import { authApiClient } from '@adonisjs/auth/plugins/api_client'
 import { sessionApiClient } from '@adonisjs/session/plugins/api_client'
 import { shieldApiClient } from '@adonisjs/shield/plugins/api_client'
@@ -60,15 +61,16 @@ export const runnerHooks: Required<Pick<Config, 'setup' | 'teardown'>> = {
  */
 export const configureSuite: Config['configureSuite'] = (suite) => {
   if (['browser', 'functional', 'e2e'].includes(suite.name)) {
-    const clearRedis = async () => {
+    const clearTestState = async () => {
       await redis.flushdb()
+      await limiter.clear()
     }
 
     suite.onTest((test) => {
-      test.setup(clearRedis)
+      test.setup(clearTestState)
     })
     suite.onGroup((group) => {
-      group.each.setup(clearRedis)
+      group.each.setup(clearTestState)
     })
     suite.setup(() => testUtils.httpServer().start())
   }

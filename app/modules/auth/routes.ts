@@ -3,6 +3,8 @@ import { middleware } from '#start/kernel'
 import {
   apiThrottle,
   authThrottle,
+  authIpThrottle,
+  verificationThrottle,
   passwordResetRequestThrottle,
   passwordResetThrottle,
 } from '#start/limiter'
@@ -18,8 +20,14 @@ const MeController = () => import('#modules/auth/controllers/me_controller')
  */
 router
   .group(() => {
-    router.post('/sign-in', [SessionsController, 'signIn']).as('session.signIn').use(authThrottle)
-    router.post('/sign-up', [SessionsController, 'signUp']).as('session.signUp').use(authThrottle)
+    router
+      .post('/sign-in', [SessionsController, 'signIn'])
+      .as('session.signIn')
+      .use([authIpThrottle, authThrottle])
+    router
+      .post('/sign-up', [SessionsController, 'signUp'])
+      .as('session.signUp')
+      .use([authIpThrottle, authThrottle])
     router
       .post('/forgot-password', [PasswordResetController, 'forgot'])
       .as('session.forgotPassword')
@@ -41,7 +49,7 @@ router
     router.get('/verify-email', [EmailVerificationController, 'verify'])
     router
       .post('/resend-verification-email', [EmailVerificationController, 'resend'])
-      .use(middleware.auth({ guards: ['jwt'] }))
+      .use([middleware.auth({ guards: ['jwt'] }), verificationThrottle])
   })
   .prefix('/api/v1')
 
