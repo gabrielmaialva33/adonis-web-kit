@@ -110,6 +110,11 @@ export class JwtGuard<
       return this.#throwUnauthorized()
     }
 
+    const version = this.#options.content?.(providerUser)?.authVersion
+    if (version !== undefined && payload.authVersion !== version) {
+      return this.#throwUnauthorized()
+    }
+
     this.tokenPayload = payload
     this.isAuthenticated = true
     this.user = providerUser.getOriginal()
@@ -159,6 +164,7 @@ export class JwtGuard<
       {
         ...customContent,
         ...extraClaims,
+        authVersion: customContent.authVersion,
         sub: String(userId),
         userId,
         token_use: 'access',

@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { DateTime } from 'luxon'
 import hash from '@adonisjs/core/services/hash'
 import { compose } from '@adonisjs/core/helpers'
@@ -55,6 +56,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @column()
   declare username: string | null
+
+  @column({ serializeAs: null })
+  declare auth_version: string
 
   @column({ serializeAs: null })
   declare password: string
@@ -148,6 +152,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @beforeSave()
   static async hashUserPassword(user: User) {
+    if (user.$dirty.password || !user.auth_version) user.auth_version = randomUUID()
     if (user.$dirty.password && !hash.isValidHash(user.password)) {
       user.password = await hash.make(user.password)
     }

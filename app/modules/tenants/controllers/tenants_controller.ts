@@ -33,7 +33,11 @@ export default class TenantsController {
     const user = auth.getUserOrFail()
     const payload = await request.validateUsing(createTenantValidator)
     const tenant = await this.createTenantService.run(user.id, payload)
-    const tokens = await this.jwtAuthTokensService.run({ userId: user.id, tenantId: tenant.id })
+    const tokens = await this.jwtAuthTokensService.run({
+      userId: user.id,
+      authVersion: user.auth_version,
+      tenantId: tenant.id,
+    })
 
     return response.created({
       tenant: {
@@ -65,7 +69,11 @@ export default class TenantsController {
       throw new ForbiddenException('You do not belong to this active tenant')
     }
 
-    const tokens = await this.jwtAuthTokensService.run({ userId: user.id, tenantId: tenant.id })
+    const tokens = await this.jwtAuthTokensService.run({
+      userId: user.id,
+      authVersion: user.auth_version,
+      tenantId: tenant.id,
+    })
 
     return response.ok({
       tenant: {

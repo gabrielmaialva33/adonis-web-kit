@@ -53,6 +53,7 @@ export default class SignUpService {
         ? undefined
         : await this.jwtAuthTokensService.run({
             userId: user.id,
+            authVersion: user.auth_version,
             tenantId: activeTenant?.id,
           })
 

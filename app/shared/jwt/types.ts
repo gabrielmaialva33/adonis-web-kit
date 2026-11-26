@@ -18,6 +18,7 @@ export interface JwtUserProviderContract<RealUser> {
 export type JwtContent = {
   userId: string | number
   tenantId?: number
+  authVersion: string
 }
 
 export type AccessTokenPayload = JwtPayload &

@@ -5,6 +5,7 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
+      table.string('auth_version', 36).notNullable()
       table.increments('id')
       table
         .integer('user_id')

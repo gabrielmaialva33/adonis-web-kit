@@ -52,7 +52,11 @@ export default class SignInService {
       const auth =
         options.issueApiTokens === false
           ? undefined
-          : await this.jwtAuthTokensService.run({ userId: user.id, tenantId: tenant?.id })
+          : await this.jwtAuthTokensService.run({
+              userId: user.id,
+              authVersion: user.auth_version,
+              tenantId: tenant?.id,
+            })
 
       const isAdmin = user.roles.some((role) =>
         [IRole.Slugs.ADMIN, IRole.Slugs.ROOT].includes(role.slug)

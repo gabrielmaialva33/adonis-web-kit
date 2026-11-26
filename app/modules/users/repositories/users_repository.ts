@@ -1,3 +1,4 @@
+import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import User from '#modules/users/models/user'
 
 import type IUser from '#modules/users/interfaces/user_interface'
@@ -9,6 +10,10 @@ export default class UsersRepository
 {
   constructor() {
     super(User)
+  }
+
+  async findForUpdate(userId: number, client: TransactionClientContract) {
+    return this.model.query({ client }).where('id', userId).forUpdate().first()
   }
 
   async verifyCredentials(uid: string, password: string): Promise<User> {

@@ -7,7 +7,7 @@ import { DateTime } from 'luxon'
 
 import UnauthorizedException from '#exceptions/unauthorized_exception'
 import RefreshTokenRepository from '#modules/auth/repositories/refresh_token_repository'
-import User from '#modules/users/models/user'
+import UsersRepository from '#modules/users/repositories/users_repository'
 import {
   API_ACCESS_TOKEN_EXPIRES_IN,
   JWT_AUDIENCE,
@@ -33,16 +33,22 @@ type RefreshTokenIssueOptions = {
 export default class JwtAuthTokensService {
   constructor(
     private jwtService: JwtService,
-    private refreshTokenRepository: RefreshTokenRepository
+    private refreshTokenRepository: RefreshTokenRepository,
+    private usersRepository: UsersRepository
   ) {}
 
   async run(payload: JwtContent): Promise<GenerateAuthTokensResponse> {
-    const [accessToken, refreshToken] = await Promise.all([
-      this.generateAccessToken(payload),
-      this.issueRefreshToken(payload),
-    ])
-
-    return { access_token: accessToken, refresh_token: refreshToken }
+    return db.transaction(async (client) => {
+      const user = await this.usersRepository.findForUpdate(Number(payload.userId), client)
+      if (!user || payload.authVersion !== user.auth_version) {
+        throw new UnauthorizedException('Credentials have changed')
+      }
+      const claims = { ...payload, authVersion: user.auth_version }
+      return {
+        access_token: await this.generateAccessToken(claims),
+        refresh_token: await this.issueRefreshToken(claims, { client }),
+      }
+    })
   }
 
   /**
@@ -53,18 +59,27 @@ export default class JwtAuthTokensService {
   async refresh(refreshToken: string): Promise<GenerateAuthTokensResponse> {
     const tokenHash = this.hashRefreshToken(refreshToken)
 
-    return db.transaction(async (client) => {
+    const candidate = await this.refreshTokenRepository.findBy('token_hash', tokenHash)
+    if (!candidate) throw new UnauthorizedException('Invalid or expired refresh token')
+    const result = await db.transaction(async (client) => {
+      // All token issuance locks the user first, then the credential record.
+      const user = await this.usersRepository.findForUpdate(candidate.user_id, client)
       const current = await this.refreshTokenRepository.findByHashForUpdate(tokenHash, client)
       const now = DateTime.now()
 
-      if (!current || current.revoked_at || current.expires_at.toMillis() <= now.toMillis()) {
-        throw new UnauthorizedException('Invalid or expired refresh token')
+      if (!user || !current || current.auth_version !== user.auth_version) {
+        return null
+      }
+      if (current.revoked_at) {
+        // A replay indicates a stolen credential: invalidate every session in
+        // this credential generation. Commit before returning the rejection.
+        user.auth_version = randomUUID()
+        await user.save()
+        await this.refreshTokenRepository.revokeAllForUser(user.id, client, now)
+        return null
       }
 
-      const user = await User.query({ client }).where('id', current.user_id).first()
-      if (!user) {
-        throw new UnauthorizedException('Invalid or expired refresh token')
-      }
+      if (current.expires_at.toMillis() <= now.toMillis()) return null
 
       current.useTransaction(client)
       current.revoked_at = now
@@ -72,6 +87,7 @@ export default class JwtAuthTokensService {
 
       const payload: JwtContent = {
         userId: user.id,
+        authVersion: user.auth_version,
         tenantId: current.tenant_id ?? undefined,
       }
 
@@ -86,6 +102,8 @@ export default class JwtAuthTokensService {
         refresh_token: rotatedRefreshToken,
       }
     })
+    if (!result) throw new UnauthorizedException('Invalid or expired refresh token')
+    return result
   }
 
   async revoke(refreshToken: string): Promise<void> {
@@ -129,6 +147,7 @@ export default class JwtAuthTokensService {
     await this.refreshTokenRepository.create(
       {
         user_id: Number(payload.userId),
+        auth_version: payload.authVersion,
         tenant_id: payload.tenantId ?? null,
         token_hash: this.hashRefreshToken(token),
         expires_at: DateTime.now().plus({ days: REFRESH_TOKEN_TTL_DAYS }),

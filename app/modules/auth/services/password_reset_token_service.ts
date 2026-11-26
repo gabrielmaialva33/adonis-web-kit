@@ -8,6 +8,7 @@ import BadRequestException from '#exceptions/bad_request_exception'
 import PasswordResetTokenRepository from '#modules/auth/repositories/password_reset_token_repository'
 import RefreshTokenRepository from '#modules/auth/repositories/refresh_token_repository'
 import User from '#modules/users/models/user'
+import UsersRepository from '#modules/users/repositories/users_repository'
 import env from '#start/env'
 
 const PASSWORD_RESET_TOKEN_BYTES = 48
@@ -21,11 +22,13 @@ export type IssuedPasswordResetToken = {
 export default class PasswordResetTokenService {
   constructor(
     private passwordResetTokenRepository: PasswordResetTokenRepository,
-    private refreshTokenRepository: RefreshTokenRepository
+    private refreshTokenRepository: RefreshTokenRepository,
+    private usersRepository: UsersRepository
   ) {}
 
   async issue(userId: number): Promise<IssuedPasswordResetToken> {
     return db.transaction(async (client) => {
+      await this.usersRepository.findForUpdate(userId, client)
       const now = DateTime.now()
       const expiresAt = now.plus({ minutes: env.get('PASSWORD_RESET_TTL_MINUTES', 60) })
       const token = randomBytes(PASSWORD_RESET_TOKEN_BYTES).toString('base64url')
@@ -48,7 +51,10 @@ export default class PasswordResetTokenService {
   async consume(token: string, password: string): Promise<User> {
     const tokenHash = this.hashToken(token)
 
+    const candidate = await this.passwordResetTokenRepository.findBy('token_hash', tokenHash)
+    if (!candidate) throw new BadRequestException('Invalid or expired password reset token')
     return db.transaction(async (client) => {
+      const user = await this.usersRepository.findForUpdate(candidate.user_id, client)
       const current = await this.passwordResetTokenRepository.findByHashForUpdate(tokenHash, client)
       const now = DateTime.now()
 
@@ -56,7 +62,6 @@ export default class PasswordResetTokenService {
         throw new BadRequestException('Invalid or expired password reset token')
       }
 
-      const user = await User.query({ client }).where('id', current.user_id).first()
       if (!user) {
         throw new BadRequestException('Invalid or expired password reset token')
       }

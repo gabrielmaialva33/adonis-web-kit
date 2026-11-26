@@ -19,6 +19,9 @@ export default class RefreshToken extends BaseModel {
   declare tenant_id: number | null
 
   @column({ serializeAs: null })
+  declare auth_version: string
+
+  @column({ serializeAs: null })
   declare token_hash: string
 
   @column.dateTime()

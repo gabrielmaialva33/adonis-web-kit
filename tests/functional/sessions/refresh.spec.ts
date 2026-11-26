@@ -2,6 +2,7 @@ import { test } from '@japa/runner'
 import type { ApiClient } from '@japa/api-client'
 import testUtils from '@adonisjs/core/services/test_utils'
 import jwt from 'jsonwebtoken'
+import { DateTime } from 'luxon'
 
 import RefreshToken from '#modules/auth/models/refresh_token'
 import User from '#modules/users/models/user'
@@ -88,15 +89,53 @@ test.group('Session refresh tokens', (group) => {
     const current = await client.post('/api/v1/sessions/refresh').json({
       refresh_token: rotatedRefreshToken,
     })
-    current.assertStatus(200)
+    current.assertStatus(401)
+    const response1 = await client.get('/api/v1/me').bearerToken(rotatedAccessToken)
+    response1.assertStatus(401)
 
     const records = await RefreshToken.query().where('user_id', user.id).orderBy('id', 'asc')
-    assert.lengthOf(records, 3)
+    assert.lengthOf(records, 2)
     assert.isNotNull(records[0].revoked_at)
     assert.isNotNull(records[1].revoked_at)
-    assert.isNull(records[2].revoked_at)
     assert.equal(records[1].rotated_from_id, records[0].id)
-    assert.equal(records[2].rotated_from_id, records[1].id)
+  })
+
+  test('replay of an expired rotated token revokes its live descendants but not future logins', async ({
+    client,
+  }) => {
+    const { user, refreshToken } = await signIn(client)
+    const rotated = await client
+      .post('/api/v1/sessions/refresh')
+      .json({ refresh_token: refreshToken })
+    rotated.assertStatus(200)
+    const predecessor = await RefreshToken.query()
+      .where('user_id', user.id)
+      .whereNotNull('revoked_at')
+      .firstOrFail()
+    predecessor.expires_at = DateTime.now().minus({ seconds: 1 })
+    await predecessor.save()
+
+    const replay = await client
+      .post('/api/v1/sessions/refresh')
+      .json({ refresh_token: refreshToken })
+    replay.assertStatus(401)
+    const descendant = await client
+      .post('/api/v1/sessions/refresh')
+      .json({ refresh_token: rotated.body().auth.refresh_token })
+    descendant.assertStatus(401)
+    const oldAccess = await client.get('/api/v1/me').bearerToken(rotated.body().auth.access_token)
+    oldAccess.assertStatus(401)
+
+    const login = await client
+      .post('/api/v1/sessions/sign-in')
+      .json({ uid: user.email, password: 'password123' })
+    login.assertStatus(200)
+    const staleReplay = await client
+      .post('/api/v1/sessions/refresh')
+      .json({ refresh_token: refreshToken })
+    staleReplay.assertStatus(401)
+    const newAccess = await client.get('/api/v1/me').bearerToken(login.body().auth.access_token)
+    newAccess.assertStatus(200)
   })
 
   test('should revoke a refresh token on API logout', async ({ client }) => {
