@@ -13,8 +13,10 @@
 import 'reflect-metadata'
 import { Ignitor, prettyPrintError } from '@adonisjs/core'
 import { processCLIArgs } from '@japa/runner'
+import { setupSyntheticGcsCredentials } from '#tests/helpers/synthetic_gcs_credentials'
 
 process.env.NODE_ENV = 'test'
+setupSyntheticGcsCredentials()
 processCLIArgs(process.argv.splice(2))
 
 /**

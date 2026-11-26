@@ -1,6 +1,7 @@
 import app from '@adonisjs/core/services/app'
 import { defineConfig, services } from '@adonisjs/drive'
 import env from '#start/env'
+import { parseGcsCredentials } from '#shared/services/gcs_credentials'
 
 const driveConfig = defineConfig({
   default: env.get('DRIVE_DISK'),
@@ -45,7 +46,7 @@ const driveConfig = defineConfig({
       visibility: 'private',
     }),
     gcs: services.gcs({
-      credentials: env.get('GCS_KEY') as any,
+      credentials: parseGcsCredentials(env.get('GCS_KEY')),
       bucket: env.get('GCS_BUCKET', ''),
       visibility: 'private',
     }),
