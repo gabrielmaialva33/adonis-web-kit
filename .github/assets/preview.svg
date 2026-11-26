@@ -1,0 +1,158 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 600" width="1100" height="600" role="img" aria-labelledby="pt pd">
+  <title id="pt">Admin shell preview</title>
+  <desc id="pd">Illustration of the dashboard: sidebar navigation, workspace switcher, stat cards and a users data grid</desc>
+  <defs>
+    <linearGradient id="bar" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0" stop-color="#5a45ff"/>
+      <stop offset="1" stop-color="#8b7bff"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#0f172a" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <g font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+    <!-- window -->
+    <g filter="url(#shadow)">
+      <rect x="20" y="16" width="1060" height="560" rx="14" fill="#0b1020"/>
+    </g>
+    <rect x="20" y="16" width="1060" height="38" rx="14" fill="#111827"/>
+    <rect x="20" y="40" width="1060" height="14" fill="#111827"/>
+    <circle cx="44" cy="35" r="6" fill="#f87171"/>
+    <circle cx="64" cy="35" r="6" fill="#fbbf24"/>
+    <circle cx="84" cy="35" r="6" fill="#34d399"/>
+    <rect x="380" y="25" width="340" height="20" rx="10" fill="#1f2937"/>
+    <text x="550" y="39" fill="#94a3b8" font-size="12" text-anchor="middle">localhost:3333/dashboard</text>
+
+    <!-- sidebar -->
+    <path d="M20 54h210v522H34a14 14 0 0 1-14-14z" fill="#0f172a"/>
+    <rect x="40" y="74" width="28" height="28" rx="8" fill="url(#bar)"/>
+    <text x="54" y="93" fill="#fff" font-size="14" font-weight="700" text-anchor="middle">A</text>
+    <text x="80" y="93" fill="#f8fafc" font-size="15" font-weight="600">Web Kit</text>
+
+    <g font-size="13.5">
+      <rect x="32" y="124" width="186" height="34" rx="8" fill="#5a45ff" fill-opacity="0.22"/>
+      <rect x="40" y="135" width="12" height="12" rx="3" fill="#8b7bff"/>
+      <text x="62" y="146" fill="#e0e7ff" font-weight="600">Dashboard</text>
+
+      <rect x="40" y="175" width="12" height="12" rx="3" fill="#475569"/>
+      <text x="62" y="186" fill="#cbd5e1">Users</text>
+      <text x="76" y="214" fill="#94a3b8">All Users</text>
+      <text x="76" y="240" fill="#94a3b8">Roles</text>
+      <text x="76" y="266" fill="#94a3b8">Permissions</text>
+      <path d="M64 200v72" stroke="#334155" stroke-width="1.5"/>
+
+      <rect x="40" y="289" width="12" height="12" rx="3" fill="#475569"/>
+      <text x="62" y="300" fill="#cbd5e1">Files</text>
+      <rect x="40" y="325" width="12" height="12" rx="3" fill="#475569"/>
+      <text x="62" y="336" fill="#cbd5e1">Settings</text>
+    </g>
+
+    <!-- user chip -->
+    <rect x="32" y="516" width="186" height="46" rx="10" fill="#111827"/>
+    <circle cx="56" cy="539" r="13" fill="#22d3ee" fill-opacity="0.25"/>
+    <text x="56" y="544" fill="#a5f3fc" font-size="12" font-weight="700" text-anchor="middle">MS</text>
+    <text x="78" y="535" fill="#e2e8f0" font-size="12.5" font-weight="600">Marina Souza</text>
+    <text x="78" y="551" fill="#64748b" font-size="11">owner</text>
+
+    <!-- header -->
+    <rect x="230" y="54" width="850" height="58" fill="#0b1020"/>
+    <path d="M230 112h850" stroke="#1e293b"/>
+    <rect x="252" y="70" width="190" height="28" rx="8" fill="#111827" stroke="#334155"/>
+    <rect x="262" y="78" width="12" height="12" rx="3" fill="#f472b6"/>
+    <text x="284" y="89" fill="#e2e8f0" font-size="12.5">Acme Health</text>
+    <path d="M422 81l5 5 5-5" fill="none" stroke="#94a3b8" stroke-width="1.6"/>
+    <rect x="980" y="70" width="28" height="28" rx="8" fill="#111827" stroke="#334155"/>
+    <circle cx="994" cy="84" r="6" fill="none" stroke="#fbbf24" stroke-width="1.8"/>
+    <circle cx="1040" cy="84" r="14" fill="#5a45ff" fill-opacity="0.3"/>
+    <text x="1040" y="89" fill="#c4bbff" font-size="12" font-weight="700" text-anchor="middle">MS</text>
+
+    <!-- title -->
+    <text x="252" y="150" fill="#f8fafc" font-size="21" font-weight="700">Welcome back, Marina Souza</text>
+    <text x="252" y="172" fill="#64748b" font-size="13">Here is what is happening in Acme Health</text>
+
+    <!-- stat cards -->
+    <g font-size="12">
+      <g transform="translate(252 192)">
+        <rect width="190" height="82" rx="12" fill="#111827" stroke="#1e293b"/>
+        <text x="16" y="26" fill="#94a3b8">Workspace users</text>
+        <text x="16" y="62" fill="#f8fafc" font-size="26" font-weight="700">128</text>
+        <rect x="150" y="16" width="24" height="24" rx="7" fill="#8b7bff" fill-opacity="0.2"/>
+      </g>
+      <g transform="translate(454 192)">
+        <rect width="190" height="82" rx="12" fill="#111827" stroke="#1e293b"/>
+        <text x="16" y="26" fill="#94a3b8">My workspaces</text>
+        <text x="16" y="62" fill="#f8fafc" font-size="26" font-weight="700">3</text>
+        <rect x="150" y="16" width="24" height="24" rx="7" fill="#f472b6" fill-opacity="0.2"/>
+      </g>
+      <g transform="translate(656 192)">
+        <rect width="190" height="82" rx="12" fill="#111827" stroke="#1e293b"/>
+        <text x="16" y="26" fill="#94a3b8">Workspace files</text>
+        <text x="16" y="62" fill="#f8fafc" font-size="26" font-weight="700">2,431</text>
+        <rect x="150" y="16" width="24" height="24" rx="7" fill="#34d399" fill-opacity="0.2"/>
+      </g>
+      <g transform="translate(858 192)">
+        <rect width="200" height="82" rx="12" fill="#111827" stroke="#1e293b"/>
+        <text x="16" y="26" fill="#94a3b8">Global roles</text>
+        <text x="16" y="62" fill="#f8fafc" font-size="26" font-weight="700">5</text>
+        <rect x="160" y="16" width="24" height="24" rx="7" fill="#22d3ee" fill-opacity="0.2"/>
+      </g>
+    </g>
+
+    <!-- chart -->
+    <g transform="translate(252 290)">
+      <rect width="392" height="268" rx="12" fill="#111827" stroke="#1e293b"/>
+      <text x="18" y="30" fill="#e2e8f0" font-size="14" font-weight="600">New workspace users</text>
+      <path d="M18 238h356" stroke="#1e293b"/>
+      <path d="M18 188h356M18 138h356M18 88h356" stroke="#1e293b" stroke-dasharray="3 5"/>
+      <g fill="url(#bar)">
+        <rect x="32" y="168" width="30" height="70" rx="5"/>
+        <rect x="80" y="148" width="30" height="90" rx="5"/>
+        <rect x="128" y="176" width="30" height="62" rx="5"/>
+        <rect x="176" y="122" width="30" height="116" rx="5"/>
+        <rect x="224" y="138" width="30" height="100" rx="5"/>
+        <rect x="272" y="98" width="30" height="140" rx="5"/>
+        <rect x="320" y="74" width="30" height="164" rx="5"/>
+      </g>
+      <g fill="#64748b" font-size="11" text-anchor="middle">
+        <text x="47" y="256">Mon</text><text x="95" y="256">Tue</text><text x="143" y="256">Wed</text>
+        <text x="191" y="256">Thu</text><text x="239" y="256">Fri</text><text x="287" y="256">Sat</text><text x="335" y="256">Sun</text>
+      </g>
+    </g>
+
+    <!-- users grid -->
+    <g transform="translate(656 290)" font-size="12">
+      <rect width="402" height="268" rx="12" fill="#111827" stroke="#1e293b"/>
+      <text x="18" y="30" fill="#e2e8f0" font-size="14" font-weight="600">Recent workspace users</text>
+      <rect x="0" y="46" width="402" height="30" fill="#0f172a"/>
+      <text x="18" y="65" fill="#64748b" font-weight="600">NAME</text>
+      <text x="200" y="65" fill="#64748b" font-weight="600">ROLE</text>
+      <text x="300" y="65" fill="#64748b" font-weight="600">STATUS</text>
+
+      <g>
+        <text x="18" y="102" fill="#e2e8f0">Rafael Lima</text>
+        <rect x="200" y="89" width="52" height="20" rx="10" fill="#8b7bff" fill-opacity="0.2"/>
+        <text x="226" y="103" fill="#c4bbff" text-anchor="middle">admin</text>
+        <circle cx="306" cy="98" r="4" fill="#34d399"/><text x="316" y="102" fill="#94a3b8">verified</text>
+        <path d="M18 120h366" stroke="#1e293b"/>
+
+        <text x="18" y="146" fill="#e2e8f0">Beatriz Costa</text>
+        <rect x="200" y="133" width="56" height="20" rx="10" fill="#22d3ee" fill-opacity="0.15"/>
+        <text x="228" y="147" fill="#a5f3fc" text-anchor="middle">editor</text>
+        <circle cx="306" cy="142" r="4" fill="#34d399"/><text x="316" y="146" fill="#94a3b8">verified</text>
+        <path d="M18 164h366" stroke="#1e293b"/>
+
+        <text x="18" y="190" fill="#e2e8f0">Lucas Almeida</text>
+        <rect x="200" y="177" width="44" height="20" rx="10" fill="#94a3b8" fill-opacity="0.15"/>
+        <text x="222" y="191" fill="#cbd5e1" text-anchor="middle">user</text>
+        <circle cx="306" cy="186" r="4" fill="#fbbf24"/><text x="316" y="190" fill="#94a3b8">pending</text>
+        <path d="M18 208h366" stroke="#1e293b"/>
+
+        <text x="18" y="234" fill="#e2e8f0">Camila Rocha</text>
+        <rect x="200" y="221" width="44" height="20" rx="10" fill="#94a3b8" fill-opacity="0.15"/>
+        <text x="222" y="235" fill="#cbd5e1" text-anchor="middle">user</text>
+        <circle cx="306" cy="230" r="4" fill="#34d399"/><text x="316" y="234" fill="#94a3b8">verified</text>
+      </g>
+    </g>
+  </g>
+</svg>

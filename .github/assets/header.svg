@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" width="1200" height="320" role="img" aria-labelledby="t d">
+  <title id="t">adonis-web-kit</title>
+  <desc id="d">Multi-tenant SaaS starter with AdonisJS 7, React 19 and Inertia 3</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0b1020"/>
+      <stop offset="0.55" stop-color="#151036"/>
+      <stop offset="1" stop-color="#1e1b4b"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5a45ff"/>
+      <stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.8" cy="0.35" r="0.5">
+      <stop offset="0" stop-color="#5a45ff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#5a45ff" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M32 0H0V32" fill="none" stroke="#ffffff" stroke-opacity="0.04" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="320" rx="18" fill="url(#bg)"/>
+  <rect width="1200" height="320" rx="18" fill="url(#grid)"/>
+  <rect width="1200" height="320" rx="18" fill="url(#glow)"/>
+
+  <!-- left: identity -->
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace">
+    <text x="64" y="92" fill="#94a3b8" font-size="17">$ pnpm dev</text>
+    <text x="64" y="150" fill="#f8fafc" font-size="52" font-weight="700" letter-spacing="-1">adonis<tspan fill="#8b7bff">-web-</tspan>kit</text>
+  </g>
+  <rect x="64" y="170" width="300" height="4" rx="2" fill="url(#accent)"/>
+  <g font-family="-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+    <text x="64" y="212" fill="#e2e8f0" font-size="21">Full-stack starter for multi-tenant SaaS</text>
+    <text x="64" y="242" fill="#94a3b8" font-size="16">AdonisJS 7 · React 19 · Inertia 3 · PostgreSQL · Redis</text>
+  </g>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="13">
+    <rect x="64" y="262" width="74" height="26" rx="13" fill="#5a45ff" fill-opacity="0.18" stroke="#5a45ff" stroke-opacity="0.6"/>
+    <text x="101" y="279" fill="#c4bbff" text-anchor="middle">JWT</text>
+    <rect x="146" y="262" width="78" height="26" rx="13" fill="#22d3ee" fill-opacity="0.12" stroke="#22d3ee" stroke-opacity="0.5"/>
+    <text x="185" y="279" fill="#a5f3fc" text-anchor="middle">RBAC</text>
+    <rect x="232" y="262" width="104" height="26" rx="13" fill="#f472b6" fill-opacity="0.12" stroke="#f472b6" stroke-opacity="0.5"/>
+    <text x="284" y="279" fill="#fbcfe8" text-anchor="middle">tenants</text>
+    <rect x="344" y="262" width="76" height="26" rx="13" fill="#34d399" fill-opacity="0.12" stroke="#34d399" stroke-opacity="0.5"/>
+    <text x="382" y="279" fill="#a7f3d0" text-anchor="middle">files</text>
+  </g>
+
+  <!-- right: stacked layers -->
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15">
+    <g transform="translate(700 46)">
+      <rect width="440" height="50" rx="12" fill="#0f172a" stroke="#22d3ee" stroke-opacity="0.55"/>
+      <circle cx="26" cy="25" r="6" fill="#22d3ee"/>
+      <text x="44" y="30" fill="#e2e8f0">inertia/</text>
+      <text x="420" y="30" fill="#64748b" text-anchor="end">React 19 · Tailwind 4</text>
+    </g>
+    <path d="M920 96v14" stroke="#475569" stroke-width="2" stroke-dasharray="3 3"/>
+    <g transform="translate(700 110)">
+      <rect width="440" height="50" rx="12" fill="#0f172a" stroke="#8b7bff" stroke-opacity="0.7"/>
+      <circle cx="26" cy="25" r="6" fill="#8b7bff"/>
+      <text x="44" y="30" fill="#e2e8f0">app/modules/</text>
+      <text x="420" y="30" fill="#64748b" text-anchor="end">9 domain modules</text>
+    </g>
+    <path d="M920 160v14" stroke="#475569" stroke-width="2" stroke-dasharray="3 3"/>
+    <g transform="translate(700 174)">
+      <rect width="440" height="50" rx="12" fill="#0f172a" stroke="#f472b6" stroke-opacity="0.55"/>
+      <circle cx="26" cy="25" r="6" fill="#f472b6"/>
+      <text x="44" y="30" fill="#e2e8f0">app/shared/</text>
+      <text x="420" y="30" fill="#64748b" text-anchor="end">guards · middleware</text>
+    </g>
+    <path d="M920 224v14" stroke="#475569" stroke-width="2" stroke-dasharray="3 3"/>
+    <g transform="translate(700 238)">
+      <rect width="215" height="50" rx="12" fill="#0f172a" stroke="#34d399" stroke-opacity="0.55"/>
+      <circle cx="26" cy="25" r="6" fill="#34d399"/>
+      <text x="44" y="30" fill="#e2e8f0">PostgreSQL</text>
+      <rect x="225" width="215" height="50" rx="12" fill="#0f172a" stroke="#fb7185" stroke-opacity="0.55"/>
+      <circle cx="251" cy="25" r="6" fill="#fb7185"/>
+      <text x="269" y="30" fill="#e2e8f0">Redis</text>
+    </g>
+  </g>
+</svg>
