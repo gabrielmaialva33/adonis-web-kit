@@ -1,0 +1,49 @@
+name: Feature request
+description: Propose an improvement to the template.
+title: '[Feature]: '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Describe the user problem and keep the proposal suitable for a reusable template.
+        For vulnerabilities, use [GitHub Private Vulnerability Reporting](https://github.com/gabrielmaialva33/adonis-web-kit/security/advisories/new).
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Before submitting
+      options:
+        - label: I searched existing issues for similar proposals.
+          required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: Who needs this, and what is difficult with the current template?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: Describe the expected behavior and which module or frontend area it belongs to.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Include existing features, application-specific solutions, or why those do not meet the need.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Compatibility and security impact
+      description: Consider migrations, dependencies, configuration, multi-tenancy, authorization, and private file access. Do not disclose vulnerability details here.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Optional examples, sketches, or links without private data.
