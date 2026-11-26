@@ -5,6 +5,8 @@ import {
   MemoryRSSCheck,
 } from '@adonisjs/core/health'
 import { DbCheck, DbConnectionCountCheck } from '@adonisjs/lucid/database'
+import { RedisCheck } from '@adonisjs/redis'
+import redis from '@adonisjs/redis/services/main'
 import db from '@adonisjs/lucid/services/db'
 
 export const healthChecks = new HealthChecks().register([
@@ -19,6 +21,7 @@ export const healthChecks = new HealthChecks().register([
   new MemoryHeapCheck().warnWhenExceedsPercentage(80).failWhenExceedsPercentage(90),
   new MemoryRSSCheck().warnWhenExceedsPercentage(70).failWhenExceedsPercentage(85),
 
+  new RedisCheck(redis.connection()),
   new DbCheck(db.connection()),
   new DbConnectionCountCheck(db.connection()),
 ])

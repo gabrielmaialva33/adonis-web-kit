@@ -13,6 +13,11 @@ export default class HealthChecksController {
     const healthResponse = {
       healthy: report.isHealthy,
       services: {
+        redis: {
+          healthy: report.checks.some(
+            (check) => check.name.includes('Redis') && check.status === 'ok'
+          ),
+        },
         database: {
           healthy: report.checks.some(
             (check) => check.name.includes('Database') && check.status === 'ok'
