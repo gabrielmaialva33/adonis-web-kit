@@ -32,7 +32,7 @@ export default class AuditService {
       resource_id: data.resourceId || null,
       result: data.result,
       reason: data.reason || null,
-      metadata: data.metadata || null,
+      metadata: data.metadata ? this.sanitizeRequestData(data.metadata) : null,
     }
 
     // Add request context if available
@@ -146,6 +146,12 @@ export default class AuditService {
    * Sanitize request data to remove sensitive information
    */
   private sanitizeRequestData(data: Record<string, any>): Record<string, any> {
+    return this.sanitizeValue(data) as Record<string, any>
+  }
+
+  private sanitizeValue(data: unknown): unknown {
+    if (Array.isArray(data)) return data.map((value) => this.sanitizeValue(value))
+    if (data === null || typeof data !== 'object') return data
     const sensitiveFields = ['password', 'token', 'secret', 'key', 'authorization', 'cookie']
     const sanitized: Record<string, any> = {}
 
@@ -156,7 +162,7 @@ export default class AuditService {
       if (isSensitive) {
         sanitized[key] = '[REDACTED]'
       } else {
-        sanitized[key] = data[key]
+        sanitized[key] = this.sanitizeValue((data as Record<string, unknown>)[key])
       }
     })
 
