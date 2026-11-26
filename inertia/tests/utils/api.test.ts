@@ -13,7 +13,19 @@ describe('ApiClient', () => {
   })
 
   afterEach(() => {
+    document.cookie = 'XSRF-TOKEN=; Max-Age=0; path=/'
     vi.unstubAllGlobals()
+  })
+
+  it('sends the decoded CSRF token for cookie-authenticated mutations including uploads', async () => {
+    document.cookie = 'XSRF-TOKEN=csrf%3Dvalue; path=/'
+    fetchMock.mockResolvedValue(new Response(null, { status: 204 }))
+    const client = new ApiClient()
+    await client.post('/tenants', { name: 'Workspace' })
+    await client.upload('/files/upload', new File(['test'], 'test.txt'))
+    for (const [, init] of fetchMock.mock.calls) {
+      expect((init?.headers as Headers).get('X-XSRF-TOKEN')).toBe('csrf=value')
+    }
   })
 
   it('handles 204 responses without attempting to parse JSON', async () => {

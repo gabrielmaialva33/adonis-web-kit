@@ -30,6 +30,19 @@ export default class HttpExceptionHandler extends ExceptionHandler {
    * response to the client
    */
   async handle(error: unknown, ctx: HttpContext) {
+    // Shield's default HTML redirect is unsuitable for API consumers.
+    if (
+      ctx.request.url().startsWith('/api/') &&
+      error &&
+      typeof error === 'object' &&
+      'code' in error &&
+      error.code === 'E_BAD_CSRF_TOKEN'
+    ) {
+      return ctx.response.forbidden({
+        errors: [{ code: 'E_BAD_CSRF_TOKEN', message: 'Invalid or expired CSRF token' }],
+      })
+    }
+
     /**
      * Handle validation errors from VineJS
      */

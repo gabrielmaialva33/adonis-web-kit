@@ -1,3 +1,4 @@
+import { JWT_COOKIE_NAME } from '#shared/jwt/constants'
 import { defineConfig } from '@adonisjs/shield'
 
 const shieldConfig = defineConfig({
@@ -18,8 +19,11 @@ const shieldConfig = defineConfig({
   csrf: {
     enabled: true,
     exceptRoutes: (ctx) => {
-      // Disable CSRF for all API routes
-      return ctx.request.url().startsWith('/api/')
+      // Bearer credentials are explicit; ambient cookie credentials need CSRF.
+      return (
+        ctx.request.url().startsWith('/api/') &&
+        (Boolean(ctx.request.header('authorization')) || !ctx.request.cookie(JWT_COOKIE_NAME))
+      )
     },
     enableXsrfCookie: true,
     methods: ['POST', 'PUT', 'PATCH', 'DELETE'],

@@ -21,6 +21,16 @@ export class ApiClient {
       headers.set('Authorization', `Bearer ${token}`)
     }
 
+    const destination = new URL(`${this.baseURL}${path}`, window.location.href)
+    if (
+      !headers.has('Authorization') &&
+      destination.origin === window.location.origin &&
+      ['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method ?? 'GET')
+    ) {
+      const xsrf = document.cookie.split('; ').find((cookie) => cookie.startsWith('XSRF-TOKEN='))
+      if (xsrf) headers.set('X-XSRF-TOKEN', decodeURIComponent(xsrf.slice('XSRF-TOKEN='.length)))
+    }
+
     const response = await fetch(`${this.baseURL}${path}`, {
       credentials: 'same-origin',
       ...options,
